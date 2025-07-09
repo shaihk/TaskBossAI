@@ -1,0 +1,361 @@
+{
+  "nav": {
+    "home": "Home",
+    "tasks": "Tasks",
+    "goals": "Goals",
+    "achievements": "Achievements",
+    "profile": "Profile"
+  },
+  "home": {
+    "welcome": "Welcome to your dashboard",
+    "newGoal": "New Goal",
+    "quickActions": "Quick Actions",
+    "addNewGoal": "Add New Goal",
+    "viewAchievements": "View Achievements",
+    "smartTaskManager": "Smart Task Manager",
+    "todayTasks": "Today's Tasks",
+    "tasksCount": "{{count}} tasks",
+    "pendingTasks": "Pending ({{count}})",
+    "completedTasks": "Completed ({{count}})",
+    "noTasksToday": "No tasks for today",
+    "perfectTimeToAdd": "Perfect time to add new tasks!",
+    "estimatedTime": "{{time}} minutes",
+    "difficulty": "Difficulty: {{level}}/10",
+    "pointsEarned": "+{{points}} points",
+    "currentLevel": "Current Level",
+    "xp": "{{xp}} XP",
+    "dailyStreak": "Daily Streak",
+    "maxStreak": "Max: {{days}} days",
+    "totalPoints": "Total Points",
+    "completedTasksCount": "{{count}} completed",
+    "progress": "Progress",
+    "recentAchievements": "Recent Achievements",
+    "noAchievementsYet": "No achievements yet",
+    "completeTasksToEarn": "Complete tasks to earn achievements!",
+    "goalProgress": "Goal Progress",
+    "goalCompleted": "Goal Completed!",
+    "noActiveGoals": "No active goals",
+    "addGoalsToTrack": "Add goals to track progress"
+  },
+  "goals": {
+    "title": "Goal Management",
+    "description": "Create goals and break them down into small tasks for maximum success",
+    "newGoal": "New Goal",
+    "sortBy": "Sort by...",
+    "recentlyAdded": "Recently Added",
+    "priorityHighToLow": "Priority (High to Low)",
+    "priorityLowToHigh": "Priority (Low to High)",
+    "difficultyHighToLow": "Difficulty (High to Low)",
+    "difficultyLowToHigh": "Difficulty (Low to High)",
+    "timeLongToShort": "Time (Long to Short)",
+    "timeShortToLong": "Time (Short to Long)",
+    "difficulty": "Difficulty: {{level}}/10",
+    "completed": "Completed",
+    "progress": "Progress",
+    "tasksProgress": "{{completed}}/{{total}} tasks",
+    "progressPercentage": "{{percentage}}% completed",
+    "goalMemory": "Goal Memory:",
+    "satisfactionLevel": "Satisfaction: {{level}}/5",
+    "actualTime": "{{time}} minutes",
+    "startGoal": "Start Goal",
+    "finishGoal": "Finish Goal",
+    "viewGoal": "View Goal",
+    "noGoalsYet": "No goals yet",
+    "createFirstGoal": "Start by creating your first goal!",
+    "backToGoals": "Back to Goals",
+    "completedTasks": "Tasks Completed",
+    "totalTasks": "Total Tasks",
+    "pointsEarned": "Points Earned",
+    "suggestAdditionalTasks": "Suggest Additional Tasks",
+    "chatWithAI": "Chat with AI",
+    "suggestedTasks": "Suggested Tasks",
+    "add": "Add",
+    "addNewTask": "Add New Task",
+    "taskTitlePlaceholder": "Task title...",
+    "myTasks": "My Tasks ({{count}})",
+    "noTasksYet": "No tasks yet",
+    "addFirstTask": "Add your first task to get started!"
+  },
+  "tasks": {
+    "title": "My Tasks",
+    "description": "All tasks from all your goals in one place",
+    "searchPlaceholder": "Search tasks...",
+    "sortBy": "Sort by...",
+    "recentlyAdded": "Recently Added",
+    "priorityHighToLow": "Priority (High to Low)",
+    "priorityLowToHigh": "Priority (Low to High)",
+    "difficultyHighToLow": "Difficulty (High to Low)",
+    "difficultyLowToHigh": "Difficulty (Low to High)",
+    "timeLongToShort": "Time (Long to Short)",
+    "timeShortToLong": "Time (Short to Long)",
+    "dueDateClosest": "Due Date (Closest)",
+    "allTasks": "All ({{count}})",
+    "pendingTasks": "Pending ({{count}})",
+    "inProgressTasks": "In Progress ({{count}})",
+    "completedTasks": "Completed ({{count}})",
+    "noTasks": "No tasks",
+    "goToGoalsPage": "Go to Goals page to create a new goal and add tasks",
+    "selectAll": "Select All",
+    "clearAll": "Clear All",
+    "selectedCount": "{{count}} selected",
+    "markAsCompleted": "Mark as Completed",
+    "deleteSelected": "Delete Selected",
+    "areYouSure": "Are you sure?",
+    "deletionWarning": "This action will permanently delete {{count}} selected tasks. Data cannot be recovered after deletion.",
+    "cancel": "Cancel",
+    "deleteTasks": "Delete Tasks",
+    "start": "Start",
+    "finish": "Finish",
+    "continue": "Continue",
+    "update": "Update",
+    "goalLabel": "Goal: {{title}}",
+    "difficulty": "Difficulty: {{level}}/10",
+    "estimatedTime": "{{time}} minutes",
+    "overdue": "(Overdue)",
+    "editTask": "Edit Task",
+    "taskPlanningControl": "Task Planning & Control",
+    "adviseMe": "Advise Me",
+    "taskCompletionAdvice": "Task Completion Advice",
+    "practicalAdvice": "Practical Advice:",
+    "recommendedActions": "Recommended Actions:",
+    "motivationTips": "Motivation Tips:",
+    "filters": "Filters:",
+    "allStatuses": "All Statuses",
+    "pending": "Pending",
+    "inProgress": "In Progress",
+    "completed": "Completed",
+    "paused": "Paused",
+    "allGoals": "All Goals",
+    "activeFilters": "{{count}} active filters"
+  },
+  "profile": {
+    "editProfile": "Edit Profile",
+    "level": "Level {{level}}",
+    "xpProgress": "{{current}} / {{total}} XP",
+    "nextLevelPoints": "{{points}} more points to next level",
+    "totalPoints": "Total Points",
+    "completedTasks": "Completed Tasks",
+    "longestStreak": "{{days}} days",
+    "achievements": "Achievements",
+    "performanceStats": "Performance & Statistics",
+    "preferredCategories": "Preferred Categories",
+    "notEnoughData": "Not enough data yet",
+    "dailyGoalStreak": "Daily Goal Streak",
+    "consecutiveDays": "Consecutive days of goal completion"
+  },
+  "achievements": {
+    "title": "Your Achievements",
+    "description": "Track your progress and discover all the trophies you can achieve",
+    "unlocked": "Unlocked ({{count}}/{{total}})",
+    "locked": "Locked",
+    "pointsReward": "+{{points}} points",
+    "firstStep": "First Step",
+    "firstStepDesc": "Complete your first task",
+    "productive": "Productive",
+    "productiveDesc": "Complete 10 tasks",
+    "taskMachine": "Task Machine",
+    "taskMachineDesc": "Complete 50 tasks",
+    "warmingUp": "Warming Up",
+    "warmingUpDesc": "Maintain a 3-day streak",
+    "unstoppable": "Unstoppable",
+    "unstoppableDesc": "Maintain a 7-day streak",
+    "pointCollector": "Point Collector",
+    "pointCollectorDesc": "Accumulate 1,000 points",
+    "xpMillionaire": "XP Millionaire",
+    "xpMillionaireDesc": "Accumulate 5,000 points",
+    "beginnerMaster": "Beginner Master",
+    "beginnerMasterDesc": "Reach level 5",
+    "experiencedMaster": "Experienced Master",
+    "experiencedMasterDesc": "Reach level 10",
+    "legend": "Legend",
+    "legendDesc": "Reach level 20"
+  },
+  "ai": {
+    "greeting": "Hello! I'm here to help you with the goal \"{{title}}\". How can I assist you?",
+    "error": "Sorry, an error occurred. Please try again.",
+    "chatTitle": "Chat with Digital Mentor",
+    "askQuestionPlaceholder": "Ask me any question about the goal..."
+  },
+  "common": {
+    "language": "Language",
+    "selectLanguage": "Select Language"
+  },
+  "form": {
+    "taskTitle": "Task Title",
+    "goalTitle": "Goal Title",
+    "description": "Description",
+    "detailedDescription": "Detailed Description",
+    "priority": "Priority",
+    "category": "Category",
+    "difficulty": "Difficulty",
+    "estimatedTime": "Estimated Time",
+    "dueDate": "Due Date",
+    "tags": "Tags",
+    "subtasks": "Subtasks",
+    "status": "Status",
+    "cancel": "Cancel",
+    "create": "Create",
+    "update": "Update",
+    "save": "Save Changes",
+    "edit": "Edit",
+    "priority": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High",
+      "urgent": "Urgent"
+    },
+    "category": {
+      "work": "Work",
+      "personal": "Personal",
+      "health": "Health",
+      "learning": "Learning",
+      "social": "Social",
+      "creative": "Creative"
+    },
+    "status": {
+      "pending": "Pending",
+      "inProgress": "In Progress",
+      "completed": "Completed",
+      "paused": "Paused"
+    },
+    "aiSuggestions": "Get AI Suggestions",
+    "adviseMe": "Advise Me",
+    "addSelectedTasks": "Add Selected Tasks",
+    "minutes": "minutes",
+    "editTask": "Edit Task",
+    "editGoal": "Edit Goal"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "loginDescription": "Enter your credentials to access your account",
+    "registerDescription": "Create a new account to get started",
+    "fullName": "Full Name",
+    "fullNamePlaceholder": "Enter your full name",
+    "email": "Email",
+    "emailPlaceholder": "Enter your email address",
+    "password": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "loginButton": "Sign In",
+    "registerButton": "Create Account",
+    "loading": "Loading...",
+    "switchToRegister": "Don't have an account? Register here",
+    "switchToLogin": "Already have an account? Login here",
+    "logout": "Logout"
+  },
+  "theme": {
+    "darkMode": "Dark Mode",
+    "lightMode": "Light Mode"
+  },
+  "usage": {
+    "title": "Usage Instructions",
+    "subtitle": "Usage Instructions - TaskMaster AI",
+    "appDescription": "TaskMaster AI is a smart task and goal management system that uses artificial intelligence to help you achieve your goals optimally. The system breaks down large goals into small, actionable tasks and provides personalized guidance for every step of the way.",
+    "whatIsTitle": "What is TaskMaster AI?",
+    "getStartedButton": "Got it, let's start!",
+    "successTips": "Tips for Success",
+    "step1": {
+      "title": "Create a New Goal",
+      "description": "Start by creating a clear and specific goal. Click 'New Goal' on the Goals page and write what you want to achieve.",
+      "details": [
+        "Choose a clear title for your goal",
+        "Write a detailed description of what you want to achieve",
+        "Set difficulty level and priority",
+        "Add a deadline if relevant"
+      ]
+    },
+    "step2": {
+      "title": "Add Small Tasks",
+      "description": "Break down your goal into small, actionable tasks. Each task should be a concrete action.",
+      "details": [
+        "Click on the goal card to enter it",
+        "Use the 'Add New Task' button",
+        "Write small and clear tasks",
+        "Set estimated time for each task"
+      ]
+    },
+    "step3": {
+      "title": "Use Artificial Intelligence",
+      "description": "Use the AI assistant to get task suggestions and advice for better execution.",
+      "details": [
+        "Click 'Suggest Additional Tasks' to get ideas",
+        "Use the 'Advise Me' button on any task",
+        "Open chat with AI for questions",
+        "Get practical tips and innovation"
+      ]
+    },
+    "step4": {
+      "title": "Track and Complete",
+      "description": "Track your progress and complete tasks one by one to reach your goal.",
+      "details": [
+        "Mark tasks as 'In Progress' when you start",
+        "Complete tasks and earn points",
+        "Track progress on the home page",
+        "Celebrate achievements and reward yourself"
+      ]
+    },
+    "step5": {
+      "title": "Earn Achievements",
+      "description": "Complete tasks and goals to earn achievements and advance through system levels.",
+      "details": [
+        "Earn points with every completed task",
+        "Maintain daily activity streak",
+        "Discover new achievements on the achievements page",
+        "Level up and unlock new features"
+      ]
+    },
+    "tips": {
+      "planning": {
+        "title": "📋 Effective Planning",
+        "items": [
+          "• Set clear and measurable goals",
+          "• Break large goals into small parts",
+          "• Set realistic times for tasks"
+        ]
+      },
+      "ai": {
+        "title": "🤖 Working with AI",
+        "items": [
+          "• Use chat for specific questions",
+          "• Ask for advice on challenging tasks",
+          "• Get suggestions for process improvement"
+        ]
+      },
+      "progress": {
+        "title": "🎯 Progress Tracking",
+        "items": [
+          "• Update task status in real-time",
+          "• Maintain daily activity streak",
+          "• Track points and achievements"
+        ]
+      },
+      "motivation": {
+        "title": "🏆 Motivation",
+        "items": [
+          "• Celebrate small achievements",
+          "• Set personal reward system",
+          "• Use achievements as motivation"
+        ]
+      }
+    }
+  },
+  "focus": {
+    "focusTimer": "Focus Timer",
+    "currentTask": "Current Task",
+    "minutes": "minutes",
+    "timerSettings": "Timer Settings",
+    "focusTime": "Focus Time",
+    "update": "Update",
+    "start": "Start",
+    "pause": "Pause",
+    "reset": "Reset",
+    "restart": "Restart",
+    "completed": "Completed!",
+    "taskCompleted": "Task Completed",
+    "focusSessionComplete": "Focus session complete!",
+    "focusTips": "Focus Tips",
+    "tip1": "Remove all distractions from your workspace",
+    "tip2": "Take short breaks every 25 minutes",
+    "tip3": "Stay hydrated and maintain good posture"
+  }
+}

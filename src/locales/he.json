@@ -1,0 +1,361 @@
+{
+  "nav": {
+    "home": "בית",
+    "tasks": "משימות",
+    "goals": "יעדים",
+    "achievements": "הישגים",
+    "profile": "פרופיל"
+  },
+  "home": {
+    "welcome": "ברוכים הבאים לדשבורד שלכם",
+    "newGoal": "יעד חדש",
+    "quickActions": "פעולות מהירות",
+    "addNewGoal": "הוספת יעד חדש",
+    "viewAchievements": "צפייה בהישגים",
+    "smartTaskManager": "מנהל משימות חכם",
+    "todayTasks": "משימות היום",
+    "tasksCount": "{{count}} משימות",
+    "pendingTasks": "ממתינות ({{count}})",
+    "completedTasks": "הושלמו ({{count}})",
+    "noTasksToday": "אין משימות להיום",
+    "perfectTimeToAdd": "זה הזמן המושלם להוסיף משימות חדשות!",
+    "estimatedTime": "{{time}} דקות",
+    "difficulty": "קושי: {{level}}/10",
+    "pointsEarned": "+{{points}} נקודות",
+    "currentLevel": "רמה נוכחית",
+    "xp": "{{xp}} XP",
+    "dailyStreak": "רצף יומי",
+    "maxStreak": "מקס: {{days}} ימים",
+    "totalPoints": "נקודות כולל",
+    "completedTasksCount": "{{count}} הושלמו",
+    "progress": "התקדמות",
+    "recentAchievements": "הישגים אחרונים",
+    "noAchievementsYet": "אין הישגים עדיין",
+    "completeTasksToEarn": "השלימו משימות כדי לזכות בהישגים!",
+    "goalProgress": "התקדמות יעדים",
+    "goalCompleted": "יעד הושלם!",
+    "noActiveGoals": "אין יעדים פעילים",
+    "addGoalsToTrack": "הוסיפו יעדים כדי לעקוב אחר ההתקדמות"
+  },
+  "goals": {
+    "title": "ניהול יעדים",
+    "description": "צרו יעדים ופרקו אותם למשימות קטנות להצלחה מרבית",
+    "newGoal": "יעד חדש",
+    "sortBy": "מיין לפי...",
+    "recentlyAdded": "האחרונים שנוספו",
+    "priorityHighToLow": "דחיפות (גבוהה לנמוכה)",
+    "priorityLowToHigh": "דחיפות (נמוכה לגבוהה)",
+    "difficultyHighToLow": "קושי (גבוה לנמוך)",
+    "difficultyLowToHigh": "קושי (נמוך לגבוה)",
+    "timeLongToShort": "זמן (ארוך לקצר)",
+    "timeShortToLong": "זמן (קצר לארוך)",
+    "difficulty": "קושי: {{level}}/10",
+    "completed": "הושלם",
+    "progress": "התקדמות",
+    "tasksProgress": "{{completed}}/{{total}} משימות",
+    "progressPercentage": "{{percentage}}% הושלם",
+    "goalMemory": "זיכרון מהיעד:",
+    "satisfactionLevel": "שביעות רצון: {{level}}/5",
+    "actualTime": "{{time}} דקות",
+    "startGoal": "התחל יעד",
+    "finishGoal": "סיים יעד",
+    "viewGoal": "צפה ביעד",
+    "noGoalsYet": "אין יעדים עדיין",
+    "createFirstGoal": "התחילו ביצירת היעד הראשון שלכם!",
+    "backToGoals": "חזור ליעדים",
+    "completedTasks": "משימות הושלמו",
+    "totalTasks": "סה״כ משימות",
+    "pointsEarned": "נקודות נצברו",
+    "suggestAdditionalTasks": "הצע משימות נוספות",
+    "chatWithAI": "צ'אט עם AI",
+    "suggestedTasks": "משימות מוצעות",
+    "add": "הוסף",
+    "addNewTask": "הוסף משימה חדשה",
+    "taskTitlePlaceholder": "כותרת המשימה...",
+    "myTasks": "המשימות שלי ({{count}})",
+    "noTasksYet": "אין משימות עדיין",
+    "addFirstTask": "הוסף משימה ראשונה כדי להתחיל!"
+  },
+  "tasks": {
+    "title": "המשימות שלי",
+    "description": "כל המשימות מכל היעדים שלך במקום אחד",
+    "searchPlaceholder": "חיפוש משימות...",
+    "sortBy": "מיין לפי...",
+    "recentlyAdded": "האחרונות שנוספו",
+    "priorityHighToLow": "דחיפות (גבוהה לנמוכה)",
+    "priorityLowToHigh": "דחיפות (נמוכה לגבוהה)",
+    "difficultyHighToLow": "קושי (גבוה לנמוך)",
+    "difficultyLowToHigh": "קושי (נמוך לגבוה)",
+    "timeLongToShort": "זמן (ארוך לקצר)",
+    "timeShortToLong": "זמן (קצר לארוך)",
+    "dueDateClosest": "תאריך יעד (הקרוב ביותר)",
+    "allTasks": "הכל ({{count}})",
+    "pendingTasks": "ממתינות ({{count}})",
+    "inProgressTasks": "בביצוע ({{count}})",
+    "completedTasks": "הושלמו ({{count}})",
+    "noTasks": "אין משימות",
+    "goToGoalsPage": "עבור לעמוד היעדים כדי ליצור יעד חדש ולהוסיף משימות",
+    "selectAll": "בחר הכל",
+    "clearAll": "נקה הכל",
+    "selectedCount": "{{count}} נבחרו",
+    "markAsCompleted": "סמן כהושלמו",
+    "deleteSelected": "מחק נבחרים",
+    "areYouSure": "האם אתה בטוח?",
+    "deletionWarning": "פעולה זו תמחק {{count}} משימות שנבחרו לצמיתות. לא ניתן לשחזר את הנתונים לאחר המחיקה.",
+    "cancel": "ביטול",
+    "deleteTasks": "מחק משימות",
+    "start": "התחל",
+    "finish": "סיים",
+    "continue": "המשך",
+    "update": "עדכן",
+    "goalLabel": "היעד: {{title}}",
+    "difficulty": "קושי: {{level}}/10",
+    "estimatedTime": "{{time}} דקות",
+    "overdue": "(באיחור)",
+    "editTask": "ערוך משימה",
+    "taskPlanningControl": "תכנון ושליטה במשימה",
+    "adviseMe": "יעץ לי",
+    "taskCompletionAdvice": "עצות להשלמת המשימה",
+    "practicalAdvice": "עצות מעשיות:",
+    "recommendedActions": "פעולות מומלצות:",
+    "motivationTips": "טיפים למוטיבציה:",
+    "filters": "מסננים:",
+    "allStatuses": "כל הסטטוסים",
+    "pending": "ממתינות",
+    "inProgress": "בביצוע",
+    "completed": "הושלמו",
+    "paused": "מושהות",
+    "allGoals": "כל היעדים",
+    "activeFilters": "{{count}} מסננים פעילים"
+  },
+  "profile": {
+    "editProfile": "ערוך פרופיל",
+    "level": "רמה {{level}}",
+    "xpProgress": "{{current}} / {{total}} XP",
+    "nextLevelPoints": "עוד {{points}} נקודות לרמה הבאה",
+    "totalPoints": "סה״כ נקודות",
+    "completedTasks": "משימות שהושלמו",
+    "longestStreak": "{{days}} ימים",
+    "achievements": "הישגים",
+    "performanceStats": "ביצועים וסטטיסטיקות",
+    "preferredCategories": "קטגוריות מועדפות",
+    "notEnoughData": "אין עדיין מספיק נתונים",
+    "dailyGoalStreak": "רצף יעדים יומי",
+    "consecutiveDays": "ימים רצופים של השלמת יעדים"
+  },
+  "achievements": {
+    "title": "ההישגים שלך",
+    "description": "עקבו אחר ההתקדמות וגלו את כל הגביעים שתוכלו להשיג",
+    "unlocked": "הושגו ({{count}}/{{total}})",
+    "locked": "נעולים",
+    "pointsReward": "+{{points}} נקודות",
+    "firstStep": "צעד ראשון",
+    "firstStepDesc": "השלמת המשימה הראשונה שלך",
+    "productive": "פרודוקטיבי",
+    "productiveDesc": "השלמת 10 משימות",
+    "taskMachine": "מכונת משימות",
+    "taskMachineDesc": "השלמת 50 משימות",
+    "warmingUp": "מתחיל להתחמם",
+    "warmingUpDesc": "שמירה על רצף של 3 ימים",
+    "unstoppable": "בלתי ניתן לעצירה",
+    "unstoppableDesc": "שמירה על רצף של 7 ימים",
+    "pointCollector": "אספן נקודות",
+    "pointCollectorDesc": "צבירת 1,000 נקודות",
+    "xpMillionaire": "מיליונר XP",
+    "xpMillionaireDesc": "צבירת 5,000 נקודות",
+    "beginnerMaster": "מאסטר מתחיל",
+    "beginnerMasterDesc": "הגעה לרמה 5",
+    "experiencedMaster": "מאסטר מנוסה",
+    "experiencedMasterDesc": "הגעה לרמה 10",
+    "legend": "אגדה",
+    "legendDesc": "הגעה לרמה 20"
+  },
+  "ai": {
+    "greeting": "שלום! אני כאן לעזור לך עם היעד \"{{title}}\". איך אני יכול לסייע?",
+    "error": "מצטער, אירעה שגיאה. אנא נסה שוב.",
+    "chatTitle": "צ'אט עם המנטור הדיגיטלי",
+    "askQuestionPlaceholder": "שאל אותי כל שאלה על היעד..."
+  },
+  "common": {
+    "language": "שפה",
+    "selectLanguage": "בחר שפה"
+  },
+  "form": {
+    "taskTitle": "כותרת המשימה",
+    "goalTitle": "כותרת היעד",
+    "description": "תיאור",
+    "detailedDescription": "תיאור מפורט",
+    "priority": "עדיפות",
+    "category": "קטגוריה",
+    "difficulty": "רמת קושי",
+    "estimatedTime": "זמן מוערך",
+    "dueDate": "תאריך יעד",
+    "tags": "תגיות",
+    "subtasks": "משימות משנה",
+    "status": "סטטוס המשימה",
+    "cancel": "ביטול",
+    "create": "יצירה",
+    "update": "עדכון",
+    "save": "שמור שינויים",
+    "edit": "עריכה",
+    "priority": {
+      "low": "נמוכה",
+      "medium": "בינונית",
+      "high": "גבוהה",
+      "urgent": "דחוף"
+    },
+    "category": {
+      "work": "עבודה",
+      "personal": "אישי",
+      "health": "בריאות",
+      "learning": "למידה",
+      "social": "חברתי",
+      "creative": "יצירתי"
+    },
+    "status": {
+      "pending": "ממתינה",
+      "inProgress": "בביצוע",
+      "completed": "הושלמה",
+      "paused": "מושהית"
+    },
+    "aiSuggestions": "קבל הצעות AI",
+    "adviseMe": "יעץ לי",
+    "addSelectedTasks": "הוסף משימות נבחרות",
+    "minutes": "דקות",
+    "editTask": "ערוך משימה",
+    "editGoal": "ערוך יעד"
+  },
+  "auth": {
+    "login": "כניסה",
+    "register": "הרשמה",
+    "loginDescription": "הזן את פרטי החשבון שלך כדי לגשת לחשבון",
+    "registerDescription": "צור חשבון חדש כדי להתחיל",
+    "fullName": "שם מלא",
+    "fullNamePlaceholder": "הזן את שמך המלא",
+    "email": "אימייל",
+    "emailPlaceholder": "הזן את כתובת האימייל שלך",
+    "password": "סיסמה",
+    "passwordPlaceholder": "הזן את הסיסמה שלך",
+    "loginButton": "כניסה",
+    "registerButton": "צור חשבון",
+    "loading": "טוען...",
+    "switchToRegister": "אין לך חשבון? הרשם כאן",
+    "switchToLogin": "יש לך כבר חשבון? התחבר כאן",
+    "logout": "יציאה"
+  },
+  "theme": {
+    "darkMode": "מצב כהה",
+    "lightMode": "מצב בהיר"
+  },
+  "usage": {
+    "title": "הוראות שימוש",
+    "subtitle": "הוראות שימוש - TaskMaster AI",
+    "appDescription": "TaskMaster AI היא מערכת חכמה לניהול משימות ויעדים שמשתמשת בבינה מלאכותית כדי לעזור לך להגיע ליעדים שלך בצורה מיטבית. המערכת מפרקת יעדים גדולים למשימות קטנות וניתנות לביצוע, ומספקת הדרכה אישית לכל שלב בדרך.",
+    "whatIsTitle": "מה זה TaskMaster AI?",
+    "getStartedButton": "הבנתי, בוא נתחיל!",
+    "successTips": "טיפים להצלחה",
+    "step1": {
+      "title": "יצירת יעד חדש",
+      "description": "התחל ביצירת יעד ברור ומדויק. לחץ על 'יעד חדש' בעמוד היעדים וכתב מה אתה רוצה להשיג.",
+      "details": [
+        "בחר כותרת ברורה ליעד שלך",
+        "כתב תיאור מפורט של מה שאתה רוצה להשיג",
+        "קבע רמת קושי ועדיפות",
+        "הוסף תאריך יעד אם רלוונטי"
+      ]
+    },
+    "step2": {
+      "title": "הוספת משימות קטנות",
+      "description": "פרק את היעד שלך למשימות קטנות וניתנות לביצוע. כל משימה צריכה להיות פעולה קונקרטית.",
+      "details": [
+        "לחץ על כרטיס היעד כדי להיכנס לתוכו",
+        "השתמש בכפתור 'הוסף משימה חדשה'",
+        "כתב משימות קטנות וברורות",
+        "הגדר זמן משוער לכל משימה"
+      ]
+    },
+    "step3": {
+      "title": "שימוש בבינה מלאכותית",
+      "description": "השתמש בעוזר הבינה המלאכותית לקבלת הצעות למשימות ועצות לביצוע טוב יותר.",
+      "details": [
+        "לחץ על 'הצע משימות נוספות' לקבלת רעיונות",
+        "השתמש בכפתור 'יעץ לי' בכל משימה",
+        "פתח צ'אט עם הבינה המלאכותית לשאלות",
+        "קבל טיפים מעשיים וחדשנות"
+      ]
+    },
+    "step4": {
+      "title": "מעקב והשלמה",
+      "description": "עקוב אחר ההתקדמות שלך והשלם משימות אחת אחת כדי להגיע ליעד.",
+      "details": [
+        "סמן משימות כ'בביצוע' כשאתה מתחיל",
+        "השלם משימות וצבור נקודות",
+        "עקוב אחר ההתקדמות בעמוד הבית",
+        "חגוג הישגים וגמול עצמי"
+      ]
+    },
+    "step5": {
+      "title": "זכה בהישגים",
+      "description": "השלם משימות ויעדים כדי לזכות בהישגים ולהתקדם ברמות המערכת.",
+      "details": [
+        "צבור נקודות עם כל משימה שתושלם",
+        "שמור על רצף יומי של פעילות",
+        "גלה הישגים חדשים בעמוד ההישגים",
+        "התקדם ברמות ופתח תכונות חדשות"
+      ]
+    },
+    "tips": {
+      "planning": {
+        "title": "📋 תכנון יעיל",
+        "items": [
+          "• הגדר יעדים ברורים ומדידים",
+          "• פרק יעדים גדולים לחלקים קטנים",
+          "• קבע זמנים מציאותיים למשימות"
+        ]
+      },
+      "ai": {
+        "title": "🤖 עבודה עם AI",
+        "items": [
+          "• השתמש בצ'אט לשאלות ספציפיות",
+          "• בקש עצות למשימות מאתגרות",
+          "• קבל הצעות לשיפור התהליך"
+        ]
+      },
+      "progress": {
+        "title": "🎯 מעקב התקדמות",
+        "items": [
+          "• עדכן סטטוס משימות בזמן אמת",
+          "• שמור על רצף יומי של פעילות",
+          "• עקוב אחר הנקודות וההישגים"
+        ]
+      },
+      "motivation": {
+        "title": "🏆 מוטיבציה",
+        "items": [
+          "• חגוג הישגים קטנים",
+          "• הגדר מערכת תגמולים אישית",
+          "• השתמש בהישגים כמוטיבציה"
+        ]
+      }
+    }
+  },
+  "focus": {
+    "focusTimer": "טיימר פוקוס",
+    "currentTask": "המשימה הנוכחית",
+    "minutes": "דקות",
+    "timerSettings": "הגדרות טיימר",
+    "focusTime": "זמן פוקוס",
+    "update": "עדכן",
+    "start": "התחל",
+    "pause": "השהה",
+    "reset": "איפוס",
+    "restart": "התחל מחדש",
+    "completed": "הושלם!",
+    "taskCompleted": "המשימה הושלמה",
+    "focusSessionComplete": "סשן הפוקוס הושלם!",
+    "focusTips": "טיפים לפוקוס",
+    "tip1": "הסר את כל הדברים המסיחים מהמרחב העבודה",
+    "tip2": "קח הפסקות קצרות כל 25 דקות",
+    "tip3": "שמור על לחות ויציבה נכונה"
+  }
+}

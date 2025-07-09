@@ -1,0 +1,280 @@
+{
+  "tasks": [
+    {
+      "id": 1752039765796,
+      "title": "לעבור על החשבוניות",
+      "goal_id": 1752039727211,
+      "status": "pending",
+      "priority": "high",
+      "difficulty": 5,
+      "estimated_time": 30,
+      "due_date": "2025-07-10"
+    },
+    {
+      "id": 1752039786098,
+      "title": "מזכירה חשבוניות דחוף",
+      "goal_id": 1752039727211,
+      "status": "pending",
+      "priority": "high",
+      "difficulty": 5,
+      "estimated_time": 30,
+      "due_date": "2025-07-10"
+    },
+    {
+      "id": 1752048241561,
+      "user_id": 1752043765602,
+      "title": "לעבור על המסמכים של 22",
+      "goal_id": 1752048230587,
+      "status": "pending",
+      "priority": "medium",
+      "difficulty": 5,
+      "estimated_time": 30,
+      "due_date": "2025-07-10"
+    },
+    {
+      "id": 1752048259726,
+      "user_id": 1752043765602,
+      "title": "גוגל 90 אלף + מרינה מזכירה 20 אלף כבר נמצא",
+      "goal_id": 1752048230587,
+      "status": "completed",
+      "priority": "medium",
+      "difficulty": 5,
+      "estimated_time": 30,
+      "due_date": "2025-07-10",
+      "completed_at": "2025-07-09T10:55:38.980Z",
+      "points_earned": 60
+    },
+    {
+      "id": 1752053262638,
+      "user_id": 1752043765602,
+      "title": "סימון נתונים חשובים במהלך הבדיקות לצורך תיעוד מעקב",
+      "goal_id": 1752044481290,
+      "status": "pending",
+      "priority": "medium",
+      "difficulty": 5,
+      "estimated_time": 30,
+      "due_date": "2025-07-10"
+    },
+    {
+      "id": 1752053267985,
+      "user_id": 1752043765602,
+      "title": "בדיקה חוזרת של תוצאות מבחנים קודמים שנמצאו לא אמינים",
+      "goal_id": 1752044481290,
+      "status": "pending",
+      "priority": "medium",
+      "difficulty": 5,
+      "estimated_time": 30,
+      "due_date": "2025-07-10"
+    },
+    {
+      "id": 1752054537692,
+      "user_id": 1752043765602,
+      "title": "יצירת קשר עם יוסי תדהר להסדרת פגישה אישית לצורך שיחה על החוב והדרכים לפתור את העניין בצורה נוחה לשני הצדדים",
+      "goal_id": 1752054514111,
+      "status": "pending",
+      "priority": "medium",
+      "difficulty": 5,
+      "estimated_time": 30,
+      "due_date": "2025-07-10"
+    },
+    {
+      "id": 1752054539968,
+      "user_id": 1752043765602,
+      "title": "מעקב אחרי לוח מועדי התשלום והחובות הפתוחים לעיתים תכופות, ועדכון מצב החוב באופן שוטף עם יוסי",
+      "goal_id": 1752054514111,
+      "status": "pending",
+      "priority": "medium",
+      "difficulty": 5,
+      "estimated_time": 30,
+      "due_date": "2025-07-10"
+    },
+    {
+      "id": 1752058394929,
+      "user_id": 1752043765602,
+      "title": "ליצור תוכן רלוונטי עבור דפי הנחיתה החדשים שכוללים מילות מפתח מרכזיות בתחום המורחב של קסם פיננסים.",
+      "goal_id": 1752058367090,
+      "status": "pending",
+      "priority": "high",
+      "difficulty": 5,
+      "estimated_time": 30,
+      "due_date": "2025-07-10"
+    },
+    {
+      "id": 1752058398149,
+      "user_id": 1752043765602,
+      "title": "לעצב גרפיקה ואינפוגרפיקות שימשכו את עיני המשתמשים וישפרו את חווית המשתמש בדפי הנחיתה החדשים.",
+      "goal_id": 1752058367090,
+      "status": "pending",
+      "priority": "high",
+      "difficulty": 5,
+      "estimated_time": 30,
+      "due_date": "2025-07-10"
+    },
+    {
+      "id": 1752058400699,
+      "user_id": 1752043765602,
+      "title": "לערוך ניתוח מתחרים כדי להבין אילו נושאים פופולריים ומבוקשים בתחום ולהשתמש בהם בפיתוח דפי הנחיתה.",
+      "goal_id": 1752058367090,
+      "status": "pending",
+      "priority": "high",
+      "difficulty": 5,
+      "estimated_time": 30,
+      "due_date": "2025-07-10"
+    },
+    {
+      "id": 1752058411762,
+      "user_id": 1752043765602,
+      "title": "לאסוף ולפרסם המלצות וביקורות חיוביות מלקוחות בעבר והווה לצורך חיזוק האמינות וההמרה באתר.",
+      "goal_id": 1752058367090,
+      "status": "pending",
+      "priority": "high",
+      "difficulty": 5,
+      "estimated_time": 30,
+      "due_date": "2025-07-10"
+    },
+    {
+      "id": 1752058435117,
+      "user_id": 1752043765602,
+      "title": "להוסיף את הדף בנושא של מסלולי מימון חוץ בנקאי ובנקאי",
+      "goal_id": 1752058367090,
+      "status": "pending",
+      "priority": "high",
+      "difficulty": 5,
+      "estimated_time": 30,
+      "due_date": "2025-07-10"
+    }
+  ],
+  "goals": [
+    {
+      "id": 1752033951677,
+      "title": "Goal Management",
+      "description": "",
+      "priority": "medium",
+      "category": "personal",
+      "difficulty": 5,
+      "estimated_time": 60,
+      "due_date": "",
+      "tags": []
+    },
+    {
+      "id": 1752039727211,
+      "title": "רואה חשבון לסיים ניירת",
+      "description": "דחוף 2022",
+      "priority": "high",
+      "category": "personal",
+      "difficulty": 5,
+      "estimated_time": 60,
+      "due_date": "",
+      "tags": [
+        "חשבונאות",
+        "רואה חשבון"
+      ]
+    },
+    {
+      "id": 1752048230587,
+      "user_id": 1752043765602,
+      "title": "לסיים הגשת חומר לרואה חשבון",
+      "description": "איתור חשבוניות של הוצאות שלא נכנסו",
+      "priority": "medium",
+      "category": "personal",
+      "difficulty": 5,
+      "estimated_time": 60,
+      "due_date": "",
+      "tags": [
+        "רואה חשבון",
+        "הגשת חומר"
+      ]
+    },
+    {
+      "id": 1752054489283,
+      "user_id": 1752043765602,
+      "title": "גביה מרפי איזורי חן - 77 אלף לדבר איתו",
+      "description": "",
+      "priority": "medium",
+      "category": "personal",
+      "difficulty": 5,
+      "estimated_time": 60,
+      "due_date": "",
+      "tags": [
+        "גבייה"
+      ]
+    },
+    {
+      "id": 1752054514111,
+      "user_id": 1752043765602,
+      "title": "גביה יוסי תדהר 87 אלף שח ",
+      "description": "",
+      "priority": "medium",
+      "category": "personal",
+      "difficulty": 5,
+      "estimated_time": 60,
+      "due_date": "",
+      "tags": [
+        "גביה",
+        "יוסי תדהר"
+      ]
+    },
+    {
+      "id": 1752058367090,
+      "user_id": 1752043765602,
+      "title": "להוסיף דפי נחיתה לאתר קסם פיננסים שלי",
+      "description": "להרחיב את הקמפיין בגוגל לעוד נושאים בתחום",
+      "priority": "high",
+      "category": "work",
+      "difficulty": 5,
+      "estimated_time": 90,
+      "due_date": "",
+      "tags": [
+        "קסם פיננסים"
+      ]
+    }
+  ],
+  "users": [
+    {
+      "id": 1,
+      "full_name": "Demo User",
+      "email": "demo@example.com",
+      "picture": null
+    },
+    {
+      "id": 1752043765602,
+      "email": "shaihk@gmail.com",
+      "full_name": "שי חכמון",
+      "password": "$2b$10$7JdFhpg/nd/PyRoId44KCOIs4uy4F19tgSKLAtQNRovGTxSux/ZB2",
+      "picture": "",
+      "created_at": "2025-07-09T06:49:25.602Z"
+    }
+  ],
+  "user_stats": [
+    {
+      "id": 1,
+      "user_id": 1,
+      "total_points": 0,
+      "current_level": 1,
+      "experience_points": 0,
+      "tasks_completed": 0,
+      "current_streak": 0,
+      "longest_streak": 0,
+      "total_time_saved": 0,
+      "achievements_unlocked": [],
+      "daily_goal_streak": 0,
+      "preferred_categories": [],
+      "last_activity": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": 1752043765603,
+      "user_id": 1752043765602,
+      "total_points": 60,
+      "current_level": 1,
+      "experience_points": 60,
+      "tasks_completed": 1,
+      "current_streak": 1,
+      "longest_streak": 1,
+      "total_time_saved": 0,
+      "achievements_unlocked": [],
+      "daily_goal_streak": 0,
+      "preferred_categories": [],
+      "last_activity": "2025-07-09T10:55:38.980Z"
+    }
+  ]
+}
