@@ -9,7 +9,7 @@ const jwt = require('jsonwebtoken');
 const { OpenAI } = require('openai');
 
 const app = express();
-const port = 3001;
+const port = process.env.PORT || 3001;
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -28,9 +28,15 @@ const writeDB = (dbData) => {
 };
 
 // Initialize OpenAI client
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY, // Use environment variable for API key
-});
+let openai;
+try {
+  openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY || 'sk-dummy-key-for-development', // Use environment variable for API key
+  });
+} catch (error) {
+  console.error('Error initializing OpenAI client:', error);
+  // Continue without OpenAI functionality
+}
 
 // JWT secret key
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this-in-production';
@@ -451,6 +457,33 @@ app.post('/api/llm/invoke', authenticateToken, async (req, res) => {
     console.error('Error details:', error.message);
     console.error('Error response:', error.response?.data);
     res.status(500).json({ error: 'Failed to communicate with OpenAI', details: error.message });
+  }
+});
+
+// Test endpoint for OpenAI integration (no authentication required)
+app.post('/api/test/openai', async (req, res) => {
+  const { prompt = 'Say hello in Hebrew' } = req.body;
+  
+  console.log("OpenAI Test Request received with prompt:", prompt);
+
+  try {
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o',
+      messages: [{ role: 'user', content: prompt }],
+    });
+
+    const responseText = completion.choices[0].message.content;
+    console.log("OpenAI Test Response:", responseText);
+    
+    res.json({ response: responseText });
+  } catch (error) {
+    console.error('Error calling OpenAI in test endpoint:', error);
+    console.error('Error details:', error.message);
+    res.status(500).json({ 
+      error: 'Failed to communicate with OpenAI', 
+      details: error.message,
+      apiKey: process.env.OPENAI_API_KEY ? 'API key is set' : 'API key is missing'
+    });
   }
 });
 
