@@ -29,7 +29,9 @@
       "priority": "medium",
       "difficulty": 5,
       "estimated_time": 30,
-      "due_date": "2025-07-10"
+      "due_date": "2025-07-10",
+      "completed_at": "2025-07-13T22:14:48.651Z",
+      "points_earned": 60
     },
     {
       "id": 1752048259726,
@@ -142,6 +144,17 @@
       "difficulty": 5,
       "estimated_time": 30,
       "due_date": "2025-07-10"
+    },
+    {
+      "id": 1752443929461,
+      "user_id": 1752443897278,
+      "title": "בדיקת התכנות לסקס עם השכנה",
+      "goal_id": 1752443911876,
+      "status": "pending",
+      "priority": "medium",
+      "difficulty": 5,
+      "estimated_time": 30,
+      "due_date": "2025-07-14"
     }
   ],
   "goals": [
@@ -239,6 +252,18 @@
       "estimated_time": 60,
       "due_date": "",
       "tags": []
+    },
+    {
+      "id": 1752443911876,
+      "user_id": 1752443897278,
+      "title": "zibi1",
+      "description": "testing",
+      "priority": "medium",
+      "category": "personal",
+      "difficulty": 5,
+      "estimated_time": 60,
+      "due_date": "",
+      "tags": []
     }
   ],
   "users": [
@@ -263,6 +288,14 @@
       "password": "$2b$10$j9Ddid7vl75dNKe5n/8wseyOOM9eWX9cko0RpdCyCG8faEK/.OfAm",
       "picture": null,
       "created_at": "2025-07-12T23:34:21.260Z"
+    },
+    {
+      "id": 1752443897278,
+      "email": "test@zibi.com",
+      "full_name": "shay test",
+      "password": "$2b$10$Agqu4ngae0cixbFU1hANJe/bD1HquHpEtoJKarRgq3/6t2HI3KD4C",
+      "picture": null,
+      "created_at": "2025-07-13T21:58:17.278Z"
     }
   ],
   "user_stats": [
@@ -284,17 +317,17 @@
     {
       "id": 1752043765603,
       "user_id": 1752043765602,
-      "total_points": 60,
+      "total_points": 120,
       "current_level": 1,
-      "experience_points": 60,
-      "tasks_completed": 1,
+      "experience_points": 120,
+      "tasks_completed": 2,
       "current_streak": 1,
       "longest_streak": 1,
       "total_time_saved": 0,
       "achievements_unlocked": [],
       "daily_goal_streak": 0,
       "preferred_categories": [],
-      "last_activity": "2025-07-09T10:55:38.980Z"
+      "last_activity": "2025-07-13T22:14:48.651Z"
     },
     {
       "id": 1752363261261,
@@ -310,6 +343,21 @@
       "daily_goal_streak": 0,
       "preferred_categories": [],
       "last_activity": "2025-07-12T23:34:21.260Z"
+    },
+    {
+      "id": 1752443897279,
+      "user_id": 1752443897278,
+      "total_points": 0,
+      "current_level": 1,
+      "experience_points": 0,
+      "tasks_completed": 0,
+      "current_streak": 0,
+      "longest_streak": 0,
+      "total_time_saved": 0,
+      "achievements_unlocked": [],
+      "daily_goal_streak": 0,
+      "preferred_categories": [],
+      "last_activity": "2025-07-13T21:58:17.278Z"
     }
   ]
 }

@@ -7,6 +7,7 @@ const fs = require('fs');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { OpenAI } = require('openai');
+const { validateSetup } = require('./validate-setup');
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -121,7 +122,7 @@ app.post('/api/auth/register', async (req, res) => {
     );
 
     // Return user without password
-    const { password: _, ...userWithoutPassword } = newUser;
+    const { password, ...userWithoutPassword } = newUser;
     res.status(201).json({
       user: userWithoutPassword,
       token,
@@ -135,9 +136,9 @@ app.post('/api/auth/register', async (req, res) => {
 });
 
 app.post('/api/auth/login', async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password: inputPassword } = req.body;
 
-  if (!email || !password) {
+  if (!email || !inputPassword) {
     return res.status(400).json({ error: 'Email and password are required' });
   }
 
@@ -151,7 +152,7 @@ app.post('/api/auth/login', async (req, res) => {
     }
 
     // Check password
-    const isValidPassword = await bcrypt.compare(password, user.password);
+    const isValidPassword = await bcrypt.compare(inputPassword, user.password);
     if (!isValidPassword) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
@@ -164,7 +165,7 @@ app.post('/api/auth/login', async (req, res) => {
     );
 
     // Return user without password
-    const { password: _, ...userWithoutPassword } = user;
+    const { password: _userPassword, ...userWithoutPassword } = user;
     res.json({
       user: userWithoutPassword,
       token,
@@ -346,7 +347,7 @@ app.get('/api/users/me', authenticateToken, (req, res) => {
   const db = readDB();
   const user = db.users.find(u => u.id === req.user.id);
   if (user) {
-    const { password, ...userWithoutPassword } = user;
+    const { password: _password, ...userWithoutPassword } = user;
     res.json(userWithoutPassword);
   } else {
     res.status(404).json({ error: 'User not found' });
@@ -360,7 +361,7 @@ app.put('/api/users/me', authenticateToken, async (req, res) => {
     
     if (userIndex !== -1) {
       // Don't allow updating email or id through this endpoint
-      const { email, id, ...updateData } = req.body;
+      const { email: _email, id: _id, ...updateData } = req.body;
       
       // If password is being updated, hash it
       if (updateData.password) {
@@ -379,7 +380,7 @@ app.put('/api/users/me', authenticateToken, async (req, res) => {
       writeDB(db);
       
       // Return updated user without password
-      const { password: _, ...userWithoutPassword } = db.users[userIndex];
+      const { password: _password, ...userWithoutPassword } = db.users[userIndex];
       res.json(userWithoutPassword);
     } else {
       res.status(404).json({ error: 'User not found' });
@@ -487,6 +488,31 @@ app.post('/api/test/openai', async (req, res) => {
   }
 });
 
-app.listen(port, () => {
-  console.log(`Server listening at http://localhost:${port}`);
+// Validate setup before starting server
+async function startServer() {
+  console.log('Starting Task Flow AI Server...');
+  console.log('');
+  
+  const isValid = await validateSetup();
+  
+  if (!isValid) {
+    console.log('');
+    console.log('Server startup aborted due to configuration errors.');
+    console.log('Please run setup.bat to configure the application properly.');
+    process.exit(1);
+  }
+  
+  app.listen(port, () => {
+    console.log('');
+    console.log('========================================');
+    console.log(`✅ Server is running at http://localhost:${port}`);
+    console.log('✅ All configurations validated successfully');
+    console.log('========================================');
+  });
+}
+
+// Start the server
+startServer().catch(error => {
+  console.error('Failed to start server:', error);
+  process.exit(1);
 });

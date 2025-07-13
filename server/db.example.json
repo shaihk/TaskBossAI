@@ -1,0 +1,56 @@
+{
+  "tasks": [
+    {
+      "id": 1,
+      "user_id": 1,
+      "title": "Complete project documentation",
+      "goal_id": 1,
+      "status": "pending",
+      "priority": "high",
+      "difficulty": 5,
+      "estimated_time": 60,
+      "due_date": "2025-07-15"
+    }
+  ],
+  "goals": [
+    {
+      "id": 1,
+      "user_id": 1,
+      "title": "Project Management",
+      "description": "Organize and complete all project tasks",
+      "priority": "high",
+      "category": "work",
+      "difficulty": 5,
+      "estimated_time": 120,
+      "due_date": "2025-07-20",
+      "tags": ["project", "management"]
+    }
+  ],
+  "users": [
+    {
+      "id": 1,
+      "full_name": "Demo User",
+      "email": "demo@example.com",
+      "password": "$2b$10$example.hashed.password.here",
+      "picture": null,
+      "created_at": "2025-01-01T00:00:00.000Z"
+    }
+  ],
+  "user_stats": [
+    {
+      "id": 1,
+      "user_id": 1,
+      "total_points": 0,
+      "current_level": 1,
+      "experience_points": 0,
+      "tasks_completed": 0,
+      "current_streak": 0,
+      "longest_streak": 0,
+      "total_time_saved": 0,
+      "achievements_unlocked": [],
+      "daily_goal_streak": 0,
+      "preferred_categories": [],
+      "last_activity": "2025-01-01T00:00:00.000Z"
+    }
+  ]
+}

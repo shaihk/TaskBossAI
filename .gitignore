@@ -29,6 +29,7 @@ dist-ssr
 .env.development.local
 .env.test.local
 .env.production.local
+server/.env
 
 # API keys and sensitive data
 *.key
@@ -43,6 +44,7 @@ config/secrets/
 *.sqlite
 *.sqlite3
 db.json.backup
+# server/db.json - commented out to allow tracking
 
 # Temporary files
 *.tmp
