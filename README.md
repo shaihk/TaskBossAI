@@ -232,6 +232,66 @@ The script will:
 - Configure firewall
 - Start the application with PM2
 
+**🔄 Updating Your VPS Application**
+
+**Option 1: Automated Update (Recommended)**
+
+Use the automated update script:
+
+1. **Upload the update script to your VPS:**
+   ```bash
+   scp vps-update.sh your-username@your-vps-ip:/tmp/
+   ```
+
+2. **Connect to your VPS and run the update:**
+   ```bash
+   ssh your-username@your-vps-ip
+   sudo chmod +x /tmp/vps-update.sh
+   sudo /tmp/vps-update.sh
+   ```
+
+The script will automatically:
+- Create a backup of current state
+- Pull latest changes from Git
+- Update dependencies
+- Restart the application with PM2
+- Test the application
+- Reload Nginx configuration
+
+**Option 2: Manual Update**
+
+1. **Connect to your VPS:**
+   ```bash
+   ssh your-username@your-vps-ip
+   ```
+
+2. **Navigate to application directory:**
+   ```bash
+   cd /var/www/task-flow-ai
+   ```
+
+3. **Pull latest changes:**
+   ```bash
+   git pull origin main
+   ```
+
+4. **Update dependencies:**
+   ```bash
+   npm install
+   cd server && npm install && cd ..
+   ```
+
+5. **Restart the application:**
+   ```bash
+   pm2 restart task-flow-ai
+   ```
+
+6. **Check status:**
+   ```bash
+   pm2 status
+   pm2 logs task-flow-ai --lines 20
+   ```
+
 **📋 Manual VPS Setup**
 
 1. **Clone and setup:**
