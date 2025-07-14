@@ -128,6 +128,11 @@ if [ -f "package.json" ]; then
         cd ..
         print_success "Server dependencies installed successfully"
     fi
+    
+    # Build the React frontend
+    print_status "Building React frontend..."
+    npm run build
+    print_success "Frontend built successfully"
 else
     print_warning "package.json not found. Please install dependencies manually."
 fi
@@ -140,19 +145,55 @@ generate_jwt_secret() {
     echo "TaskFlowAI_$(date +%s)$(shuf -i 100000-999999 -n 1)_$(openssl rand -hex 16)" 2>/dev/null || echo "TaskFlowAI_$(date +%s)$(shuf -i 100000-999999 -n 1)_$(head -c 32 /dev/urandom | base64 | tr -d '=+/' | cut -c1-32)"
 }
 
-# Setup main .env file
-if [ ! -f ".env" ]; then
-    print_status "Creating main .env file..."
+# Check if .env files exist
+if [ -f ".env" ] && [ -f "server/.env" ]; then
+    print_success "Configuration files already exist"
+    print_success "Using existing environment configuration"
+else
+    print_status "Setting up environment configuration for first time..."
     
-    echo "Please enter your OpenAI API key:"
-    echo "(You can get one from: https://platform.openai.com/account/api-keys)"
-    read -s -p "OpenAI API Key: " OPENAI_KEY
+    echo ""
+    echo "========================================="
+    echo "    OpenAI API Key Configuration"
+    echo "========================================="
+    echo ""
+    echo "To use the AI features (chat, task suggestions, consultation),"
+    echo "you need an OpenAI API key."
+    echo ""
+    echo "How to get your OpenAI API key:"
+    echo "1. Go to: https://platform.openai.com/account/api-keys"
+    echo "2. Sign in to your OpenAI account (or create one)"
+    echo "3. Click 'Create new secret key'"
+    echo "4. Copy the key (it starts with sk-...)"
+    echo ""
+    echo "IMPORTANT: Keep this key secure and never share it publicly!"
     echo ""
     
-    if [[ $OPENAI_KEY =~ ^sk-[a-zA-Z0-9_-]+$ ]]; then
-        JWT_SECRET=$(generate_jwt_secret)
+    while true; do
+        read -s -p "Please enter your OpenAI API key: " OPENAI_KEY
+        echo ""
         
-        cat > .env << EOF
+        if [ -z "$OPENAI_KEY" ]; then
+            print_error "API key cannot be empty!"
+            continue
+        fi
+        
+        if [[ $OPENAI_KEY =~ ^sk-[a-zA-Z0-9_-]+$ ]]; then
+            print_success "API key format looks correct"
+            break
+        else
+            print_warning "API key should start with 'sk-'"
+            read -p "Continue anyway? (y/n): " confirm
+            if [[ $confirm =~ ^[Yy]$ ]]; then
+                break
+            fi
+        fi
+    done
+    
+    JWT_SECRET=$(generate_jwt_secret)
+    
+    print_status "Creating main .env file..."
+    cat > .env << EOF
 # OpenAI API Configuration
 OPENAI_API_KEY=$OPENAI_KEY
 
@@ -163,39 +204,46 @@ JWT_SECRET=$JWT_SECRET
 PORT=3001
 NODE_ENV=production
 EOF
-        print_success "Main .env file created successfully"
-    else
-        print_error "Invalid OpenAI API key format. Please create .env file manually."
-    fi
-else
-    print_success ".env file already exists"
-fi
-
-# Setup server .env file
-if [ -d "server" ] && [ ! -f "server/.env" ]; then
-    print_status "Creating server .env file..."
+    print_success "Main .env file created successfully"
     
-    if [ -f ".env" ]; then
-        cp .env server/.env
-        print_success "Server .env file created successfully"
-    else
-        print_warning "Main .env file not found. Please create server/.env manually."
-    fi
-else
-    print_success "Server .env file already exists or server directory not found"
+    print_status "Creating server .env file..."
+    cat > server/.env << EOF
+# OpenAI API Configuration
+OPENAI_API_KEY=$OPENAI_KEY
+
+# JWT Secret (auto-generated)
+JWT_SECRET=$JWT_SECRET
+
+# Server Configuration
+PORT=3001
+NODE_ENV=production
+EOF
+    print_success "Server .env file created successfully"
 fi
 
 # Step 8.5: Handle database initialization
+echo ""
+echo "========================================="
+echo "    Database Setup"
+echo "========================================="
+echo ""
+
 print_status "Checking database setup..."
 if [ -d "server" ]; then
     if [ -f "server/db.json" ]; then
         print_success "Database file found - using existing data"
+        print_success "Your tasks, goals, and user data will be preserved"
+        # Backup existing database
+        cp server/db.json server/db.backup.$(date +%Y%m%d_%H%M%S).json
+        print_success "Database backed up successfully"
     elif [ -f "server/db.example.json" ]; then
         print_status "No database found, creating from example..."
         cp server/db.example.json server/db.json
-        print_success "Database initialized from example"
+        print_success "Database initialized with example data"
     else
-        print_warning "No database file found. Please ensure db.json exists in server directory."
+        print_warning "No database file found!"
+        print_warning "Please ensure db.json exists in server directory"
+        print_warning "You may need to manually upload your db.json file to the server/ directory"
     fi
 else
     print_warning "Server directory not found. Database setup skipped."

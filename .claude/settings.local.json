@@ -12,7 +12,8 @@
       "Bash(grep:*)",
       "Bash(cat:*)",
       "Bash(pkill:*)",
-      "Bash(true)"
+      "Bash(true)",
+      "Bash(chmod:*)"
     ],
     "deny": []
   }

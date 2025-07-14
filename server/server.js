@@ -4,6 +4,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const fs = require('fs');
+const path = require('path');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { OpenAI } = require('openai');
@@ -14,6 +15,9 @@ const port = process.env.PORT || 3001;
 
 app.use(cors());
 app.use(bodyParser.json());
+
+// Serve static files from React build
+app.use(express.static(path.join(__dirname, '../dist')));
 
 const dbPath = './db.json';
 
@@ -486,6 +490,11 @@ app.post('/api/test/openai', async (req, res) => {
       apiKey: process.env.OPENAI_API_KEY ? 'API key is set' : 'API key is missing'
     });
   }
+});
+
+// Serve React app for all non-API routes
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../dist/index.html'));
 });
 
 // Validate setup before starting server

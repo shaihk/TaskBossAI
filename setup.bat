@@ -86,6 +86,27 @@ echo ✓ JWT secret generated automatically
 echo ✓ Environment variables configured
 echo.
 
+REM Handle database initialization
+echo ========================================
+echo    Database Setup
+echo ========================================
+echo.
+
+if exist "server\db.json" (
+    echo ✓ Database file found - using existing data
+    echo ✓ Your tasks, goals, and user data will be preserved
+) else (
+    if exist "server\db.example.json" (
+        echo No database found, creating from example...
+        copy "server\db.example.json" "server\db.json" >nul
+        echo ✓ Database initialized with example data
+    ) else (
+        echo Warning: No database file found!
+        echo Please ensure db.json exists in server directory
+    )
+)
+echo.
+
 :start_app
 echo ========================================
 echo    Starting Task Flow AI...
