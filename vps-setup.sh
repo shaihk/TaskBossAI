@@ -207,6 +207,16 @@ chown -R www-data:www-data $APP_DIR
 chmod -R 755 $APP_DIR
 chmod 600 .env 2>/dev/null || true
 chmod 600 server/.env 2>/dev/null || true
+
+# Make scripts executable
+chmod +x start-server.sh 2>/dev/null || true
+chmod +x setup.sh 2>/dev/null || true
+chmod +x stop.sh 2>/dev/null || true
+chmod +x status.sh 2>/dev/null || true
+chmod +x pre-check.sh 2>/dev/null || true
+chmod +x vps-setup.sh 2>/dev/null || true
+chmod +x vps-update.sh 2>/dev/null || true
+
 print_success "File permissions set successfully"
 
 # Step 10: Test the application

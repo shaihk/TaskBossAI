@@ -240,6 +240,9 @@ fi
 # Make scripts executable
 chmod +x start-server.sh
 chmod +x setup.sh
+chmod +x stop.sh
+chmod +x status.sh
+chmod +x pre-check.sh
 chmod +x vps-setup.sh 2>/dev/null || true
 chmod +x vps-update.sh 2>/dev/null || true
 

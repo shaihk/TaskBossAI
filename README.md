@@ -58,12 +58,19 @@ The setup script will automatically:
 
 3. **After setup, the application runs automatically with PM2 and Nginx**
 
+**Pre-deployment validation:**
+```bash
+./pre-check.sh             # Validate dependencies and configuration before deployment
+```
+
 **Regular usage commands:**
 ```bash
-pm2 status                 # Check application status
-pm2 logs                   # View application logs
+./status.sh                # Check application status (comprehensive)
+./stop.sh                  # Stop all application processes
+./start-server.sh          # Start application
+pm2 status                 # Check PM2 status
+pm2 logs                   # View PM2 logs
 pm2 restart all            # Restart application
-pm2 stop all               # Stop application
 ```
 
 **Access your application:**
@@ -252,7 +259,13 @@ chmod +x setup.sh start-server.sh
 
 Use our comprehensive VPS setup script that includes Nginx, SSL, security, and PM2:
 
-1. **Upload and run the VPS setup script:**
+1. **Validate your setup before deployment (recommended):**
+   ```bash
+   ./pre-check.sh
+   ```
+   This will check all dependencies, configuration files, and project structure.
+
+2. **Upload and run the VPS setup script:**
    ```bash
    sudo chmod +x vps-setup.sh
    sudo ./vps-setup.sh
