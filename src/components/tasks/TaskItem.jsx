@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import PropTypes from "prop-types";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -108,7 +109,7 @@ export default function TaskItem({ task, goal, onStatusChange, showGoalInfo = tr
     }
   };
 
-  const handleTaskUpdate = (updatedTaskData) => {
+  const handleTaskUpdate = () => {
     setShowEditForm(false);
     if (onTaskUpdate) {
       onTaskUpdate();
@@ -356,3 +357,24 @@ export default function TaskItem({ task, goal, onStatusChange, showGoalInfo = tr
     </>
   );
 }
+
+TaskItem.propTypes = {
+  task: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    title: PropTypes.string.isRequired,
+    description: PropTypes.string,
+    status: PropTypes.oneOf(['pending', 'in_progress', 'completed', 'paused']).isRequired,
+    due_date: PropTypes.string,
+    difficulty: PropTypes.string,
+    estimated_time: PropTypes.string,
+    points_earned: PropTypes.number
+  }).isRequired,
+  goal: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    title: PropTypes.string.isRequired
+  }),
+  onStatusChange: PropTypes.func.isRequired,
+  showGoalInfo: PropTypes.bool,
+  onCreateSubTask: PropTypes.func,
+  onTaskUpdate: PropTypes.func
+};

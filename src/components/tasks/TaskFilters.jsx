@@ -1,4 +1,4 @@
-import React from "react";
+import PropTypes from "prop-types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { useTranslation } from "react-i18next";
@@ -54,3 +54,15 @@ export default function TaskFilters({ filters, onFiltersChange, goals }) {
     </div>
   );
 }
+
+TaskFilters.propTypes = {
+  filters: PropTypes.shape({
+    status: PropTypes.string.isRequired,
+    goal: PropTypes.string.isRequired
+  }).isRequired,
+  onFiltersChange: PropTypes.func.isRequired,
+  goals: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    title: PropTypes.string.isRequired
+  })).isRequired
+};
