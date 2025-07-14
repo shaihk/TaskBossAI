@@ -47,10 +47,15 @@ print_status "Updating system packages..."
 apt update && apt upgrade -y
 print_success "System updated successfully"
 
-# Step 2: Install Node.js
+# Step 2: Install essential system dependencies
+print_status "Installing essential system dependencies..."
+apt install -y curl wget gnupg2 software-properties-common apt-transport-https ca-certificates lsb-release build-essential python3 python3-pip unzip
+print_success "Essential dependencies installed successfully"
+
+# Step 3: Install Node.js (Latest LTS)
 print_status "Installing Node.js..."
 if ! command -v node &> /dev/null; then
-    curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
+    curl -fsSL https://deb.nodesource.com/setup_lts.x | bash -
     apt install -y nodejs
     print_success "Node.js installed successfully"
 else
@@ -63,7 +68,7 @@ NPM_VERSION=$(npm --version)
 print_success "Node.js version: $NODE_VERSION"
 print_success "NPM version: $NPM_VERSION"
 
-# Step 3: Install Git
+# Step 4: Install Git
 print_status "Installing Git..."
 if ! command -v git &> /dev/null; then
     apt install -y git
@@ -72,7 +77,7 @@ else
     print_success "Git is already installed"
 fi
 
-# Step 4: Install PM2
+# Step 5: Install PM2
 print_status "Installing PM2..."
 if ! command -v pm2 &> /dev/null; then
     npm install -g pm2
@@ -81,7 +86,7 @@ else
     print_success "PM2 is already installed"
 fi
 
-# Step 4.5: Install Nginx
+# Step 6: Install Nginx
 print_status "Installing Nginx..."
 if ! command -v nginx &> /dev/null; then
     apt install -y nginx
@@ -92,29 +97,79 @@ else
     print_success "Nginx is already installed"
 fi
 
-# Step 5: Create application directory
-APP_DIR="/var/www/task-flow-ai"
-print_status "Creating application directory at $APP_DIR..."
-mkdir -p $APP_DIR
-cd $APP_DIR
+# Step 7: Install additional tools
+print_status "Installing additional development tools..."
+apt install -y htop nano vim ufw fail2ban certbot python3-certbot-nginx
+print_success "Additional tools installed successfully"
 
-# Step 6: Clone repository (if not already present)
-if [ ! -d ".git" ]; then
-    print_status "Please enter your GitHub repository URL:"
-    read -p "Repository URL: " REPO_URL
+# Step 8: Setup application directory
+CURRENT_DIR=$(pwd)
+APP_DIR="/var/www/task-flow-ai"
+
+# Check if we're running from the application directory
+if [ -f "$CURRENT_DIR/package.json" ] && [ -f "$CURRENT_DIR/server/package.json" ]; then
+    print_status "Detected application files in current directory: $CURRENT_DIR"
+    read -p "Deploy from current directory? (y/n): " USE_CURRENT
     
-    if [ -n "$REPO_URL" ]; then
-        print_status "Cloning repository..."
-        git clone $REPO_URL .
-        print_success "Repository cloned successfully"
+    if [[ $USE_CURRENT =~ ^[Yy]$ ]]; then
+        print_status "Copying application files to $APP_DIR..."
+        mkdir -p $APP_DIR
+        
+        # Copy all files except node_modules, .git, and build directories
+        rsync -av --exclude=node_modules --exclude=.git --exclude=dist --exclude=build --exclude=.env --exclude=server/.env "$CURRENT_DIR/" "$APP_DIR/"
+        
+        # Copy .env files if they exist
+        if [ -f "$CURRENT_DIR/.env" ]; then
+            cp "$CURRENT_DIR/.env" "$APP_DIR/.env"
+            print_success "Existing .env file copied"
+        fi
+        if [ -f "$CURRENT_DIR/server/.env" ]; then
+            cp "$CURRENT_DIR/server/.env" "$APP_DIR/server/.env"
+            print_success "Existing server/.env file copied"
+        fi
+        
+        cd $APP_DIR
+        print_success "Application files copied successfully"
     else
-        print_warning "No repository URL provided. Please clone manually later."
+        print_status "Creating application directory at $APP_DIR..."
+        mkdir -p $APP_DIR
+        cd $APP_DIR
+        
+        # Clone repository
+        print_status "Please enter your GitHub repository URL:"
+        read -p "Repository URL: " REPO_URL
+        
+        if [ -n "$REPO_URL" ]; then
+            print_status "Cloning repository..."
+            git clone $REPO_URL .
+            print_success "Repository cloned successfully"
+        else
+            print_warning "No repository URL provided. Please clone manually later."
+        fi
     fi
 else
-    print_success "Git repository already exists"
+    print_status "Creating application directory at $APP_DIR..."
+    mkdir -p $APP_DIR
+    cd $APP_DIR
+    
+    # Clone repository (if not already present)
+    if [ ! -d ".git" ]; then
+        print_status "Please enter your GitHub repository URL:"
+        read -p "Repository URL: " REPO_URL
+        
+        if [ -n "$REPO_URL" ]; then
+            print_status "Cloning repository..."
+            git clone $REPO_URL .
+            print_success "Repository cloned successfully"
+        else
+            print_warning "No repository URL provided. Please clone manually later."
+        fi
+    else
+        print_success "Git repository already exists"
+    fi
 fi
 
-# Step 7: Install dependencies
+# Step 9: Install dependencies
 if [ -f "package.json" ]; then
     print_status "Installing Node.js dependencies..."
     npm install
@@ -137,7 +192,7 @@ else
     print_warning "package.json not found. Please install dependencies manually."
 fi
 
-# Step 8: Setup environment variables
+# Step 10: Setup environment variables
 print_status "Setting up environment variables..."
 
 # Function to generate secure JWT secret
@@ -178,11 +233,43 @@ else
             continue
         fi
         
+        # Basic validation - check if key starts with sk-
         if [[ $OPENAI_KEY =~ ^sk-[a-zA-Z0-9_-]+$ ]]; then
             print_success "API key format looks correct"
-            break
+            
+            # Test the API key
+            print_status "Testing OpenAI API key..."
+            
+            # Create a simple test request
+            TEST_RESPONSE=$(curl -s -X POST "https://api.openai.com/v1/models" \
+                -H "Authorization: Bearer $OPENAI_KEY" \
+                -H "Content-Type: application/json" \
+                --connect-timeout 10 \
+                --max-time 30 || echo "curl_failed")
+            
+            if [ "$TEST_RESPONSE" = "curl_failed" ]; then
+                print_warning "Could not connect to OpenAI API (network issue)"
+                read -p "Continue anyway? (y/n): " confirm
+                if [[ $confirm =~ ^[Yy]$ ]]; then
+                    break
+                fi
+            elif echo "$TEST_RESPONSE" | grep -q '"object": "list"' && echo "$TEST_RESPONSE" | grep -q '"data"'; then
+                print_success "✓ API key validated successfully!"
+                break
+            elif echo "$TEST_RESPONSE" | grep -q '"error"'; then
+                ERROR_MSG=$(echo "$TEST_RESPONSE" | python3 -c "import sys,json; data=json.load(sys.stdin); print(data.get('error', {}).get('message', 'Unknown error'))" 2>/dev/null || echo "Invalid API key")
+                print_error "API key validation failed: $ERROR_MSG"
+                print_error "Please check your OpenAI API key and try again"
+                continue
+            else
+                print_warning "Could not validate API key (unexpected response)"
+                read -p "Continue anyway? (y/n): " confirm
+                if [[ $confirm =~ ^[Yy]$ ]]; then
+                    break
+                fi
+            fi
         else
-            print_warning "API key should start with 'sk-'"
+            print_warning "API key should start with 'sk-' and contain only letters, numbers, hyphens, and underscores"
             read -p "Continue anyway? (y/n): " confirm
             if [[ $confirm =~ ^[Yy]$ ]]; then
                 break
@@ -221,7 +308,7 @@ EOF
     print_success "Server .env file created successfully"
 fi
 
-# Step 8.5: Handle database initialization
+# Step 11: Handle database initialization
 echo ""
 echo "========================================="
 echo "    Database Setup"
@@ -249,7 +336,7 @@ else
     print_warning "Server directory not found. Database setup skipped."
 fi
 
-# Step 9: Set proper permissions
+# Step 12: Set proper permissions
 print_status "Setting proper file permissions..."
 chown -R www-data:www-data $APP_DIR
 chmod -R 755 $APP_DIR
@@ -267,7 +354,7 @@ chmod +x vps-update.sh 2>/dev/null || true
 
 print_success "File permissions set successfully"
 
-# Step 10: Test the application
+# Step 13: Test the application
 print_status "Testing the application..."
 if [ -f "server/server.js" ]; then
     cd server
@@ -298,7 +385,7 @@ else
     print_warning "Server file not found. Please check your application structure."
 fi
 
-# Step 11: Setup PM2
+# Step 14: Setup PM2
 print_status "Setting up PM2 process manager..."
 
 # Determine the correct server file path
@@ -339,7 +426,7 @@ pm2 startup
 
 print_success "PM2 configured and application started"
 
-# Step 12: Setup Nginx configuration
+# Step 15: Setup Nginx configuration
 print_status "Configuring Nginx..."
 
 # Get domain name or use IP
@@ -454,7 +541,7 @@ else
     exit 1
 fi
 
-# Step 13: Setup firewall
+# Step 16: Setup firewall
 print_status "Setting up firewall..."
 if command -v ufw &> /dev/null; then
     ufw --force enable
@@ -467,7 +554,7 @@ else
     print_warning "UFW not available. Please configure firewall manually."
 fi
 
-# Step 14: Setup SSL (optional)
+# Step 17: Setup SSL (optional)
 print_status "Would you like to setup SSL certificate with Let's Encrypt? (y/n)"
 read -p "Setup SSL: " SETUP_SSL
 
@@ -491,7 +578,7 @@ elif [[ $SETUP_SSL =~ ^[Yy]$ ]] && [ -z "$DOMAIN_NAME" ]; then
     print_warning "SSL requires a domain name. Skipping SSL setup."
 fi
 
-# Step 15: Final status check
+# Step 18: Final status check
 print_status "Checking final status..."
 sleep 3
 
