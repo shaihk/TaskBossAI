@@ -255,8 +255,8 @@ else
     exit 1
 fi
 
-# Create PM2 ecosystem file
-cat > ecosystem.config.js << EOF
+# Create PM2 ecosystem file (use .cjs extension for CommonJS)
+cat > ecosystem.config.cjs << EOF
 module.exports = {
   apps: [{
     name: 'task-flow-ai',
@@ -275,7 +275,7 @@ module.exports = {
 EOF
 
 # Start the application with PM2
-pm2 start ecosystem.config.js
+pm2 start ecosystem.config.cjs
 pm2 save
 pm2 startup
 
