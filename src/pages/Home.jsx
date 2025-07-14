@@ -85,7 +85,7 @@ export default function Home() {
           <div className="flex items-center gap-3">
             <div className="w-2 h-12 bg-gradient-to-b from-blue-600 to-purple-600 rounded-full"></div>
             <h1 className="text-4xl lg:text-5xl font-bold gradient-text tracking-tight leading-tight">
-              {user?.full_name ? `${t('home.welcome')}, ${user.full_name}` : t('home.welcome')}
+              {t('home.welcome', { username: user?.full_name || 'User' })}
             </h1>
           </div>
           <p className="text-gray-600 text-lg font-medium flex items-center gap-2">
@@ -131,19 +131,19 @@ export default function Home() {
                   <div className="flex items-center gap-2 bg-yellow-50 px-4 py-2 rounded-xl border border-yellow-200">
                     <Trophy className="w-5 h-5 text-yellow-600" />
                     <span className="text-sm font-bold text-yellow-800">
-                      רמה {userStats?.current_level || 1}
+                      {t('profile.level', { level: userStats?.current_level || 1 })}
                     </span>
                   </div>
                   <div className="flex items-center gap-2 bg-purple-50 px-4 py-2 rounded-xl border border-purple-200">
                     <Star className="w-5 h-5 text-purple-600" />
                     <span className="text-sm font-bold text-purple-800">
-                      {userStats?.total_points || 0} נקודות
+                      {t('home.totalPoints', { count: userStats?.total_points || 0 })}
                     </span>
                   </div>
                   <div className="flex items-center gap-2 bg-orange-50 px-4 py-2 rounded-xl border border-orange-200">
                     <Flame className="w-5 h-5 text-orange-600" />
                     <span className="text-sm font-bold text-orange-800">
-                      רצף {userStats?.current_streak || 0} ימים
+                      {t('home.dailyStreak', { count: userStats?.current_streak || 0 })}
                     </span>
                   </div>
                 </div>
@@ -151,14 +151,14 @@ export default function Home() {
               
               <div className="w-full lg:w-80 space-y-4 bg-gradient-to-br from-blue-50 to-purple-50 p-6 rounded-2xl border border-blue-100">
                 <div className="flex justify-between items-center">
-                  <span className="font-bold text-gray-800">התקדמות ברמה</span>
+                  <span className="font-bold text-gray-800">{t('profile.xpProgress', { current: userStats?.experience_points || 0, total: 1000})}</span>
                   <span className="text-sm font-medium text-blue-600 bg-blue-100 px-3 py-1 rounded-full">
                     {userStats?.experience_points || 0} XP
                   </span>
                 </div>
                 <Progress value={levelProgress} className="h-3 bg-white/50" />
                 <p className="text-sm text-center text-gray-600 font-medium">
-                  עוד {1000 - (userStats?.experience_points || 0) % 1000} XP לרמה הבאה
+                  {t('profile.nextLevelPoints', { points: 1000 - (userStats?.experience_points || 0) % 1000 })}
                 </p>
               </div>
             </div>

@@ -15,7 +15,12 @@
       "Bash(true)",
       "Bash(chmod:*)",
       "Bash(git commit:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(sqlite3:*)",
+      "Bash(node:*)",
+      "Bash(rm:*)",
+      "Bash(apt-get:*)",
+      "Bash(apt-get install:*)"
     ],
     "deny": []
   }

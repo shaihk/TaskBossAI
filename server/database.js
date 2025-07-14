@@ -174,7 +174,7 @@ const dbHelpers = {
 
     getGoalsByUserId: (db, userId) => {
         return new Promise((resolve, reject) => {
-            db.all('SELECT * FROM goals WHERE user_id = ? OR user_id IS NULL', [userId], (err, rows) => {
+            db.all('SELECT * FROM goals WHERE user_id = ?', [userId], (err, rows) => {
                 if (err) reject(err);
                 else {
                     // Parse tags JSON
@@ -198,7 +198,7 @@ const dbHelpers = {
             const values = Object.values(updates);
             values.push(id, userId);
             
-            db.run(`UPDATE goals SET ${fields} WHERE id = ? AND (user_id = ? OR user_id IS NULL)`, values, function(err) {
+            db.run(`UPDATE goals SET ${fields} WHERE id = ? AND user_id = ?`, values, function(err) {
                 if (err) reject(err);
                 else resolve({ changes: this.changes });
             });
@@ -207,7 +207,7 @@ const dbHelpers = {
 
     deleteGoal: (db, id, userId) => {
         return new Promise((resolve, reject) => {
-            db.run('DELETE FROM goals WHERE id = ? AND (user_id = ? OR user_id IS NULL)', [id, userId], function(err) {
+            db.run('DELETE FROM goals WHERE id = ? AND user_id = ?', [id, userId], function(err) {
                 if (err) reject(err);
                 else resolve({ changes: this.changes });
             });
@@ -231,7 +231,7 @@ const dbHelpers = {
 
     getTasksByUserId: (db, userId) => {
         return new Promise((resolve, reject) => {
-            db.all('SELECT * FROM tasks WHERE user_id = ? OR user_id IS NULL', [userId], (err, rows) => {
+            db.all('SELECT * FROM tasks WHERE user_id = ?', [userId], (err, rows) => {
                 if (err) reject(err);
                 else resolve(rows);
             });
@@ -244,7 +244,7 @@ const dbHelpers = {
             const values = Object.values(updates);
             values.push(id, userId);
             
-            db.run(`UPDATE tasks SET ${fields} WHERE id = ? AND (user_id = ? OR user_id IS NULL)`, values, function(err) {
+            db.run(`UPDATE tasks SET ${fields} WHERE id = ? AND user_id = ?`, values, function(err) {
                 if (err) reject(err);
                 else resolve({ changes: this.changes });
             });
@@ -253,7 +253,7 @@ const dbHelpers = {
 
     deleteTask: (db, id, userId) => {
         return new Promise((resolve, reject) => {
-            db.run('DELETE FROM tasks WHERE id = ? AND (user_id = ? OR user_id IS NULL)', [id, userId], function(err) {
+            db.run('DELETE FROM tasks WHERE id = ? AND user_id = ?', [id, userId], function(err) {
                 if (err) reject(err);
                 else resolve({ changes: this.changes });
             });

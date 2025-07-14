@@ -8,10 +8,12 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Task } from "@/api/entities";
 import { X, Save, Loader2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 
 export default function TaskEditForm({ task, goal, onClose, onTaskUpdate }) {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     title: task.title || "",
     description: task.description || "",
@@ -45,37 +47,37 @@ export default function TaskEditForm({ task, goal, onClose, onTaskUpdate }) {
     <Card className="glass-effect border-0 shadow-xl">
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
-          <span>עריכת משימה</span>
+          <span>{t('form.editTask')}</span>
           <Button variant="ghost" size="icon" onClick={onClose}>
             <X className="w-5 h-5" />
           </Button>
         </CardTitle>
         {goal && (
-          <p className="text-sm text-gray-600">היעד: {goal.title}</p>
+          <p className="text-sm text-gray-600">{t('tasks.goalLabel', { title: goal.title })}</p>
         )}
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Title */}
           <div className="space-y-2">
-            <Label htmlFor="title">כותרת המשימה</Label>
+            <Label htmlFor="title">{t('form.taskTitle')}</Label>
             <Input
               id="title"
               value={formData.title}
               onChange={(e) => handleInputChange("title", e.target.value)}
-              placeholder="מה צריך לעשות?"
+              placeholder={t('form.taskTitlePlaceholder')}
               required
             />
           </div>
 
           {/* Description */}
           <div className="space-y-2">
-            <Label htmlFor="description">תיאור מפורט</Label>
+            <Label htmlFor="description">{t('form.detailedDescription')}</Label>
             <Textarea
               id="description"
               value={formData.description}
               onChange={(e) => handleInputChange("description", e.target.value)}
-              placeholder="הוסף פרטים נוספים על המשימה..."
+              placeholder={t('form.descriptionPlaceholder')}
               rows={4}
             />
           </div>
@@ -83,31 +85,31 @@ export default function TaskEditForm({ task, goal, onClose, onTaskUpdate }) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Priority */}
             <div className="space-y-2">
-                <Label htmlFor="priority">דחיפות</Label>
+                <Label htmlFor="priority">{t('form.priority.title')}</Label>
                 <Select value={formData.priority} onValueChange={(value) => handleInputChange("priority", value)}>
                     <SelectTrigger id="priority">
                         <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="low">נמוכה</SelectItem>
-                        <SelectItem value="medium">בינונית</SelectItem>
-                        <SelectItem value="high">גבוהה</SelectItem>
-                        <SelectItem value="urgent">דחופה</SelectItem>
+                        <SelectItem value="low">{t('form.priority.low')}</SelectItem>
+                        <SelectItem value="medium">{t('form.priority.medium')}</SelectItem>
+                        <SelectItem value="high">{t('form.priority.high')}</SelectItem>
+                        <SelectItem value="urgent">{t('form.priority.urgent')}</SelectItem>
                     </SelectContent>
                 </Select>
             </div>
             {/* Status */}
             <div className="space-y-2">
-              <Label htmlFor="status">סטטוס המשימה</Label>
+              <Label htmlFor="status">{t('form.status.title')}</Label>
                <Select value={formData.status} onValueChange={(value) => handleInputChange("status", value)}>
                     <SelectTrigger id="status">
                         <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="pending">ממתינה</SelectItem>
-                        <SelectItem value="in_progress">בביצוע</SelectItem>
-                        <SelectItem value="completed">הושלמה</SelectItem>
-                        <SelectItem value="paused">מושהית</SelectItem>
+                        <SelectItem value="pending">{t('form.status.pending')}</SelectItem>
+                        <SelectItem value="in_progress">{t('form.status.inProgress')}</SelectItem>
+                        <SelectItem value="completed">{t('form.status.completed')}</SelectItem>
+                        <SelectItem value="paused">{t('form.status.paused')}</SelectItem>
                     </SelectContent>
                 </Select>
             </div>
@@ -116,7 +118,7 @@ export default function TaskEditForm({ task, goal, onClose, onTaskUpdate }) {
           {/* Difficulty and Time */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <Label>רמת קושי: {formData.difficulty}/10</Label>
+              <Label>{t('form.difficulty')}: {formData.difficulty}/10</Label>
               <Slider
                 value={[formData.difficulty]}
                 onValueChange={(value) => handleInputChange("difficulty", value[0])}
@@ -128,7 +130,7 @@ export default function TaskEditForm({ task, goal, onClose, onTaskUpdate }) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="estimated_time">זמן מוערך (דקות)</Label>
+              <Label htmlFor="estimated_time">{t('form.estimatedTime')} ({t('form.minutes')})</Label>
               <Input
                 id="estimated_time"
                 type="number"
@@ -141,7 +143,7 @@ export default function TaskEditForm({ task, goal, onClose, onTaskUpdate }) {
 
           {/* Due Date */}
           <div className="space-y-2">
-            <Label htmlFor="due_date">תאריך יעד</Label>
+            <Label htmlFor="due_date">{t('form.dueDate')}</Label>
             <Input
               id="due_date"
               type="date"
@@ -153,7 +155,7 @@ export default function TaskEditForm({ task, goal, onClose, onTaskUpdate }) {
           {/* Form Actions */}
           <div className="flex justify-end gap-3 pt-4">
             <Button type="button" variant="outline" onClick={onClose}>
-              ביטול
+              {t('form.cancel')}
             </Button>
             <Button
               type="submit"
@@ -163,12 +165,12 @@ export default function TaskEditForm({ task, goal, onClose, onTaskUpdate }) {
               {isUpdating ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  שומר...
+                  {t('form.saving')}...
                 </>
               ) : (
                 <>
                   <Save className="w-4 h-4 mr-2" />
-                  שמור שינויים
+                  {t('form.save')}
                 </>
               )}
             </Button>

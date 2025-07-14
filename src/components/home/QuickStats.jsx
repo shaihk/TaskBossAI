@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useTranslation } from "react-i18next";
 import { 
   Trophy, 
   Flame, 
@@ -14,6 +15,7 @@ import {
 } from "lucide-react";
 
 export default function QuickStats({ userStats, todayTasks, completionRate, isLoading }) {
+  const { t } = useTranslation();
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -38,7 +40,7 @@ export default function QuickStats({ userStats, todayTasks, completionRate, isLo
 
   const stats = [
     {
-      title: "רמה נוכחית",
+      title: t('home.currentLevel'),
       value: userStats?.current_level || 1,
       icon: Trophy,
       color: "from-yellow-400 to-orange-500",
@@ -46,28 +48,28 @@ export default function QuickStats({ userStats, todayTasks, completionRate, isLo
       subtitle: `${userStats?.experience_points || 0} XP`
     },
     {
-      title: "רצף יומי",
+      title: t('home.dailyStreak'),
       value: userStats?.current_streak || 0,
       icon: Flame,
       color: "from-red-400 to-pink-500",
       progress: Math.min((userStats?.current_streak || 0) * 10, 100),
-      subtitle: `מקס: ${userStats?.longest_streak || 0} ימים`
+      subtitle: t('home.maxStreak', { days: userStats?.longest_streak || 0 })
     },
     {
-      title: "משימות היום",
+      title: t('home.todayTasks'),
       value: `${completedToday}/${todayTasks.length}`,
       icon: Target,
       color: "from-blue-400 to-cyan-500",
       progress: completionRate,
-      subtitle: `${pendingTasks} ממתינות`
+      subtitle: t('home.pendingTasks', { count: pendingTasks })
     },
     {
-      title: "נקודות כולל",
+      title: t('home.totalPoints'),
       value: userStats?.total_points || 0,
       icon: Star,
       color: "from-purple-400 to-pink-500",
       progress: Math.min((userStats?.total_points || 0) / 100, 100),
-      subtitle: `${userStats?.tasks_completed || 0} הושלמו`
+      subtitle: t('home.completedTasksCount', { count: userStats?.tasks_completed || 0 })
     }
   ];
 
@@ -95,7 +97,7 @@ export default function QuickStats({ userStats, todayTasks, completionRate, isLo
               </div>
               <div className="space-y-2">
                 <div className="flex justify-between text-xs font-semibold text-gray-600">
-                  <span>התקדמות</span>
+                  <span>{t('home.progress')}</span>
                   <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">
                     {Math.round(stat.progress)}%
                   </span>

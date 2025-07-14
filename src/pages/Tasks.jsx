@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from "react";
 import { tasksAPI, goalsAPI } from "@/services/api";
+import { UserStats } from '@/api/entities';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, Filter, ArrowUpDown } from "lucide-react";
@@ -100,7 +101,23 @@ export default function Tasks() {
       
       if (newStatus === "completed") {
         updateData.completed_at = new Date().toISOString();
-        updateData.points_earned = calculatePoints(task);
+        const points = calculatePoints(task);
+        updateData.points_earned = points;
+
+        // Update user stats
+        const userStats = await userStatsAPI.get();
+        if (userStats) {
+          const newPoints = userStats.total_points + points;
+          const newLevel = Math.floor(newPoints / 1000) + 1;
+          
+          await userStatsAPI.update(userStats.id, {
+            total_points: newPoints,
+            current_level: newLevel,
+            experience_points: newPoints,
+            tasks_completed: userStats.tasks_completed + 1,
+            last_activity: new Date().toISOString()
+          });
+        }
       }
       
       await tasksAPI.update(task.id, updateData);
@@ -202,14 +219,14 @@ export default function Tasks() {
                 <SelectValue placeholder={t('tasks.sortBy')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="-created_date">האחרונות שנוספו</SelectItem>
-                <SelectItem value="priority_desc">דחיפות (גבוהה לנמוכה)</SelectItem>
-                <SelectItem value="priority_asc">דחיפות (נ��וכה לגבוהה)</SelectItem>
-                <SelectItem value="difficulty_desc">קושי (גבוה לנמוך)</SelectItem>
-                <SelectItem value="difficulty_asc">קושי (נמוך לגבוה)</SelectItem>
-                <SelectItem value="time_desc">זמן (ארוך לקצר)</SelectItem>
-                <SelectItem value="time_asc">זמן (קצר לארוך)</SelectItem>
-                <SelectItem value="due_date_asc">תאריך יעד (הקרוב ביותר)</SelectItem>
+                <SelectItem value="-created_date">{t('tasks.recentlyAdded')}</SelectItem>
+                <SelectItem value="priority_desc">{t('tasks.priorityHighToLow')}</SelectItem>
+                <SelectItem value="priority_asc">{t('tasks.priorityLowToHigh')}</SelectItem>
+                <SelectItem value="difficulty_desc">{t('tasks.difficultyHighToLow')}</SelectItem>
+                <SelectItem value="difficulty_asc">{t('tasks.difficultyLowToHigh')}</SelectItem>
+                <SelectItem value="time_desc">{t('tasks.timeLongToShort')}</SelectItem>
+                <SelectItem value="time_asc">{t('tasks.timeShortToLong')}</SelectItem>
+                <SelectItem value="due_date_asc">{t('tasks.dueDateClosest')}</SelectItem>
               </SelectContent>
             </Select>
         </div>
@@ -218,10 +235,10 @@ export default function Tasks() {
       {/* Task Tabs */}
       <Tabs defaultValue="all" className="w-full">
         <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="all">הכל ({filteredTasks.length})</TabsTrigger>
-          <TabsTrigger value="pending">ממתינות ({pendingTasks.length})</TabsTrigger>
-          <TabsTrigger value="in_progress">בביצוע ({inProgressTasks.length})</TabsTrigger>
-          <TabsTrigger value="completed">הושלמו ({completedTasks.length})</TabsTrigger>
+          <TabsTrigger value="all">{t('tasks.allTasks', { count: filteredTasks.length })}</TabsTrigger>
+          <TabsTrigger value="pending">{t('tasks.pendingTasks', { count: pendingTasks.length })}</TabsTrigger>
+          <TabsTrigger value="in_progress">{t('tasks.inProgressTasks', { count: inProgressTasks.length })}</TabsTrigger>
+          <TabsTrigger value="completed">{t('tasks.completedTasks', { count: completedTasks.length })}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="all" className="mt-6">

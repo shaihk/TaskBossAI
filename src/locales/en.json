@@ -7,7 +7,7 @@
     "profile": "Profile"
   },
   "home": {
-    "welcome": "Welcome to your dashboard",
+    "welcome": "Wellcome {{username}} To Your Control Dashboard",
     "newGoal": "New Goal",
     "quickActions": "Quick Actions",
     "addNewGoal": "Add New Goal",
@@ -357,5 +357,29 @@
     "tip1": "Remove all distractions from your workspace",
     "tip2": "Take short breaks every 25 minutes",
     "tip3": "Stay hydrated and maintain good posture"
+  },
+  "sidebar": {
+    "toggle": "Toggle Sidebar",
+    "expand": "Expand Sidebar",
+    "collapse": "Collapse Sidebar"
+  },
+  "app": {
+    "name": "TaskBoss-AI"
+  },
+  "profile": {
+    "title": "User Profile",
+    "editProfile": "Edit Profile",
+    "level": "Level {{level}}",
+    "xpProgress": "{{current}} / {{total}} XP",
+    "nextLevelPoints": "{{points}} more points to next level",
+    "totalPoints": "Total Points",
+    "completedTasks": "Completed Tasks",
+    "longestStreak": "{{days}} days",
+    "achievements": "Achievements",
+    "performanceStats": "Performance & Statistics",
+    "preferredCategories": "Preferred Categories",
+    "notEnoughData": "Not enough data yet",
+    "dailyGoalStreak": "Daily Goal Streak",
+    "consecutiveDays": "Consecutive days of goal completion"
   }
 }

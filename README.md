@@ -27,16 +27,21 @@ TaskBoss-AI is a comprehensive task and goal management application with AI-powe
    status.bat
    ```
 
-### VPS Deployment (Linux)
+### VPS Deployment (Linux) - **UPDATED & FIXED**
 
 1. **Complete Setup** (first time):
    ```bash
-   chmod +x setup.sh
-   ./setup.sh
+   chmod +x setup-root.sh run.sh start-simple.sh stop.sh status.sh
+   sudo ./setup-root.sh
    ```
-   This will install all dependencies, configure nginx, set up PM2, and deploy the application.
+   **FIXED VERSION** - This will install all dependencies, configure nginx properly, set up PM2 with correct ecosystem config, and deploy the application with comprehensive health checks.
 
-2. **Start Servers** (after setup):
+2. **Quick Start** (after setup):
+   ```bash
+   ./start-simple.sh
+   ```
+
+3. **Full Start with Health Checks** (after setup):
    ```bash
    ./run.sh
    ```
@@ -51,15 +56,31 @@ TaskBoss-AI is a comprehensive task and goal management application with AI-powe
    ./status.sh
    ```
 
+## 🔧 Recent Fixes & Improvements
+
+### ✅ Fixed Issues:
+1. **Nginx Configuration** - Fixed `gzip_proxied must-revalidate auth` syntax error to `must-revalidate`
+2. **PM2 Ecosystem** - Changed from `ecosystem.config.js` to `ecosystem.config.cjs` for CommonJS compatibility
+3. **Health Endpoint** - Added `/api/health` endpoint for server monitoring
+4. **Setup Validation** - Added comprehensive file existence checks before operations
+5. **Error Handling** - Improved error messages and debugging information
+
+### 🆕 New Features:
+- **Health Monitoring** - Real-time health checks during startup and operation
+- **Retry Logic** - Automatic retry mechanism for backend connectivity tests
+- **Simple Start Script** - `start-simple.sh` for quick daily startup without full setup
+- **Comprehensive Logging** - Better error tracking and debugging capabilities
+
 ## 📁 File Structure
 
 ### Setup Scripts
 - **`setup.bat`** - Complete Windows setup (installs dependencies, configures database, starts servers)
-- **`setup.sh`** - Complete VPS setup (installs dependencies, configures nginx/PM2, deploys application)
+- **`setup-root.sh`** - **FIXED** Complete VPS setup (nginx config, PM2 ecosystem, health checks)
 
 ### Runtime Scripts
 - **`run.bat`** - Start servers locally (Windows)
-- **`run.sh`** - Start servers on VPS (Linux)
+- **`run.sh`** - **IMPROVED** Start servers on VPS with comprehensive health checks
+- **`start-simple.sh`** - **NEW** Quick start script for daily use
 - **`stop.bat`** - Stop all servers locally (Windows)
 - **`stop.sh`** - Stop all servers on VPS (Linux)
 - **`status.bat`** - Check system status locally (Windows)
@@ -132,7 +153,19 @@ TaskBoss-AI uses SQLite for data storage with the following tables:
 - OpenAI API key
 - Domain name (optional, for SSL)
 
-## 🔄 Migration from JSON
+## 📖 Detailed Setup Guide
+
+For comprehensive VPS deployment instructions, troubleshooting, and advanced configuration, see:
+**[VPS-SETUP-GUIDE.md](VPS-SETUP-GUIDE.md)**
+
+This guide includes:
+- Step-by-step installation process
+- Common issues and solutions
+- Health check procedures
+- Configuration file locations
+- Useful commands for maintenance
+
+## � Migration from JSON
 
 If you have an existing JSON database (`server/db.json`), the setup scripts will automatically migrate your data to SQLite while preserving all:
 - User accounts and passwords

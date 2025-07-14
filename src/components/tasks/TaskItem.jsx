@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useTranslation } from "react-i18next";
 import { 
   CheckCircle2, 
   Circle, 
@@ -43,6 +44,7 @@ const statusColors = {
 };
 
 export default function TaskItem({ task, goal, onStatusChange, showGoalInfo = true, onCreateSubTask, onTaskUpdate }) {
+  const { t, i18n } = useTranslation();
   const StatusIcon = statusIcons[task.status];
   const isCompleted = task.status === "completed";
   const isOverdue = task.due_date && new Date(task.due_date) < new Date() && !isCompleted;
@@ -67,11 +69,11 @@ export default function TaskItem({ task, goal, onStatusChange, showGoalInfo = tr
 
   const getStatusText = () => {
     switch (task.status) {
-      case "pending": return "התחל";
-      case "in_progress": return "סיים";
-      case "completed": return "בטל";
-      case "paused": return "המשך";
-      default: return "עדכן";
+      case "pending": return t('tasks.start');
+      case "in_progress": return t('tasks.finish');
+      case "completed": return t('tasks.cancel');
+      case "paused": return t('tasks.continue');
+      default: return t('tasks.update');
     }
   };
 
@@ -155,7 +157,7 @@ export default function TaskItem({ task, goal, onStatusChange, showGoalInfo = tr
               {showGoalInfo && goal && (
                 <div className="mb-2">
                   <Link to={createPageUrl(`Goals?goal=${goal.id}`)} className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800">
-                    <span>היעד: {goal.title}</span>
+                    <span>{t('tasks.goalLabel', { title: goal.title })}</span>
                     <ArrowRight className="w-3 h-3" />
                   </Link>
                 </div>
@@ -165,13 +167,13 @@ export default function TaskItem({ task, goal, onStatusChange, showGoalInfo = tr
               <div className="flex flex-wrap gap-2 mb-2">
                 {task.difficulty && (
                   <Badge variant="outline">
-                    קושי: {task.difficulty}/10
+                    {t('tasks.difficulty', { level: task.difficulty })}
                   </Badge>
                 )}
                 {task.estimated_time && (
                   <Badge variant="outline" className="flex items-center gap-1">
                     <Clock className="w-3 h-3" />
-                    {task.estimated_time} דקות
+                    {t('tasks.estimatedTime', { time: task.estimated_time })}
                   </Badge>
                 )}
               </div>
@@ -183,9 +185,9 @@ export default function TaskItem({ task, goal, onStatusChange, showGoalInfo = tr
                 }`}>
                   <Calendar className="w-4 h-4" />
                   <span>
-                    {format(new Date(task.due_date), "d MMMM yyyy", { locale: he })}
+                    {format(new Date(task.due_date), "d MMMM yyyy", { locale: i18n.language === 'he' ? he : undefined })}
                   </span>
-                  {isOverdue && <span className="font-medium">(באיחור)</span>}
+                  {isOverdue && <span className="font-medium">{t('tasks.overdue')}</span>}
                 </div>
               )}
             </div>
@@ -209,7 +211,7 @@ export default function TaskItem({ task, goal, onStatusChange, showGoalInfo = tr
                     ? 'bg-gray-800 border-gray-600 text-gray-200 hover:bg-gray-700 hover:border-gray-500' 
                     : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
                 }`}
-                title="ערוך משימה"
+                title={t('tasks.editTask')}
               >
                 <Edit className="w-3 h-3" />
               </Button>
@@ -222,7 +224,7 @@ export default function TaskItem({ task, goal, onStatusChange, showGoalInfo = tr
                     ? 'bg-gray-800 border-gray-600 text-gray-200 hover:bg-gray-700 hover:border-gray-500' 
                     : 'bg-gradient-to-r from-blue-50 to-purple-50 hover:from-blue-100 hover:to-purple-100 border-blue-200'
                 }`}
-                title="תכנון ושליטה במשימה"
+                title={t('tasks.taskPlanningControl')}
               >
                 <Settings className="w-3 h-3" />
               </Button>
@@ -235,7 +237,7 @@ export default function TaskItem({ task, goal, onStatusChange, showGoalInfo = tr
                     ? 'bg-gray-800 border-gray-600 text-gray-200 hover:bg-gray-700 hover:border-gray-500' 
                     : 'bg-gradient-to-r from-green-50 to-teal-50 hover:from-green-100 hover:to-teal-100 border-green-200'
                 }`}
-                title="פוקוס"
+                title={t('focus.focusTimer')}
               >
                 <Timer className="w-3 h-3" />
               </Button>
@@ -249,7 +251,7 @@ export default function TaskItem({ task, goal, onStatusChange, showGoalInfo = tr
                     ? 'bg-gray-800 border-gray-600 text-gray-200 hover:bg-gray-700 hover:border-gray-500 disabled:bg-gray-800 disabled:text-gray-500' 
                     : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
                 }`}
-                title="יעץ לי"
+                title={t('tasks.adviseMe')}
               >
                 {isGettingAdvice ? <Loader2 className="w-3 h-3 animate-spin" /> : <Lightbulb className="w-3 h-3" />}
               </Button>
@@ -262,7 +264,7 @@ export default function TaskItem({ task, goal, onStatusChange, showGoalInfo = tr
               <div className="flex justify-between items-center mb-3">
                 <h4 className="font-medium text-green-800 flex items-center gap-2">
                   <Lightbulb className="w-4 h-4" />
-                  עצות להשלמת המשימה
+                  {t('tasks.taskCompletionAdvice')}
                 </h4>
                 <Button variant="ghost" size="sm" onClick={() => setShowAdvice(false)}>
                   ×
@@ -272,7 +274,7 @@ export default function TaskItem({ task, goal, onStatusChange, showGoalInfo = tr
               <div className="space-y-3 text-sm">
                 {taskAdvice.advice_tips && taskAdvice.advice_tips.length > 0 && (
                   <div>
-                    <h5 className="font-medium text-green-700 mb-1">עצות מעשיות:</h5>
+                    <h5 className="font-medium text-green-700 mb-1">{t('tasks.practicalAdvice')}</h5>
                     <ul className="space-y-1">
                       {taskAdvice.advice_tips.map((tip, i) => (
                         <li key={i} className="text-gray-700 flex items-start gap-2">
@@ -286,7 +288,7 @@ export default function TaskItem({ task, goal, onStatusChange, showGoalInfo = tr
                 
                 {taskAdvice.action_steps && taskAdvice.action_steps.length > 0 && (
                   <div>
-                    <h5 className="font-medium text-blue-700 mb-1">פעולות מומלצות:</h5>
+                    <h5 className="font-medium text-blue-700 mb-1">{t('tasks.recommendedActions')}</h5>
                     <ul className="space-y-1">
                       {taskAdvice.action_steps.map((step, i) => (
                         <li key={i} className="text-gray-700 flex items-start gap-2">
@@ -300,7 +302,7 @@ export default function TaskItem({ task, goal, onStatusChange, showGoalInfo = tr
 
                 {taskAdvice.motivation_tips && taskAdvice.motivation_tips.length > 0 && (
                   <div>
-                    <h5 className="font-medium text-purple-700 mb-1">טיפים למוטיבציה:</h5>
+                    <h5 className="font-medium text-purple-700 mb-1">{t('tasks.motivationTips')}</h5>
                     <ul className="space-y-1">
                       {taskAdvice.motivation_tips.map((tip, i) => (
                         <li key={i} className="text-gray-700 flex items-start gap-2">

@@ -8,6 +8,7 @@ import { Progress } from "@/components/ui/progress";
 import { tasksAPI } from "@/services/api";
 import { UserStats } from "@/api/entities";
 import { InvokeLLM } from "@/api/integrations";
+import { useTranslation } from "react-i18next";
 import { 
   ArrowRight, 
   Plus, 
@@ -43,6 +44,7 @@ const categoryColors = {
 };
 
 export default function GoalDetail({ goal, tasks, onBack, onTaskUpdate }) {
+  const { t } = useTranslation();
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [showChat, setShowChat] = useState(false);
@@ -258,7 +260,7 @@ export default function GoalDetail({ goal, tasks, onBack, onTaskUpdate }) {
       <div className="flex items-center gap-4">
         <Button variant="outline" onClick={onBack}>
           <ArrowRight className="w-4 h-4 mr-2" />
-          חזור ליעדים
+          {t('goals.backToGoals')}
         </Button>
         <div className="flex-1">
           <h1 className="text-2xl font-bold text-gray-900">{goal.title}</h1>
@@ -274,19 +276,19 @@ export default function GoalDetail({ goal, tasks, onBack, onTaskUpdate }) {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <div className="text-center">
               <p className="text-2xl font-bold text-blue-600">{completedTasks.length}</p>
-              <p className="text-sm text-gray-600">משימות הושלמו</p>
+              <p className="text-sm text-gray-600">{t('goals.completedTasks')}</p>
             </div>
             <div className="text-center">
               <p className="text-2xl font-bold text-purple-600">{tasks.length}</p>
-              <p className="text-sm text-gray-600">סה״כ משימות</p>
+              <p className="text-sm text-gray-600">{t('goals.totalTasks')}</p>
             </div>
             <div className="text-center">
               <p className="text-2xl font-bold text-green-600">{progress}%</p>
-              <p className="text-sm text-gray-600">התקדמות</p>
+              <p className="text-sm text-gray-600">{t('goals.progress')}</p>
             </div>
             <div className="text-center">
               <p className="text-2xl font-bold text-yellow-600">{goal.total_points || 0}</p>
-              <p className="text-sm text-gray-600">נקודות נצברו</p>
+              <p className="text-sm text-gray-600">{t('goals.pointsEarned')}</p>
             </div>
           </div>
 
@@ -300,7 +302,7 @@ export default function GoalDetail({ goal, tasks, onBack, onTaskUpdate }) {
               </Badge>
               {goal.difficulty && (
                 <Badge variant="outline">
-                  קושי: {goal.difficulty}/10
+                  {t('goals.difficulty', { level: goal.difficulty })}
                 </Badge>
               )}
               {goal.tags && goal.tags.map(tag => (
@@ -312,7 +314,7 @@ export default function GoalDetail({ goal, tasks, onBack, onTaskUpdate }) {
 
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <span>התקדמות כללית</span>
+                <span>{t('goals.progress')}</span>
                 <span>{progress}%</span>
               </div>
               <Progress value={progress} className="h-3" />
@@ -330,7 +332,7 @@ export default function GoalDetail({ goal, tasks, onBack, onTaskUpdate }) {
           className="flex items-center gap-2"
         >
           {isGettingSuggestions ? <Loader2 className="w-4 h-4 animate-spin" /> : <BrainCircuit className="w-4 h-4" />}
-          הצע משימות נוספות
+          {t('goals.suggestAdditionalTasks')}
         </Button>
         <Button
           onClick={() => setShowChat(!showChat)}
@@ -338,7 +340,7 @@ export default function GoalDetail({ goal, tasks, onBack, onTaskUpdate }) {
           className="flex items-center gap-2"
         >
           <MessageCircle className="w-4 h-4" />
-          צ'אט עם AI
+          {t('goals.chatWithAI')}
         </Button>
       </div>
 
@@ -358,7 +360,7 @@ export default function GoalDetail({ goal, tasks, onBack, onTaskUpdate }) {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Lightbulb className="w-5 h-5 text-yellow-500" />
-              משימות מוצעות
+              {t('goals.suggestedTasks')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -371,7 +373,7 @@ export default function GoalDetail({ goal, tasks, onBack, onTaskUpdate }) {
                     onClick={() => addSuggestedTask(task)}
                     className="bg-green-600 hover:bg-green-700"
                   >
-                    הוסף
+                    {t('goals.add')}
                   </Button>
                 </div>
               ))}
@@ -383,14 +385,14 @@ export default function GoalDetail({ goal, tasks, onBack, onTaskUpdate }) {
       {/* Add New Task */}
       <Card className="glass-effect border-0 shadow-lg">
         <CardHeader>
-          <CardTitle>הוסף משימה חדשה</CardTitle>
+          <CardTitle>{t('goals.addNewTask')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex gap-3">
             <Input
               value={newTaskTitle}
               onChange={(e) => setNewTaskTitle(e.target.value)}
-              placeholder="כותרת המשימה..."
+              placeholder={t('goals.taskTitlePlaceholder')}
               onKeyPress={(e) => e.key === 'Enter' && handleAddTask()}
             />
             <Button
@@ -407,7 +409,7 @@ export default function GoalDetail({ goal, tasks, onBack, onTaskUpdate }) {
       {/* Tasks List */}
       <Card className="glass-effect border-0 shadow-lg">
         <CardHeader>
-          <CardTitle>המשימות שלי ({tasks.length})</CardTitle>
+          <CardTitle>{t('goals.myTasks', { count: tasks.length })}</CardTitle>
         </CardHeader>
         <CardContent>
           {tasks.length > 0 ? (
@@ -423,8 +425,8 @@ export default function GoalDetail({ goal, tasks, onBack, onTaskUpdate }) {
           ) : (
             <div className="text-center py-8">
               <Circle className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500">אין משימות עדיין</p>
-              <p className="text-sm text-gray-400">הוסף משימה ראשונה כדי להתחיל!</p>
+              <p className="text-gray-500">{t('goals.noTasksYet')}</p>
+              <p className="text-sm text-gray-400">{t('goals.addFirstTask')}</p>
             </div>
           )}
         </CardContent>

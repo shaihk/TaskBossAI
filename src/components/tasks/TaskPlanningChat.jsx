@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { InvokeLLM } from "@/api/integrations";
+import { useTranslation } from "react-i18next";
 import { 
   X, 
   Send, 
@@ -20,18 +21,11 @@ import {
 } from "lucide-react";
 
 export default function TaskPlanningChat({ task, goal, onClose, onCreateSubTask }) {
+  const { t } = useTranslation();
   const [messages, setMessages] = useState([
     {
       type: "ai",
-      content: `שלום! אני המתכנן הדיגיטלי שלך. אני כאן לעזור לך עם המשימה "${task.title}". 
-
-אני יכול לעזור לך עם:
-🎯 הדרכה צעד אחר צעד
-📋 פירוק למשימות משנה
-💡 עצות והכוונה מקצועית
-🔧 פתרון בעיות וקשיים
-
-איך תרצה שנתחיל?`
+      content: t('taskPlanning.greeting', { title: task.title })
     }
   ]);
   const [newMessage, setNewMessage] = useState("");
@@ -41,10 +35,10 @@ export default function TaskPlanningChat({ task, goal, onClose, onCreateSubTask 
   const [suggestedSubTasks, setSuggestedSubTasks] = useState([]);
 
   const quickActions = [
-    { id: "step_guide", label: "הדרכה צעד אחר צעד", icon: List },
-    { id: "breakdown", label: "פירוק למשימות משנה", icon: CheckSquare },
-    { id: "tips", label: "טיפים ועצות", icon: Lightbulb },
-    { id: "troubleshoot", label: "פתרון בעיות", icon: Settings }
+    { id: "step_guide", label: t('taskPlanning.stepGuide'), icon: List },
+    { id: "breakdown", label: t('taskPlanning.breakdown'), icon: CheckSquare },
+    { id: "tips", label: t('taskPlanning.tips'), icon: Lightbulb },
+    { id: "troubleshoot", label: t('taskPlanning.troubleshoot'), icon: Settings }
   ];
 
   const sendMessage = async (message = newMessage, isQuickAction = false) => {
@@ -191,7 +185,7 @@ ${context}
       }
     } catch (error) {
       console.error("Error with AI planning chat:", error);
-      const errorMessage = { type: "ai", content: "מצטער, אירעה שגיאה. אנא נסה שוב." };
+      const errorMessage = { type: "ai", content: t('ai.error') };
       setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
@@ -222,7 +216,7 @@ ${context}
               <Sparkles className="w-5 h-5 text-white" />
             </div>
             <div>
-              <span className="text-lg">מתכנן המשימות AI</span>
+              <span className="text-lg">{t('taskPlanning.title')}</span>
               <p className="text-sm text-gray-600 font-normal">"{task.title}"</p>
             </div>
           </div>
@@ -284,7 +278,7 @@ ${context}
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <List className="w-5 h-5 text-blue-600" />
-                מדריך צעד אחר צעד
+                {t('taskPlanning.stepGuideTitle')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -300,7 +294,7 @@ ${context}
                         <p className="text-sm text-gray-700 mb-3 leading-relaxed">{step.description}</p>
                         {step.tips && step.tips.length > 0 && (
                           <div className="space-y-2">
-                            <p className="text-xs font-medium text-blue-700">💡 טיפים חשובים:</p>
+                            <p className="text-xs font-medium text-blue-700">💡 {t('taskPlanning.importantTips')}:</p>
                             <ul className="space-y-1">
                               {step.tips.map((tip, tipIndex) => (
                                 <li key={tipIndex} className="text-xs text-gray-600 flex items-start gap-2">
@@ -326,7 +320,7 @@ ${context}
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <CheckSquare className="w-5 h-5 text-green-600" />
-                משימות משנה מוצעות
+                {t('taskPlanning.suggestedSubTasks')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -345,7 +339,7 @@ ${context}
                       className="bg-green-600 hover:bg-green-700"
                     >
                       <Plus className="w-3 h-3 mr-1" />
-                      הוסף כמשימה
+                      {t('taskPlanning.addTask')}
                     </Button>
                   </div>
                 ))}
@@ -360,7 +354,7 @@ ${context}
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <Target className="w-5 h-5 text-purple-600" />
-                עצות ופעולות מומלצות
+                {t('taskPlanning.recommendedActions')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -381,7 +375,7 @@ ${context}
           <Input
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
-            placeholder="שאל אותי כל שאלה על המשימה או בקש עזרה..."
+            placeholder={t('taskPlanning.inputPlaceholder')}
             onKeyPress={(e) => e.key === 'Enter' && !isLoading && sendMessage()}
             disabled={isLoading}
             className="flex-1"

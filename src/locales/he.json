@@ -7,7 +7,7 @@
     "profile": "פרופיל"
   },
   "home": {
-    "welcome": "ברוכים הבאים לדשבורד שלכם",
+    "welcome": "ברוך הבא {{username}} לדשבורד הבקרה שלך",
     "newGoal": "יעד חדש",
     "quickActions": "פעולות מהירות",
     "addNewGoal": "הוספת יעד חדש",
@@ -357,5 +357,29 @@
     "tip1": "הסר את כל הדברים המסיחים מהמרחב העבודה",
     "tip2": "קח הפסקות קצרות כל 25 דקות",
     "tip3": "שמור על לחות ויציבה נכונה"
+  },
+  "sidebar": {
+    "toggle": "החלף סרגל צד",
+    "expand": "הרחב סרגל צד",
+    "collapse": "כווץ סרגל צד"
+  },
+  "app": {
+    "name": "TaskBoss-AI"
+  },
+  "profile": {
+    "title": "פרופיל משתמש",
+    "editProfile": "ערוך פרופיל",
+    "level": "רמה {{level}}",
+    "xpProgress": "{{current}} / {{total}} XP",
+    "nextLevelPoints": "עוד {{points}} נקודות לרמה הבאה",
+    "totalPoints": "סה״כ נקודות",
+    "completedTasks": "משימות שהושלמו",
+    "longestStreak": "{{days}} ימים",
+    "achievements": "הישגים",
+    "performanceStats": "ביצועים וסטטיסטיקות",
+    "preferredCategories": "קטגוריות מועדפות",
+    "notEnoughData": "אין עדיין מספיק נתונים",
+    "dailyGoalStreak": "רצף יעדים יומי",
+    "consecutiveDays": "ימים רצופים של השלמת יעדים"
   }
 }

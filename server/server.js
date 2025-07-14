@@ -60,6 +60,16 @@ const authenticateToken = (req, res, next) => {
 
 // --- API Endpoints ---
 
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+    res.json({
+        status: 'OK',
+        timestamp: new Date().toISOString(),
+        service: 'TaskBoss-AI',
+        database: db ? 'connected' : 'disconnected'
+    });
+});
+
 // Authentication endpoints
 app.post('/api/auth/register', async (req, res) => {
     const { email, password, full_name } = req.body;

@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
+import { useTranslation } from "react-i18next";
 import { X, Plus, Save, Sparkles, Loader2 } from "lucide-react";
 import { InvokeLLM } from "@/api/integrations";
 
@@ -27,6 +28,7 @@ const categories = [
 ];
 
 export default function GoalForm({ goal, onSubmit, onCancel }) {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     title: goal?.title || "",
     description: goal?.description || "",
@@ -110,7 +112,7 @@ export default function GoalForm({ goal, onSubmit, onCancel }) {
     <Card className="glass-effect border-0 shadow-lg">
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
-          <span>{goal ? "עריכת יעד" : "יעד חדש"}</span>
+          <span>{goal ? t('form.editGoal') : t('goals.newGoal')}</span>
           <Button variant="ghost" size="icon" onClick={onCancel}>
             <X className="w-5 h-5" />
           </Button>
@@ -120,24 +122,24 @@ export default function GoalForm({ goal, onSubmit, onCancel }) {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Title */}
           <div className="space-y-2">
-            <Label htmlFor="title">כותרת היעד</Label>
+            <Label htmlFor="title">{t('form.goalTitle')}</Label>
             <Input
               id="title"
               value={formData.title}
               onChange={(e) => handleInputChange("title", e.target.value)}
-              placeholder="מה תרצה להשיג?"
+              placeholder={t('form.goalTitlePlaceholder')}
               required
             />
           </div>
 
           {/* Description */}
           <div className="space-y-2">
-            <Label htmlFor="description">תיאור</Label>
+            <Label htmlFor="description">{t('form.description')}</Label>
             <Textarea
               id="description"
               value={formData.description}
               onChange={(e) => handleInputChange("description", e.target.value)}
-              placeholder="פרטים נוספים על היעד..."
+              placeholder={t('form.descriptionPlaceholder')}
               rows={3}
             />
           </div>
@@ -145,7 +147,7 @@ export default function GoalForm({ goal, onSubmit, onCancel }) {
           {/* Priority and Category */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>עדיפות</Label>
+              <Label>{t('form.priority.title')}</Label>
               <Select value={formData.priority} onValueChange={(value) => handleInputChange("priority", value)}>
                 <SelectTrigger>
                   <SelectValue />
@@ -153,7 +155,7 @@ export default function GoalForm({ goal, onSubmit, onCancel }) {
                 <SelectContent>
                   {priorities.map(priority => (
                     <SelectItem key={priority.value} value={priority.value}>
-                      {priority.label}
+                      {t(`form.priority.${priority.value}`)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -161,7 +163,7 @@ export default function GoalForm({ goal, onSubmit, onCancel }) {
             </div>
 
             <div className="space-y-2">
-              <Label>קטגוריה</Label>
+              <Label>{t('form.category.title')}</Label>
               <Select value={formData.category} onValueChange={(value) => handleInputChange("category", value)}>
                 <SelectTrigger>
                   <SelectValue />
@@ -169,7 +171,7 @@ export default function GoalForm({ goal, onSubmit, onCancel }) {
                 <SelectContent>
                   {categories.map(category => (
                     <SelectItem key={category.value} value={category.value}>
-                      {category.label}
+                      {t(`form.category.${category.value}`)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -180,7 +182,7 @@ export default function GoalForm({ goal, onSubmit, onCancel }) {
           {/* Difficulty and Time */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <Label>רמת קושי: {formData.difficulty}/10</Label>
+              <Label>{t('form.difficulty')}: {formData.difficulty}/10</Label>
               <Slider
                 value={[formData.difficulty]}
                 onValueChange={(value) => handleInputChange("difficulty", value[0])}
@@ -192,7 +194,7 @@ export default function GoalForm({ goal, onSubmit, onCancel }) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="estimated_time">זמן מוערך (דקות)</Label>
+              <Label htmlFor="estimated_time">{t('form.estimatedTime')} ({t('form.minutes')})</Label>
               <Input
                 id="estimated_time"
                 type="number"
@@ -205,7 +207,7 @@ export default function GoalForm({ goal, onSubmit, onCancel }) {
 
           {/* Due Date */}
           <div className="space-y-2">
-            <Label htmlFor="due_date">תאריך יעד</Label>
+            <Label htmlFor="due_date">{t('form.dueDate')}</Label>
             <Input
               id="due_date"
               type="date"
@@ -216,7 +218,7 @@ export default function GoalForm({ goal, onSubmit, onCancel }) {
 
           {/* Tags */}
           <div className="space-y-2">
-            <Label>תגיות</Label>
+            <Label>{t('form.tags')}</Label>
             {/* Suggested Tags */}
             <div className="flex flex-wrap gap-2 mb-2">
               {isGettingTags && <Loader2 className="w-4 h-4 animate-spin" />}
@@ -230,7 +232,7 @@ export default function GoalForm({ goal, onSubmit, onCancel }) {
               <Input
                 value={newTag}
                 onChange={(e) => setNewTag(e.target.value)}
-                placeholder="הוסף תגית..."
+                placeholder={t('form.addTagPlaceholder')}
                 onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag(newTag))}
               />
               <Button type="button" variant="outline" onClick={() => addTag(newTag)}>
@@ -250,11 +252,11 @@ export default function GoalForm({ goal, onSubmit, onCancel }) {
           {/* Form Actions */}
           <div className="flex justify-end gap-3 pt-4">
             <Button type="button" variant="outline" onClick={onCancel}>
-              ביטול
+              {t('form.cancel')}
             </Button>
             <Button type="submit" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
               <Save className="w-4 h-4 mr-2" />
-              {goal ? "עדכון" : "יצירה"}
+              {goal ? t('form.update') : t('form.create')}
             </Button>
           </div>
         </form>

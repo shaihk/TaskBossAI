@@ -6,6 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Target, CheckSquare, Trash2, X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,6 +22,7 @@ import {
 import TaskItem from "./TaskItem";
 
 export default function TaskList({ tasks, goals, onStatusChange, isLoading, getTaskGoal, onCreateSubTask, onBulkDelete, onTaskUpdate }) {
+  const { t } = useTranslation();
   const [selectedTasks, setSelectedTasks] = useState(new Set());
   const [showBulkActions, setShowBulkActions] = useState(false);
 
@@ -94,8 +96,8 @@ export default function TaskList({ tasks, goals, onStatusChange, isLoading, getT
       <Card className="glass-effect border-0 shadow-lg">
         <CardContent className="p-12 text-center">
           <Target className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">אין משימות</h3>
-          <p className="text-gray-500">עבור לעמוד היעדים כדי ליצור יעד חדש ולהוסיף משימות</p>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">{t('tasks.noTasks')}</h3>
+          <p className="text-gray-500">{t('tasks.goToGoalsPage')}</p>
         </CardContent>
       </Card>
     );
@@ -127,7 +129,7 @@ export default function TaskList({ tasks, goals, onStatusChange, isLoading, getT
                     onClick={handleSelectAll}
                     disabled={selectedTasks.size === tasks.length}
                   >
-                    בחר הכל
+                    {t('tasks.selectAll')}
                   </Button>
                   <Button
                     variant="outline"
@@ -135,12 +137,12 @@ export default function TaskList({ tasks, goals, onStatusChange, isLoading, getT
                     onClick={handleClearAll}
                     disabled={selectedTasks.size === 0}
                   >
-                    נקה הכל
+                    {t('tasks.clearAll')}
                   </Button>
                 </div>
                 {selectedTasks.size > 0 && (
                   <Badge variant="secondary">
-                    {selectedTasks.size} נבחרו
+                    {t('tasks.selectedCount', { count: selectedTasks.size })}
                   </Badge>
                 )}
               </div>
@@ -154,7 +156,7 @@ export default function TaskList({ tasks, goals, onStatusChange, isLoading, getT
                     className="bg-green-600 hover:bg-green-700"
                   >
                     <CheckSquare className="w-4 h-4 mr-2" />
-                    סמן כהושלמו
+                    {t('tasks.markAsCompleted')}
                   </Button>
                   
                   <AlertDialog>
@@ -164,24 +166,23 @@ export default function TaskList({ tasks, goals, onStatusChange, isLoading, getT
                         variant="destructive"
                       >
                         <Trash2 className="w-4 h-4 mr-2" />
-                        מחק נבחרים
+                        {t('tasks.deleteSelected')}
                       </Button>
                     </AlertDialogTrigger>
-                    <AlertDialogContent dir="rtl">
+                    <AlertDialogContent dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
                       <AlertDialogHeader>
-                        <AlertDialogTitle>האם אתה בטוח?</AlertDialogTitle>
+                        <AlertDialogTitle>{t('tasks.areYouSure')}</AlertDialogTitle>
                         <AlertDialogDescription>
-                          פעולה זו תמחק {selectedTasks.size} משימות שנבחרו לצמיתות. 
-                          לא ניתן לשחזר את הנתונים לאחר המחיקה.
+                          {t('tasks.deletionWarning', { count: selectedTasks.size })}
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
-                        <AlertDialogCancel>ביטול</AlertDialogCancel>
+                        <AlertDialogCancel>{t('tasks.cancel')}</AlertDialogCancel>
                         <AlertDialogAction
                           onClick={handleBulkDelete}
                           className="bg-red-600 hover:bg-red-700"
                         >
-                          מחק משימות
+                          {t('tasks.deleteTasks')}
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>

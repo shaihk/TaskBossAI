@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { tasksAPI } from "@/services/api";
+import { useTranslation } from "react-i18next";
 import { 
   CheckCircle2, 
   Circle, 
@@ -29,6 +30,7 @@ const statusIcons = {
 };
 
 export default function TodayTasks({ tasks, isLoading, onTaskUpdate }) {
+  const { t } = useTranslation();
   const handleStatusChange = async (task, newStatus) => {
     try {
       const updateData = { status: newStatus };
@@ -70,7 +72,7 @@ export default function TodayTasks({ tasks, isLoading, onTaskUpdate }) {
     return (
       <Card className="glass-effect border-0 shadow-lg">
         <CardHeader>
-          <CardTitle>משימות היום</CardTitle>
+          <CardTitle>{t('home.todayTasks')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -101,10 +103,10 @@ export default function TodayTasks({ tasks, isLoading, onTaskUpdate }) {
             <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg">
               <Clock className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-bold text-gray-800">משימות היום</span>
+            <span className="text-xl font-bold text-gray-800">{t('home.todayTasks')}</span>
           </div>
           <Badge variant="secondary" className="bg-blue-100 text-blue-800 px-4 py-2 rounded-xl font-bold text-sm">
-            {tasks.length} משימות
+            {t('home.tasksCount', { count: tasks.length })}
           </Badge>
         </CardTitle>
       </CardHeader>
@@ -116,7 +118,7 @@ export default function TodayTasks({ tasks, isLoading, onTaskUpdate }) {
               <div className="flex items-center gap-3 p-3 bg-orange-50 rounded-xl border-l-4 border-orange-400">
                 <AlertCircle className="w-5 h-5 text-orange-600" />
                 <h4 className="font-bold text-orange-800">
-                  ממתינות ({pendingTasks.length})
+                  {t('home.pendingTasks', { count: pendingTasks.length })}
                 </h4>
               </div>
               <div className="space-y-3">
@@ -137,7 +139,7 @@ export default function TodayTasks({ tasks, isLoading, onTaskUpdate }) {
               <div className="flex items-center gap-3 p-3 bg-green-50 rounded-xl border-l-4 border-green-400">
                 <CheckCircle2 className="w-5 h-5 text-green-600" />
                 <h4 className="font-bold text-green-800">
-                  הושלמו ({completedTasks.length})
+                  {t('home.completedTasks', { count: completedTasks.length })}
                 </h4>
               </div>
               <div className="space-y-3">
@@ -157,8 +159,8 @@ export default function TodayTasks({ tasks, isLoading, onTaskUpdate }) {
               <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center mx-auto mb-6">
                 <Clock className="w-10 h-10 text-blue-500" />
               </div>
-              <p className="text-xl font-bold text-gray-700 mb-2">אין משימות להיום</p>
-              <p className="text-gray-500">זה הזמן המושלם להוסיף משימות חדשות!</p>
+              <p className="text-xl font-bold text-gray-700 mb-2">{t('home.noTasksToday')}</p>
+              <p className="text-gray-500">{t('home.perfectTimeToAdd')}</p>
             </div>
           )}
         </div>
@@ -168,6 +170,7 @@ export default function TodayTasks({ tasks, isLoading, onTaskUpdate }) {
 }
 
 function TaskItem({ task, onStatusChange }) {
+  const { t } = useTranslation();
   const StatusIcon = statusIcons[task.status];
   const isCompleted = task.status === "completed";
 
@@ -202,12 +205,12 @@ function TaskItem({ task, onStatusChange }) {
           </Badge>
           {task.estimated_time && (
             <span className="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded-lg">
-              {task.estimated_time} דקות
+              {t('home.estimatedTime', { time: task.estimated_time })}
             </span>
           )}
           {task.difficulty && (
             <span className="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded-lg">
-              קושי: {task.difficulty}/10
+              {t('home.difficulty', { level: task.difficulty })}/10
             </span>
           )}
         </div>
@@ -215,7 +218,7 @@ function TaskItem({ task, onStatusChange }) {
       
       {task.points_earned > 0 && (
         <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-bold px-3 py-2 rounded-xl shadow-lg">
-          +{task.points_earned} נקודות
+          {t('home.pointsEarned', { points: task.points_earned })}
         </Badge>
       )}
     </div>

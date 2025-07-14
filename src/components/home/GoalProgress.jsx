@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useTranslation } from "react-i18next";
 import { Target, TrendingUp, Calendar } from "lucide-react";
 
 const goalTypeColors = {
@@ -13,11 +14,12 @@ const goalTypeColors = {
 };
 
 export default function GoalProgress({ goals, isLoading }) {
+  const { t } = useTranslation();
   if (isLoading) {
     return (
       <Card className="glass-effect border-0 shadow-lg">
         <CardHeader>
-          <CardTitle>התקדמות יעדים</CardTitle>
+          <CardTitle>{t('home.goalProgress')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -43,7 +45,7 @@ export default function GoalProgress({ goals, isLoading }) {
           <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-lg">
             <Target className="w-5 h-5 text-white" />
           </div>
-          <span className="text-xl font-bold text-gray-800">התקדמות יעדים</span>
+          <span className="text-xl font-bold text-gray-800">{t('home.goalProgress')}</span>
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -77,7 +79,7 @@ export default function GoalProgress({ goals, isLoading }) {
                   {isCompleted && (
                     <div className="flex items-center gap-2 text-green-600 bg-green-50 px-3 py-2 rounded-xl border border-green-200">
                       <TrendingUp className="w-4 h-4" />
-                      <span className="text-sm font-bold">יעד הושלם!</span>
+                      <span className="text-sm font-bold">{t('home.goalCompleted')}</span>
                     </div>
                   )}
                 </div>
@@ -88,8 +90,8 @@ export default function GoalProgress({ goals, isLoading }) {
               <div className="w-16 h-16 rounded-full bg-gradient-to-br from-green-100 to-emerald-100 flex items-center justify-center mx-auto mb-4">
                 <Target className="w-8 h-8 text-green-500" />
               </div>
-              <p className="text-lg font-bold text-gray-700 mb-2">אין יעדים פעילים</p>
-              <p className="text-gray-500">התחל ביצירת יעדים חדשים!</p>
+              <p className="text-lg font-bold text-gray-700 mb-2">{t('home.noActiveGoals')}</p>
+              <p className="text-gray-500">{t('home.addGoalsToTrack')}</p>
             </div>
           )}
         </div>

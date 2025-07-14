@@ -265,88 +265,117 @@ export default function Layout({ children, currentPageName }) {
       <div className="mesh-background"></div>
 
       {/* Desktop Sidebar */}
-      <div className={`hidden lg:flex lg:flex-col lg:fixed lg:inset-y-0 lg:right-0 lg:z-50 transition-all duration-500 ease-in-out ${sidebarCollapsed ? 'lg:w-20' : 'lg:w-72'}`}>
-        <div className="flex grow flex-col gap-y-6 overflow-y-auto glass-effect-strong px-6 pb-6 m-4 rounded-2xl scale-in">
-          <div className="flex h-24 shrink-0 items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-600 flex items-center justify-center floating-animation shadow-lg glow-effect">
-                <Sparkles className="w-7 h-7 text-white" />
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-600 to-purple-600 opacity-20 blur-lg"></div>
-              </div>
-              {!sidebarCollapsed && (
-                <div className="text-right">
-                  <h1 className="text-2xl font-bold">TaskBoss-AI</h1>
-                  <p className={`text-xs font-medium mt-1 ${
-                    isDarkMode ? 'text-gray-300' : 'text-gray-500'
-                  }`}>{t('home.smartTaskManager')}</p>
-                </div>
-              )}
-            </div>
+      <div className={`group hidden lg:flex lg:flex-col lg:fixed lg:inset-y-0 lg:right-0 lg:z-50 transition-all duration-500 ease-in-out ${sidebarCollapsed ? 'lg:w-16' : 'lg:w-72'}`}>
+        {/* Collapse/Expand indicator line */}
+        <div className={`absolute left-0 top-1/2 transform -translate-y-1/2 w-1 h-16 rounded-r-full transition-all duration-500 ${
+          sidebarCollapsed 
+            ? 'bg-gradient-to-b from-blue-500 to-purple-500 shadow-lg shadow-blue-500/50 group-hover:w-2 group-hover:h-20' 
+            : 'bg-gradient-to-b from-gray-300 to-gray-400 opacity-50'
+        }`}></div>
+        {sidebarCollapsed ? (
+          // Collapsed state - only show toggle button
+          <div className="flex items-center justify-center h-full">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-              className={`p-2.5 rounded-xl transition-colors ${
-                isDarkMode ? 'hover:bg-gray-800/20' : 'hover:bg-white/20'
+              className={`group relative p-3 rounded-xl transition-all duration-300 hover:scale-110 ${
+                isDarkMode 
+                  ? 'hover:bg-gray-800/40 hover:shadow-lg hover:shadow-blue-500/20' 
+                  : 'hover:bg-white/40 hover:shadow-lg hover:shadow-blue-500/20'
               }`}
+              title={t('sidebar.expand')}
             >
-              {sidebarCollapsed ? 
-                <ChevronLeft className={`h-5 w-5 ${
-                  isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                }`} /> : 
-                <ChevronRight className={`h-5 w-5 ${
-                  isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                }`} />
-              }
+              <div className={`absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
+                isDarkMode 
+                  ? 'bg-gradient-to-r from-blue-600/20 to-purple-600/20' 
+                  : 'bg-gradient-to-r from-blue-500/20 to-purple-500/20'
+              }`}></div>
+              <ChevronLeft className={`relative z-10 h-5 w-5 transition-all duration-300 group-hover:scale-110 ${
+                isDarkMode ? 'text-gray-300 group-hover:text-white' : 'text-gray-600 group-hover:text-blue-600'
+              }`} />
             </Button>
           </div>
-          
-          <nav className="flex flex-1 flex-col">
-            <ul className="flex flex-1 flex-col gap-y-3">
-              {navigationItems.map((item, index) => (
-                <li key={item.name}>
-                  <Link
-                    to={item.url}
-                    className={`group flex gap-x-4 rounded-2xl p-4 text-sm font-semibold transition-all duration-300 relative overflow-hidden ${
-                      location.pathname === item.url
-                        ? 'bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white shadow-xl glow-effect'
-                        : isDarkMode 
-                          ? 'text-gray-200 hover:text-white hover:bg-gray-800/60 hover:shadow-md card-hover'
-                          : 'text-gray-700 hover:text-blue-700 hover:bg-white/60 hover:shadow-md card-hover'
-                    } ${sidebarCollapsed ? 'justify-center' : ''}`}
-                    title={sidebarCollapsed ? item.name : ''}
-                    style={{
-                      animationDelay: `${index * 0.1}s`
-                    }}
-                  >
-                    <div className={`relative z-10 p-1 rounded-lg ${
-                      location.pathname === item.url 
-                        ? 'bg-white/20' 
-                        : isDarkMode
-                          ? 'group-hover:bg-gray-700/50 transition-colors duration-200'
-                          : 'group-hover:bg-blue-50 transition-colors duration-200'
-                    }`}>
-                      <item.icon className={`h-5 w-5 shrink-0 ${
+        ) : (
+          // Expanded state - show full sidebar
+          <div className="flex grow flex-col gap-y-6 overflow-y-auto glass-effect-strong px-6 pb-6 m-4 rounded-2xl scale-in">
+            <div className="flex h-24 shrink-0 items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-600 flex items-center justify-center floating-animation shadow-lg glow-effect">
+                  <Sparkles className="w-7 h-7 text-white" />
+                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-600 to-purple-600 opacity-20 blur-lg"></div>
+                </div>
+                <div className="text-right">
+                  <h1 className="text-2xl font-bold">{t('app.name')}</h1>
+                  <p className={`text-xs font-medium mt-1 ${
+                    isDarkMode ? 'text-gray-300' : 'text-gray-500'
+                  }`}>{t('home.smartTaskManager')}</p>
+                </div>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+                className={`group relative p-2.5 rounded-xl transition-all duration-300 hover:scale-110 ${
+                  isDarkMode 
+                    ? 'hover:bg-gray-800/40 hover:shadow-lg hover:shadow-blue-500/20' 
+                    : 'hover:bg-white/40 hover:shadow-lg hover:shadow-blue-500/20'
+                }`}
+                title={t('sidebar.collapse')}
+              >
+                <div className={`absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
+                  isDarkMode 
+                    ? 'bg-gradient-to-r from-blue-600/20 to-purple-600/20' 
+                    : 'bg-gradient-to-r from-blue-500/20 to-purple-500/20'
+                }`}></div>
+                <ChevronRight className={`relative z-10 h-5 w-5 transition-all duration-300 group-hover:scale-110 ${
+                  isDarkMode ? 'text-gray-300 group-hover:text-white' : 'text-gray-600 group-hover:text-blue-600'
+                }`} />
+              </Button>
+            </div>
+            
+            <nav className="flex flex-1 flex-col">
+              <ul className="flex flex-1 flex-col gap-y-3">
+                {navigationItems.map((item, index) => (
+                  <li key={item.name}>
+                    <Link
+                      to={item.url}
+                      className={`group flex gap-x-4 rounded-2xl p-4 text-sm font-semibold transition-all duration-300 relative overflow-hidden ${
+                        location.pathname === item.url
+                          ? 'bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white shadow-xl glow-effect'
+                          : isDarkMode 
+                            ? 'text-gray-200 hover:text-white hover:bg-gray-800/60 hover:shadow-md card-hover'
+                            : 'text-gray-700 hover:text-blue-700 hover:bg-white/60 hover:shadow-md card-hover'
+                      }`}
+                      style={{
+                        animationDelay: `${index * 0.1}s`
+                      }}
+                    >
+                      <div className={`relative z-10 p-1 rounded-lg ${
                         location.pathname === item.url 
-                          ? 'text-white' 
+                          ? 'bg-white/20' 
                           : isDarkMode
-                            ? 'text-gray-300 group-hover:text-white'
-                            : 'text-gray-600 group-hover:text-blue-600'
-                      }`} />
-                    </div>
-                    {!sidebarCollapsed && (
+                            ? 'group-hover:bg-gray-700/50 transition-colors duration-200'
+                            : 'group-hover:bg-blue-50 transition-colors duration-200'
+                      }`}>
+                        <item.icon className={`h-5 w-5 shrink-0 ${
+                          location.pathname === item.url 
+                            ? 'text-white' 
+                            : isDarkMode
+                              ? 'text-gray-300 group-hover:text-white'
+                              : 'text-gray-600 group-hover:text-blue-600'
+                        }`} />
+                      </div>
                       <span className="relative z-10 tracking-wide">
                         {item.name}
                       </span>
-                    )}
-                    {location.pathname === item.url && (
-                      <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-2xl blur-xl"></div>
-                    )}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-            {!sidebarCollapsed && (
+                      {location.pathname === item.url && (
+                        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-2xl blur-xl"></div>
+                      )}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
               <div className={`mt-auto pt-6 border-t space-y-4 ${
                 isDarkMode ? 'border-gray-600/50' : 'border-gray-200/50'
               }`}>
@@ -362,7 +391,7 @@ export default function Layout({ children, currentPageName }) {
                   </div>
                   <div className={`text-xs mt-1 ${
                     isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                  }`}>פרפיל משתמש</div>
+                  }`}>{t('profile.title')}</div>
                 </div>
                 <div className="px-2 space-y-2">
                   <LanguageSelector />
@@ -407,9 +436,9 @@ export default function Layout({ children, currentPageName }) {
                   <span className="font-medium">{t('auth.logout')}</span>
                 </Button>
               </div>
-            )}
-          </nav>
-        </div>
+            </nav>
+          </div>
+        )}
       </div>
 
       {/* Mobile header */}
@@ -426,7 +455,7 @@ export default function Layout({ children, currentPageName }) {
                 <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center">
                   <Sparkles className="w-4 h-4 text-white" />
                 </div>
-                <span className="text-lg font-bold gradient-text">TaskMaster AI</span>
+                <span className="text-lg font-bold gradient-text">{t('app.name')}</span>
               </div>
             </div>
             <nav className="mt-8">
@@ -479,7 +508,7 @@ export default function Layout({ children, currentPageName }) {
             <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center">
               <Sparkles className="w-4 h-4 text-white" />
             </div>
-            <span className="text-lg font-bold gradient-text">TaskMaster AI</span>
+            <span className="text-lg font-bold gradient-text">{t('app.name')}</span>
           </div>
           <div className="flex items-center gap-2 ml-auto">
             <LanguageSelector />
@@ -488,7 +517,7 @@ export default function Layout({ children, currentPageName }) {
       </div>
 
       {/* Main content */}
-      <main className={`transition-all duration-500 ease-in-out ${sidebarCollapsed ? 'lg:pr-24' : 'lg:pr-80'} ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+      <main className={`transition-all duration-500 ease-in-out ${sidebarCollapsed ? 'lg:pr-20' : 'lg:pr-80'} ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
         <div className="px-6 py-10 sm:px-8 lg:px-12 min-h-screen">
           <div className="mx-auto max-w-7xl relative z-10">
             <div className="scale-in">

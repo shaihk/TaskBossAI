@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { goalsAPI, tasksAPI } from '@/services/api';
+import { UserStats } from '@/api/entities';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -103,18 +104,53 @@ export default function Goals() {
     setShowCompletionModal(true);
   };
 
+  const calculateGoalPoints = (goal, tasks) => {
+    let points = 0;
+    // Base points for completing a goal
+    points += 100;
+
+    // Bonus points for difficulty
+    points += (goal.difficulty || 5) * 20;
+
+    // Bonus points for completing all tasks
+    const completedTasks = tasks.filter(task => task.status === 'completed');
+    if (completedTasks.length === tasks.length) {
+      points += 50;
+    }
+
+    return points;
+  };
+
   const handleGoalCompletion = async (completionData) => {
     try {
+      const points = calculateGoalPoints(completingGoal, getGoalTasks(completingGoal.id));
       await goalsAPI.update(completingGoal.id, {
         status: "completed",
         completed_at: completionData.completed_at,
         completion_status: completionData.completion_status,
         completion_memo: {
-            ...completionData.completion_memo, // This should contain final_thoughts, satisfaction_level
-            actual_time_taken: completionData.time_taken // Adding time_taken to memo for display consistency
+            ...completionData.completion_memo,
+            actual_time_taken: completionData.time_taken
         },
-        actual_time_taken: completionData.time_taken // Keep this top-level as well if the schema supports it
+        actual_time_taken: completionData.time_taken,
+        points_earned: points
       });
+
+      // Update user stats
+      const statsList = await UserStats.list();
+      if (statsList.length > 0) {
+        const userStats = statsList[0];
+        const newPoints = userStats.total_points + points;
+        const newLevel = Math.floor(newPoints / 1000) + 1;
+        
+        await UserStats.update(userStats.id, {
+          total_points: newPoints,
+          current_level: newLevel,
+          experience_points: newPoints,
+          goals_completed: userStats.goals_completed + 1,
+          last_activity: new Date().toISOString()
+        });
+      }
       
       setShowCompletionModal(false);
       setCompletingGoal(null);
@@ -280,29 +316,29 @@ export default function Goals() {
                   </Badge>
                   {goal.difficulty && (
                     <Badge variant="outline">
-                      קושי: {goal.difficulty}/10
+                      {t('goals.difficulty', { level: goal.difficulty })}
                     </Badge>
                   )}
                   {isCompleted && (
                     <Badge className="bg-green-100 text-green-800">
                       <Trophy className="w-3 h-3 mr-1" />
-                      הושלם
+                      {t('goals.completed')}
                     </Badge>
                   )}
                 </div>
 
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span>התקדמות</span>
-                    <span>{completedTasks}/{goalTasks.length} משימות</span>
+                    <span>{t('goals.progress')}</span>
+                    <span>{t('goals.tasksProgress', { completed: completedTasks, total: goalTasks.length })}</span>
                   </div>
                   <Progress value={progress} className="h-2" />
-                  <p className="text-xs text-gray-500">{progress}% הושלם</p>
+                  <p className="text-xs text-gray-500">{t('goals.progressPercentage', { percentage: progress })}</p>
                 </div>
 
                 {isCompleted && goal.completion_memo && (
                   <div className="p-3 bg-green-50 rounded-lg border border-green-200">
-                    <p className="text-xs text-green-700 font-medium mb-1">זיכרון מהיעד:</p>
+                    <p className="text-xs text-green-700 font-medium mb-1">{t('goals.goalMemory')}</p>
                     {goal.completion_memo.final_thoughts && (
                       <p className="text-sm text-green-800 italic">
                         "{goal.completion_memo.final_thoughts.substring(0, 100)}
@@ -312,12 +348,12 @@ export default function Goals() {
                     <div className="flex items-center gap-2 mt-2">
                       {goal.completion_memo.satisfaction_level && (
                         <Badge variant="outline" className="text-xs">
-                          שביעות רצון: {goal.completion_memo.satisfaction_level}/5
+                          {t('goals.satisfactionLevel', { level: goal.completion_memo.satisfaction_level })}
                         </Badge>
                       )}
                       {goal.completion_memo.actual_time_taken && ( // Changed to goal.completion_memo.actual_time_taken
                         <Badge variant="outline" className="text-xs">
-                          {goal.completion_memo.actual_time_taken} דקות
+                          {t('goals.actualTime', { time: goal.completion_memo.actual_time_taken })}
                         </Badge>
                       )}
                     </div>
@@ -332,7 +368,7 @@ export default function Goals() {
                         className="flex-1 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700"
                       >
                         <Play className="w-4 h-4 mr-2" />
-                        התחל יעד
+                        {t('goals.startGoal')}
                       </Button>
                       {progress >= 50 && (
                         <Button
@@ -341,7 +377,7 @@ export default function Goals() {
                           className="border-green-500 text-green-700 hover:bg-green-50"
                         >
                           <Trophy className="w-4 h-4 mr-2" />
-                          סיים יעד
+                          {t('goals.finishGoal')}
                         </Button>
                       )}
                     </>
@@ -352,7 +388,7 @@ export default function Goals() {
                       className="flex-1"
                     >
                       <Target className="w-4 h-4 mr-2" />
-                      צפה ביעד
+                      {t('goals.viewGoal')}
                     </Button>
                   )}
                 </div>
@@ -366,8 +402,8 @@ export default function Goals() {
         <Card className="glass-effect border-0 shadow-lg text-center py-20">
           <CardContent>
             <Target className="w-16 h-16 mx-auto text-gray-300 mb-4" />
-            <h2 className="text-2xl font-bold text-gray-800">אין יעדים עדיין</h2>
-            <p className="text-gray-600 mt-2">התחילו ביצירת היעד הראשון שלכם!</p>
+            <h2 className="text-2xl font-bold text-gray-800">{t('goals.noGoalsYet')}</h2>
+            <p className="text-gray-600 mt-2">{t('goals.createFirstGoal')}</p>
           </CardContent>
         </Card>
       )}

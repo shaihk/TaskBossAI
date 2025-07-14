@@ -45,25 +45,43 @@ check_setup() {
     
     if [[ ! -d "$APP_DIR" ]]; then
         print_error "Application directory not found at $APP_DIR"
-        print_info "Please run setup.sh first to set up the application."
+        print_info "Please run setup-root.sh first to set up the application."
         exit 1
     fi
     
     if [[ ! -f "$APP_DIR/.env" ]]; then
         print_error "Configuration file not found!"
-        print_info "Please run setup.sh first to configure the application."
+        print_info "Please run setup-root.sh first to configure the application."
         exit 1
     fi
     
     if [[ ! -f "$APP_DIR/server/taskboss.db" ]]; then
         print_error "Database not found!"
-        print_info "Please run setup.sh first to set up the database."
+        print_info "Please run setup-root.sh first to set up the database."
         exit 1
     fi
     
     if [[ ! -d "$APP_DIR/node_modules" ]]; then
         print_error "Dependencies not found!"
-        print_info "Please run setup.sh first to install dependencies."
+        print_info "Please run setup-root.sh first to install dependencies."
+        exit 1
+    fi
+    
+    if [[ ! -f "$APP_DIR/server/server.js" ]]; then
+        print_error "Server file not found!"
+        print_info "Please run setup-root.sh first to set up the server."
+        exit 1
+    fi
+    
+    if [[ ! -f "$APP_DIR/ecosystem.config.cjs" ]]; then
+        print_error "PM2 configuration not found!"
+        print_info "Please run setup-root.sh first to configure PM2."
+        exit 1
+    fi
+    
+    if [[ ! -d "$APP_DIR/dist" ]]; then
+        print_error "Frontend build not found!"
+        print_info "Please run setup-root.sh first to build the frontend."
         exit 1
     fi
     
@@ -101,7 +119,7 @@ start_application() {
         pm2 restart $APP_NAME
     else
         print_info "Starting new application instance..."
-        pm2 start ecosystem.config.js
+        pm2 start ecosystem.config.cjs
     fi
     
     # Save PM2 configuration
@@ -115,22 +133,51 @@ check_health() {
     print_info "Checking application health..."
     
     # Wait a moment for the application to start
-    sleep 3
+    sleep 5
     
-    # Check if the backend is responding
-    if curl -s http://localhost:$PORT/api/health > /dev/null 2>&1; then
-        print_status "Backend is responding on port $PORT"
-    else
-        print_warning "Backend health check failed, but this might be normal if no health endpoint exists"
-    fi
-    
-    # Check PM2 status
+    # Check PM2 status first
     if pm2 list | grep -q "$APP_NAME.*online"; then
         print_status "PM2 process is running"
     else
         print_error "PM2 process is not running properly"
+        print_info "PM2 process status:"
+        pm2 list
+        print_info "Recent logs:"
         pm2 logs $APP_NAME --lines 10
         exit 1
+    fi
+    
+    # Check if the backend is responding
+    print_info "Testing backend health endpoint..."
+    local retry_count=0
+    local max_retries=10
+    
+    while [ $retry_count -lt $max_retries ]; do
+        if curl -s http://localhost:$PORT/api/health > /dev/null 2>&1; then
+            print_status "Backend is responding on port $PORT"
+            
+            # Get health response
+            local health_response=$(curl -s http://localhost:$PORT/api/health)
+            print_info "Health response: $health_response"
+            break
+        else
+            retry_count=$((retry_count + 1))
+            if [ $retry_count -lt $max_retries ]; then
+                print_info "Backend not ready yet, retrying in 2 seconds... ($retry_count/$max_retries)"
+                sleep 2
+            else
+                print_warning "Backend health check failed after $max_retries attempts"
+                print_info "This might indicate a startup issue. Check logs with: pm2 logs $APP_NAME"
+                break
+            fi
+        fi
+    done
+    
+    # Check if port is actually listening
+    if netstat -tlnp 2>/dev/null | grep -q ":$PORT "; then
+        print_status "Port $PORT is listening"
+    else
+        print_warning "Port $PORT is not listening"
     fi
 }
 

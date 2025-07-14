@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { X, Save, Trophy, Star, Clock, Target } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -34,6 +35,7 @@ const completionStatus = [
 ];
 
 export default function GoalCompletionModal({ goal, tasks, isOpen, onClose, onComplete }) {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     completion_status: "completed",
     satisfaction_level: 4,
@@ -94,7 +96,7 @@ export default function GoalCompletionModal({ goal, tasks, isOpen, onClose, onCo
                 <Trophy className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h2 className="text-xl">סיום היעד</h2>
+                <h2 className="text-xl">{t('goalCompletion.title')}</h2>
                 <p className="text-sm text-gray-600 font-normal">{goal.title}</p>
               </div>
             </div>
@@ -111,15 +113,15 @@ export default function GoalCompletionModal({ goal, tasks, isOpen, onClose, onCo
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
                 <div>
                   <p className="text-2xl font-bold text-blue-600">{completedTasks}/{tasks.length}</p>
-                  <p className="text-sm text-gray-600">משימות הושלמו</p>
+                  <p className="text-sm text-gray-600">{t('goalCompletion.tasksCompleted')}</p>
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-green-600">{progressPercentage}%</p>
-                  <p className="text-sm text-gray-600">אחוז השלמה</p>
+                  <p className="text-sm text-gray-600">{t('goalCompletion.completionPercentage')}</p>
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-purple-600">{formData.time_taken || 0}</p>
-                  <p className="text-sm text-gray-600">דקות בפועל</p>
+                  <p className="text-sm text-gray-600">{t('goalCompletion.actualMinutes')}</p>
                 </div>
               </div>
             </CardContent>
@@ -127,7 +129,7 @@ export default function GoalCompletionModal({ goal, tasks, isOpen, onClose, onCo
 
           {/* Completion Status */}
           <div className="space-y-3">
-            <Label className="text-base font-medium">סטטוס סיום היעד</Label>
+            <Label className="text-base font-medium">{t('goalCompletion.statusTitle')}</Label>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               {completionStatus.map((status) => {
                 const StatusIcon = status.icon;
@@ -143,7 +145,7 @@ export default function GoalCompletionModal({ goal, tasks, isOpen, onClose, onCo
                   >
                     <div className="flex items-center gap-3">
                       <StatusIcon className="w-5 h-5" />
-                      <span className="font-medium">{status.label}</span>
+                      <span className="font-medium">{t(`goalCompletion.status.${status.value}`)}</span>
                     </div>
                   </div>
                 );
@@ -153,7 +155,7 @@ export default function GoalCompletionModal({ goal, tasks, isOpen, onClose, onCo
 
           {/* Time Taken */}
           <div className="space-y-3">
-            <Label className="text-base font-medium">זמן שלקח בפועל (דקות)</Label>
+            <Label className="text-base font-medium">{t('goalCompletion.timeTakenTitle')}</Label>
             <div className="space-y-2">
               <Slider
                 value={[formData.time_taken]}
@@ -164,19 +166,19 @@ export default function GoalCompletionModal({ goal, tasks, isOpen, onClose, onCo
                 className="mt-2"
               />
               <div className="flex justify-between text-sm text-gray-500">
-                <span>0 דקות</span>
-                <span className="font-medium">{formData.time_taken} דקות</span>
-                <span>{Math.max(goal.estimated_time * 3, 1000)} דקות</span>
+                <span>{t('goalCompletion.minutes', { count: 0 })}</span>
+                <span className="font-medium">{t('goalCompletion.minutes', { count: formData.time_taken })}</span>
+                <span>{t('goalCompletion.minutes', { count: Math.max(goal.estimated_time * 3, 1000) })}</span>
               </div>
               {goal.estimated_time && (
                 <p className="text-xs text-gray-500">
-                  הערכה מקורית: {goal.estimated_time} דקות
+                  {t('goalCompletion.originalEstimate')}: {t('goalCompletion.minutes', { count: goal.estimated_time })}
                   {formData.time_taken !== goal.estimated_time && (
                     <span className={`ml-2 font-medium ${
                       formData.time_taken < goal.estimated_time ? "text-green-600" : "text-red-600"
                     }`}>
                       ({formData.time_taken < goal.estimated_time ? "-" : "+"}
-                      {Math.abs(formData.time_taken - goal.estimated_time)} דקות)
+                      {t('goalCompletion.minutes', { count: Math.abs(formData.time_taken - goal.estimated_time) })})
                     </span>
                   )}
                 </p>
@@ -186,7 +188,7 @@ export default function GoalCompletionModal({ goal, tasks, isOpen, onClose, onCo
 
           {/* Satisfaction Level */}
           <div className="space-y-3">
-            <Label className="text-base font-medium">רמת שביעות רצון מהתוצאה</Label>
+            <Label className="text-base font-medium">{t('goalCompletion.satisfactionTitle')}</Label>
             <Select 
               value={formData.satisfaction_level.toString()} 
               onValueChange={(value) => handleInputChange("satisfaction_level", parseInt(value))}
@@ -197,7 +199,7 @@ export default function GoalCompletionModal({ goal, tasks, isOpen, onClose, onCo
               <SelectContent>
                 {satisfactionLevels.map(level => (
                   <SelectItem key={level.value} value={level.value.toString()}>
-                    <span className={level.color}>{level.label}</span>
+                    <span className={level.color}>{t(`goalCompletion.satisfactionLevels.${level.value}`)}</span>
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -207,57 +209,57 @@ export default function GoalCompletionModal({ goal, tasks, isOpen, onClose, onCo
           {/* Reflection Questions */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <Label htmlFor="what_worked">מה עבד טוב?</Label>
+              <Label htmlFor="what_worked">{t('goalCompletion.whatWorked')}</Label>
               <Textarea
                 id="what_worked"
                 value={formData.what_worked}
                 onChange={(e) => handleInputChange("what_worked", e.target.value)}
-                placeholder="תאר מה הצליח במיוחד, איזה אסטרטגיות עבדו..."
+                placeholder={t('goalCompletion.whatWorkedPlaceholder')}
                 rows={4}
               />
             </div>
 
             <div className="space-y-2">  
-              <Label htmlFor="what_didnt_work">מה לא עבד כל כך טוב?</Label>
+              <Label htmlFor="what_didnt_work">{t('goalCompletion.whatDidntWork')}</Label>
               <Textarea
                 id="what_didnt_work"
                 value={formData.what_didnt_work}
                 onChange={(e) => handleInputChange("what_didnt_work", e.target.value)}
-                placeholder="תאר מה היה מאתגר, איפה נתקלת בקשיים..."
+                placeholder={t('goalCompletion.whatDidntWorkPlaceholder')}
                 rows={4}
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="lessons_learned">לקחים שלמדתי</Label>
+            <Label htmlFor="lessons_learned">{t('goalCompletion.lessonsLearned')}</Label>
             <Textarea
               id="lessons_learned"
               value={formData.lessons_learned}
               onChange={(e) => handleInputChange("lessons_learned", e.target.value)}
-              placeholder="מה למדתי על עצמי, על התהליך, על ההגשמה של יעדים..."
+              placeholder={t('goalCompletion.lessonsLearnedPlaceholder')}
               rows={3}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="would_do_differently">מה הייתי עושה אחרת?</Label>
+            <Label htmlFor="would_do_differently">{t('goalCompletion.wouldDoDifferently')}</Label>
             <Textarea
               id="would_do_differently"
               value={formData.would_do_differently}
               onChange={(e) => handleInputChange("would_do_differently", e.target.value)}
-              placeholder="אילו שינויים הייתי מבצע אם הייתי מתחיל מחדש..."
+              placeholder={t('goalCompletion.wouldDoDifferentlyPlaceholder')}
               rows={3}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="final_thoughts">מחשבות אחרונות</Label>
+            <Label htmlFor="final_thoughts">{t('goalCompletion.finalThoughts')}</Label>
             <Textarea
               id="final_thoughts"
               value={formData.final_thoughts}
               onChange={(e) => handleInputChange("final_thoughts", e.target.value)}
-              placeholder="תחושות, התרגשות, גאווה, או כל דבר אחר שחשוב לך לזכור..."
+              placeholder={t('goalCompletion.finalThoughtsPlaceholder')}
               rows={3}
             />
           </div>
@@ -265,7 +267,7 @@ export default function GoalCompletionModal({ goal, tasks, isOpen, onClose, onCo
           {/* Action Buttons */}
           <div className="flex justify-end gap-3 pt-4 border-t">
             <Button variant="outline" onClick={onClose} disabled={isSubmitting}>
-              ביטול
+              {t('form.cancel')}
             </Button>
             
             <AlertDialog>
@@ -277,28 +279,27 @@ export default function GoalCompletionModal({ goal, tasks, isOpen, onClose, onCo
                   {isSubmitting ? (
                     <>
                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                      שומר...
+                      {t('form.saving')}...
                     </>
                   ) : (
                     <>
                       <Trophy className="w-4 h-4 mr-2" />
-                      סיים יעד
+                      {t('goals.finishGoal')}
                     </>
                   )}
                 </Button>
               </AlertDialogTrigger>
-              <AlertDialogContent dir="rtl">
+              <AlertDialogContent dir={i18n.language === 'he' ? 'rtl' : 'ltr'}>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>סיום היעד</AlertDialogTitle>
+                  <AlertDialogTitle>{t('goalCompletion.confirmTitle')}</AlertDialogTitle>
                   <AlertDialogDescription>
-                    האם אתה בטוח שברצונך לסיים את היעד "{goal.title}"? 
-                    פעולה זו תסמן את היעד כמושלם ותשמור את הזיכרון שרשמת.
+                    {t('goalCompletion.confirmDescription', { title: goal.title })}
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>עוד לא</AlertDialogCancel>
+                  <AlertDialogCancel>{t('goalCompletion.confirmCancel')}</AlertDialogCancel>
                   <AlertDialogAction onClick={handleSubmit} className="bg-green-600 hover:bg-green-700">
-                    כן, סיים יעד
+                    {t('goalCompletion.confirmAction')}
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
