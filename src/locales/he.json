@@ -7,7 +7,7 @@
     "profile": "פרופיל"
   },
   "home": {
-    "welcome": "ברוך הבא {{username}} לדשבורד הבקרה שלך",
+    "welcome": "ברוך הבא, {{username}}!",
     "newGoal": "יעד חדש",
     "quickActions": "פעולות מהירות",
     "addNewGoal": "הוספת יעד חדש",
@@ -35,7 +35,16 @@
     "goalProgress": "התקדמות יעדים",
     "goalCompleted": "יעד הושלם!",
     "noActiveGoals": "אין יעדים פעילים",
-    "addGoalsToTrack": "הוסיפו יעדים כדי לעקוב אחר ההתקדמות"
+    "addGoalsToTrack": "הוסיפו יעדים כדי לעקוב אחר ההתקדמות",
+    "motivationQuote": "ציטוט יומי",
+    "saveQuote": "שמור במועדפים",
+    "newQuote": "ציטוט חדש",
+    "favoriteQuotes": "ציטוטים מועדפים",
+    "noFavoriteQuotes": "אין לך עדיין ציטוטים מועדפים.",
+    "saved": "נשמר",
+    "generating": "יוצר...",
+    "generatingQuote": "יוצר ציטוט חדש...",
+    "deleteQuoteConfirm": "האם אתה בטוח שברצונך למחוק את הציטוט הזה מהמועדפים? פעולה זו לא ניתנת לביטול."
   },
   "goals": {
     "title": "ניהול יעדים",
@@ -61,7 +70,7 @@
     "finishGoal": "סיים יעד",
     "viewGoal": "צפה ביעד",
     "noGoalsYet": "אין יעדים עדיין",
-    "createFirstGoal": "התחילו ביצירת היעד הראשון שלכם!",
+    "createFirstGoal": "התחילו ביצירת היעד הראשון ש��כם!",
     "backToGoals": "חזור ליעדים",
     "completedTasks": "משימות הושלמו",
     "totalTasks": "סה״כ משימות",
@@ -128,7 +137,43 @@
     "allGoals": "כל היעדים",
     "activeFilters": "{{count}} מסננים פעילים"
   },
+  "taskPlanning": {
+    "greeting": "שלום! אני המתכנן הדיגיטלי שלך. אני כאן לעזור לך עם המשימה \"{{title}}\".\n\nאני יכול לעזור לך עם:\n🎯 הדרכה צעד אחר צעד\n📋 פירוק למשימות משנה\n💡 עצות והכוונה מקצועית\n🔧 פתרון בעיות וקשיים\n\nאיך תרצה שנתחיל?",
+    "stepGuide": "הדרכה צעד אחר צעד",
+    "breakdown": "פירוק למשימות משנה",
+    "tips": "טיפים ועצות",
+    "troubleshoot": "פתרון בעיות",
+    "title": "מתכנן המשימות AI",
+    "stepGuideTitle": "מדריך צעד אחר צעד",
+    "importantTips": "טיפים חשובים",
+    "suggestedSubTasks": "משימות משנה מוצעות",
+    "addTask": "הוסף כמשימה",
+    "recommendedActions": "פעולות מומלצות",
+    "inputPlaceholder": "שאל אותי כל שאלה על המשימה או בקש עזרה...",
+    "problem": "בעיה",
+    "solution": "פתרון",
+    "context": {
+      "task": "משימה",
+      "description": "תיאור",
+      "noDescription": "אין תיאור",
+      "mainGoal": "יעד ראשי",
+      "notAssociated": "לא משויך ליעד",
+      "category": "קטגוריה",
+      "notSpecified": "לא צוין",
+      "difficulty": "רמת קושי",
+      "estimatedTime": "זמן מוערך",
+      "minutes": "דקות"
+    },
+    "prompts": {
+      "stepGuide": "בהתבסס על המשימה \"{{title}}\", תן לי מדריך צעד אחר צעד מפורט איך לבצע את המשימה הזו.\n\nהמדריך צריך להיות:\n- מפורט וקונקרטי עם לפחות 5-8 צעדים\n- עם צעדים ברורים ומספרים\n- כולל הוראות מדויקות (איפה ללחוץ, מה לבחור, איך לגשת)\n- עם טיפים חשובים לכל צעד\n\nלמשל, אם זה משימה דיגיטלית - תן הוראות מדויקות איפה ללחוץ, איזה תפריטים לפתוח, מה לבחור.\n\nתמיד תענה בעברית ובצורה מקצועית.",
+      "breakdown": "בהתבסס על המשימה \"{{title}}\", פרק אותה ל-4-7 משימות משנה קטנות ומנוהלות.\n\nכל משימת משנה צריכה להיות:\n- קונקרטית וברורה\n- ניתנת לביצוע ב-15-45 דקות\n- עם תוצאה מדידה וברורה\n- מתקדמת לוגית אחת אחרי השנייה\n\nתמיד תענה בעברית.",
+      "tips": "תן לי עצות מקצועיות ומעשיות לביצוע המשימה \"{{title}}\".\n\nכלול:\n- 4-6 טיפים חשובים להצלחה\n- מלכודות נפוצות להימנע מהן\n- כלים או משאבים מומלצים\n- דרכים לשפר את התוצאות\n- טיפים לחיסכון בזמן\n\nתמיד תענה בעברית.",
+      "troubleshoot": "מה הבעיות והקשיים הנפוצים ביותר בביצוע המשימה \"{{title}}\" ואיך לפתור אותם?\n\nכלול:\n- 3-5 בעיות טכניות נפוצות ופתרונות\n- קשיים תהליכיים ואיך להתמודד\n- פתרונות מעשיים לכל בעיה\n- דרכים למניעת בעיות מראש\n- מה לעשות כשדברים לא עובדים\n\nתמיד תענה בעברית.",
+      "default": "אתה יועץ מקצועי ומתכנן משימות מומחה. הקונטקסט שלך:\n{{context}}\n\nהמשתמש שאל: \"{{message}}\"\n\nתן תשובה מועילה, מקצועית ומפורטת שתעזור למשתמש להצליח במשימה. אם מתאים, הצע צעדים קונקרטיים או משימות משנה.\n\nתמיד תענה בעברית בצורה ברורה ומעשית."
+    }
+  },
   "profile": {
+    "title": "פרופיל משתמש",
     "editProfile": "ערוך פרופיל",
     "level": "רמה {{level}}",
     "xpProgress": "{{current}} / {{total}} XP",
@@ -178,52 +223,60 @@
   },
   "common": {
     "language": "שפה",
-    "selectLanguage": "בחר שפה"
+    "selectLanguage": "בחר שפה",
+    "delete": "מחק",
+    "cancel": "ביטול",
+    "confirmDelete": "אישור מחיקה"
   },
   "form": {
     "taskTitle": "כותרת המשימה",
     "goalTitle": "כותרת היעד",
+    "goalTitlePlaceholder": "כתוב כותרת קצרה וברורה",
+    "descriptionPlaceholder": "תן תיאור ברור ומדויק",
     "description": "תיאור",
     "detailedDescription": "תיאור מפורט",
-    "priority": "עדיפות",
-    "category": "קטגוריה",
-    "difficulty": "רמת קושי",
-    "estimatedTime": "זמן מוערך",
-    "dueDate": "תאריך יעד",
-    "tags": "תגיות",
-    "subtasks": "משימות משנה",
-    "status": "סטטוס המשימה",
-    "cancel": "ביטול",
-    "create": "יצירה",
-    "update": "עדכון",
-    "save": "שמור שינויים",
-    "edit": "עריכה",
     "priority": {
+      "title": "עדיפות",
       "low": "נמוכה",
       "medium": "בינונית",
       "high": "גבוהה",
       "urgent": "דחוף"
     },
-    "category": {
-      "work": "עבודה",
-      "personal": "אישי",
-      "health": "בריאות",
-      "learning": "למידה",
-      "social": "חברתי",
-      "creative": "יצירתי"
-    },
+    "difficulty": "רמת קושי",
+    "estimatedTime": "זמן מוערך",
+    "dueDate": "תאריך יעד",
+    "tags": "תגיות",
+    "subtasks": "משימות משנה",
     "status": {
+      "title": "סטטוס",
       "pending": "ממתינה",
       "inProgress": "בביצוע",
       "completed": "הושלמה",
       "paused": "מושהית"
     },
+    "cancel": "ביטול",
+    "create": "יצירה",
+    "update": "עדכון",
+    "save": "שמור שינויים",
+    "edit": "עריכה",
+    "category": {
+      "title": "קטגוריה",
+      "work": "עבודה",
+      "personal": "אישי",
+      "health": "בריאות",
+      "learning": "למידה",
+      "social": "חברתי",
+      "creative": "יצי��תי"
+    },
     "aiSuggestions": "קבל הצעות AI",
     "adviseMe": "יעץ לי",
     "addSelectedTasks": "הוסף משימות נבחרות",
     "minutes": "דקות",
+    "addTagPlaceholder": "בחר תגיות ליעד",
     "editTask": "ערוך משימה",
-    "editGoal": "ערוך יעד"
+    "editGoal": "ערוך יעד",
+    "updateError": "שגיאה בעדכון המשימה. אנא נסה שוב.",
+    "updateSuccess": "המשימה עודכנה בהצלחה!"
   },
   "auth": {
     "login": "כניסה",
@@ -365,21 +418,5 @@
   },
   "app": {
     "name": "TaskBoss-AI"
-  },
-  "profile": {
-    "title": "פרופיל משתמש",
-    "editProfile": "ערוך פרופיל",
-    "level": "רמה {{level}}",
-    "xpProgress": "{{current}} / {{total}} XP",
-    "nextLevelPoints": "עוד {{points}} נקודות לרמה הבאה",
-    "totalPoints": "סה״כ נקודות",
-    "completedTasks": "משימות שהושלמו",
-    "longestStreak": "{{days}} ימים",
-    "achievements": "הישגים",
-    "performanceStats": "ביצועים וסטטיסטיקות",
-    "preferredCategories": "קטגוריות מועדפות",
-    "notEnoughData": "אין עדיין מספיק נתונים",
-    "dailyGoalStreak": "רצף יעדים יומי",
-    "consecutiveDays": "ימים רצופים של השלמת יעדים"
   }
 }

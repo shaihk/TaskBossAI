@@ -62,8 +62,14 @@ export default function GoalForm({ goal, onSubmit, onCancel }) {
   const getAITags = async () => {
     setIsGettingTags(true);
     try {
+      const currentLanguage = localStorage.getItem('language') || 'he';
+      const languageMap = {
+        'he': 'Hebrew',
+        'en': 'English',
+        'ru': 'Russian'
+      };
       const result = await InvokeLLM({
-        prompt: `Generate 3 relevant tags in Hebrew for the goal: "${formData.title}". Respond with a JSON object containing a "tags" array.`,
+        prompt: `Generate 3 relevant tags in ${languageMap[currentLanguage]} for the goal: "${formData.title}". Respond with a JSON object containing a "tags" array.`,
         response_json_schema: {
           type: "object",
           properties: {

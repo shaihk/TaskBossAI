@@ -16,7 +16,8 @@ import {
   LogOut,
   Moon,
   Sun,
-  HelpCircle
+  HelpCircle,
+  Settings
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -25,6 +26,7 @@ import LanguageSelector from "@/components/common/LanguageSelector";
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import UsageInstructions from '@/components/common/UsageInstructions';
+import SettingsModal from '@/components/settings/SettingsModal';
 
 const getNavigationItems = (t) => [
   { name: t("nav.home"), url: createPageUrl("Home"), icon: Home },
@@ -42,6 +44,7 @@ export default function Layout({ children, currentPageName }) {
   const { user, logout } = useAuth();
   const { isDarkMode, toggleDarkMode } = useTheme();
   const [showUsageInstructions, setShowUsageInstructions] = React.useState(false);
+  const [showSettings, setShowSettings] = React.useState(false);
   
   const navigationItems = getNavigationItems(t);
 
@@ -425,6 +428,19 @@ export default function Layout({ children, currentPageName }) {
                 <Button
                   variant="ghost"
                   size="sm"
+                  onClick={() => setShowSettings(true)}
+                  className={`w-full justify-start rounded-xl p-3 transition-all duration-200 ${
+                    isDarkMode
+                      ? 'text-gray-400 hover:text-gray-200 hover:bg-gray-800/80' 
+                      : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100/80'
+                  }`}
+                >
+                  <Settings className="h-4 w-4 mr-3" />
+                  <span className="font-medium">הגדרות</span>
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={handleLogout}
                   className={`w-full justify-start rounded-xl p-3 transition-all duration-200 ${
                     isDarkMode
@@ -488,6 +504,22 @@ export default function Layout({ children, currentPageName }) {
                 <Button
                   variant="ghost"
                   size="sm"
+                  onClick={() => {
+                    setShowSettings(true);
+                    setMobileMenuOpen(false);
+                  }}
+                  className={`w-full justify-start ${
+                    isDarkMode
+                      ? 'text-gray-400 hover:text-gray-200 hover:bg-gray-800/80'
+                      : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100/80'
+                  }`}
+                >
+                  <Settings className="h-4 w-4 mr-2" />
+                  הגדרות
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={handleLogout}
                   className={`w-full justify-start ${
                     isDarkMode
@@ -531,6 +563,12 @@ export default function Layout({ children, currentPageName }) {
       <UsageInstructions
         isOpen={showUsageInstructions}
         onClose={() => setShowUsageInstructions(false)}
+      />
+      
+      {/* Settings Modal */}
+      <SettingsModal
+        isOpen={showSettings}
+        onClose={() => setShowSettings(false)}
       />
     </div>
   );

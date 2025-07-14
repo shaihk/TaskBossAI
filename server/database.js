@@ -55,6 +55,7 @@ function initializeDatabase() {
                     user_id INTEGER,
                     goal_id INTEGER,
                     title TEXT NOT NULL,
+                    description TEXT,
                     status TEXT DEFAULT 'pending',
                     priority TEXT DEFAULT 'medium',
                     difficulty INTEGER DEFAULT 5,
@@ -84,6 +85,18 @@ function initializeDatabase() {
                     daily_goal_streak INTEGER DEFAULT 0,
                     preferred_categories TEXT, -- JSON string for categories array
                     last_activity DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (user_id) REFERENCES users (id)
+                )
+            `);
+
+            // User preferences table
+            db.run(`
+                CREATE TABLE IF NOT EXISTS user_preferences (
+                    id INTEGER PRIMARY KEY,
+                    user_id INTEGER UNIQUE,
+                    ai_models TEXT, -- JSON string for AI model preferences
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                     FOREIGN KEY (user_id) REFERENCES users (id)
                 )
             `, (err) => {
@@ -218,10 +231,19 @@ const dbHelpers = {
     createTask: (db, task) => {
         return new Promise((resolve, reject) => {
             const stmt = db.prepare(`
-                INSERT INTO tasks (id, user_id, goal_id, title, status, priority, difficulty, estimated_time, due_date, completed_at, points_earned)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO tasks (id, user_id, goal_id, title, description, status, priority, difficulty, estimated_time, due_date, completed_at, points_earned)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             `);
-            stmt.run([task.id, task.user_id, task.goal_id, task.title, task.status, task.priority, task.difficulty, task.estimated_time, task.due_date, task.completed_at, task.points_earned], function(err) {
+            
+            // Handle both camelCase and snake_case input
+            const userId = task.user_id || task.userId;
+            const goalId = task.goal_id || task.goalId;
+            const estimatedTime = task.estimated_time || task.estimatedTime;
+            const dueDate = task.due_date || task.dueDate;
+            const completedAt = task.completed_at || task.completedAt;
+            const pointsEarned = task.points_earned || task.pointsEarned;
+            
+            stmt.run([task.id, userId, goalId, task.title, task.description, task.status, task.priority, task.difficulty, estimatedTime, dueDate, completedAt, pointsEarned], function(err) {
                 if (err) reject(err);
                 else resolve({ id: this.lastID, ...task });
             });
@@ -233,20 +255,98 @@ const dbHelpers = {
         return new Promise((resolve, reject) => {
             db.all('SELECT * FROM tasks WHERE user_id = ?', [userId], (err, rows) => {
                 if (err) reject(err);
-                else resolve(rows);
+                else {
+                    // Convert snake_case to camelCase for frontend
+                    const tasks = rows.map(task => ({
+                        id: task.id,
+                        userId: task.user_id,
+                        goalId: task.goal_id,
+                        title: task.title,
+                        description: task.description,
+                        status: task.status,
+                        priority: task.priority,
+                        difficulty: task.difficulty,
+                        estimatedTime: task.estimated_time,
+                        dueDate: task.due_date,
+                        completedAt: task.completed_at,
+                        pointsEarned: task.points_earned,
+                        createdAt: task.created_at
+                    }));
+                    resolve(tasks);
+                }
+            });
+        });
+    },
+
+    getTasksByGoalId: (db, goalId) => {
+        return new Promise((resolve, reject) => {
+            db.all('SELECT * FROM tasks WHERE goal_id = ?', [goalId], (err, rows) => {
+                if (err) reject(err);
+                else {
+                    // Convert snake_case to camelCase for frontend
+                    const tasks = rows.map(task => ({
+                        id: task.id,
+                        userId: task.user_id,
+                        goalId: task.goal_id,
+                        title: task.title,
+                        description: task.description,
+                        status: task.status,
+                        priority: task.priority,
+                        difficulty: task.difficulty,
+                        estimatedTime: task.estimated_time,
+                        dueDate: task.due_date,
+                        completedAt: task.completed_at,
+                        pointsEarned: task.points_earned,
+                        createdAt: task.created_at
+                    }));
+                    resolve(tasks);
+                }
             });
         });
     },
 
     updateTask: (db, id, userId, updates) => {
         return new Promise((resolve, reject) => {
-            const fields = Object.keys(updates).map(key => `${key} = ?`).join(', ');
-            const values = Object.values(updates);
+            console.log(`updateTask called with id: ${id}, userId: ${userId}, updates:`, updates);
+            
+            // Map camelCase to snake_case for database columns
+            const fieldMapping = {
+                'dueDate': 'due_date',
+                'completedAt': 'completed_at',
+                'pointsEarned': 'points_earned',
+                'estimatedTime': 'estimated_time',
+                'createdAt': 'created_at'
+            };
+            
+            const fields = [];
+            const values = [];
+            
+            Object.keys(updates).forEach(key => {
+                const dbColumn = fieldMapping[key] || key;
+                fields.push(`${dbColumn} = ?`);
+                values.push(updates[key]);
+            });
+            
+            if (fields.length === 0) {
+                console.log('No fields to update');
+                resolve({ changes: 0 });
+                return;
+            }
+            
             values.push(id, userId);
             
-            db.run(`UPDATE tasks SET ${fields} WHERE id = ? AND user_id = ?`, values, function(err) {
-                if (err) reject(err);
-                else resolve({ changes: this.changes });
+            const sql = `UPDATE tasks SET ${fields.join(', ')} WHERE id = ? AND user_id = ?`;
+            console.log(`Executing SQL: ${sql}`);
+            console.log(`With values:`, values);
+            
+            db.run(sql, values, function(err) {
+                if (err) {
+                    console.error('Database update error:', err);
+                    reject(err);
+                } else {
+                    console.log(`Update result: changes=${this.changes}`);
+                    resolve({ changes: this.changes });
+                }
             });
         });
     },

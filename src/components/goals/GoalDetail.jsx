@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { tasksAPI } from "@/services/api";
+import { tasksAPI, userStatsAPI } from "@/services/api";
 import { UserStats } from "@/api/entities";
 import { InvokeLLM } from "@/api/integrations";
 import { useTranslation } from "react-i18next";
@@ -111,9 +111,8 @@ export default function GoalDetail({ goal, tasks, onBack, onTaskUpdate }) {
 
   const updateUserStats = async (task) => {
     try {
-      const stats = await UserStats.list();
-      if (stats.length > 0) {
-        const userStats = stats[0];
+      const userStats = await userStatsAPI.get();
+      if (userStats) {
         const newPoints = userStats.total_points + (task.points_earned || 0);
         const newLevel = Math.floor(newPoints / 1000) + 1;
         

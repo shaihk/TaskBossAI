@@ -1,10 +1,8 @@
 
-import React, { useState, useEffect } from "react";
-import { tasksAPI, goalsAPI } from "@/services/api";
-import { UserStats } from '@/api/entities';
-import { Button } from "@/components/ui/button";
+import { useState, useEffect, useCallback } from "react";
+import { tasksAPI, goalsAPI, userStatsAPI } from "@/services/api";
 import { Input } from "@/components/ui/input";
-import { Search, Filter, ArrowUpDown } from "lucide-react";
+import { Search, ArrowUpDown } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useTranslation } from 'react-i18next';
@@ -31,31 +29,12 @@ export default function Tasks() {
     loadData();
   }, []);
 
-  useEffect(() => {
-    filterAndSortTasks();
-  }, [tasks, searchTerm, filters, sortOrder]);
-
-  const loadData = async () => {
-    try {
-      const [tasksData, goalsData] = await Promise.all([
-        tasksAPI.getAll(),
-        goalsAPI.getAll()
-      ]);
-      setTasks(tasksData);
-      setGoals(goalsData);
-    } catch (error) {
-      console.error("Error loading data:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const filterAndSortTasks = () => {
+  const filterAndSortTasks = useCallback(() => {
     let processedTasks = [...tasks];
 
     // Filtering
     if (searchTerm) {
-      processedTasks = processedTasks.filter(task => 
+      processedTasks = processedTasks.filter(task =>
         task.title.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
@@ -93,7 +72,27 @@ export default function Tasks() {
     });
 
     setFilteredTasks(processedTasks);
+  }, [tasks, searchTerm, filters, sortOrder]);
+
+  useEffect(() => {
+    filterAndSortTasks();
+  }, [filterAndSortTasks]);
+
+  const loadData = async () => {
+    try {
+      const [tasksData, goalsData] = await Promise.all([
+        tasksAPI.getAll(),
+        goalsAPI.getAll()
+      ]);
+      setTasks(tasksData);
+      setGoals(goalsData);
+    } catch (error) {
+      console.error("Error loading data:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
+
 
   const handleStatusChange = async (task, newStatus) => {
     try {

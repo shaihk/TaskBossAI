@@ -51,11 +51,20 @@ if exist "server\package-lock.json" (
 
 echo.
 echo ========================================
-echo    OpenAI API Key Configuration
+echo    AI API Keys Configuration
 echo ========================================
 echo.
-echo To use the AI features (chat, task suggestions, consultation),
-echo you need an OpenAI API key.
+echo TaskBoss-AI supports both OpenAI and Google Gemini for AI features
+echo (chat, task suggestions, consultation, quote generation).
+echo.
+echo You can configure one or both API keys:
+echo - OpenAI: More advanced features, requires paid API
+echo - Gemini: Free tier available, good performance
+echo.
+
+echo ========================================
+echo    OpenAI API Key (Optional)
+echo ========================================
 echo.
 echo How to get your OpenAI API key:
 echo 1. Go to: https://platform.openai.com/account/api-keys
@@ -66,26 +75,70 @@ echo.
 echo IMPORTANT: Keep this key secure and never share it publicly!
 echo.
 
-:ask_key
-set /p OPENAI_KEY="Please enter your OpenAI API key: "
+set /p OPENAI_KEY="Enter your OpenAI API key (or press Enter to skip): "
 
-if "%OPENAI_KEY%"=="" (
-    echo Error: API key cannot be empty!
-    echo.
-    goto :ask_key
+if not "%OPENAI_KEY%"=="" (
+    REM Basic validation - check if key starts with sk-
+    echo %OPENAI_KEY% | findstr /B "sk-" >nul
+    if errorlevel 1 (
+        echo Warning: API key should start with 'sk-'
+        echo Are you sure this is correct?
+        set /p confirm="Continue anyway? (y/n): "
+        if /i not "%confirm%"=="y" set OPENAI_KEY=
+    )
 )
 
-REM Basic validation - check if key starts with sk-
-echo %OPENAI_KEY% | findstr /B "sk-" >nul
-if errorlevel 1 (
-    echo Warning: API key should start with 'sk-'
-    echo Are you sure this is correct?
-    set /p confirm="Continue anyway? (y/n): "
-    if /i not "%confirm%"=="y" goto :ask_key
+if not "%OPENAI_KEY%"=="" (
+    echo ✓ OpenAI API key configured
+) else (
+    echo ⚠ OpenAI API key skipped
 )
 
 echo.
-echo ✓ API key configured
+echo ========================================
+echo    Google Gemini API Key (Optional)
+echo ========================================
+echo.
+echo How to get your Gemini API key:
+echo 1. Go to: https://aistudio.google.com/app/apikey
+echo 2. Sign in to your Google account
+echo 3. Click "Create API key"
+echo 4. Copy the key (it starts with AIza...)
+echo.
+echo IMPORTANT: Keep this key secure and never share it publicly!
+echo.
+
+set /p GEMINI_KEY="Enter your Gemini API key (or press Enter to skip): "
+
+if not "%GEMINI_KEY%"=="" (
+    REM Basic validation - check if key starts with AIza
+    echo %GEMINI_KEY% | findstr /B "AIza" >nul
+    if errorlevel 1 (
+        echo Warning: Gemini API key should start with 'AIza'
+        echo Are you sure this is correct?
+        set /p confirm="Continue anyway? (y/n): "
+        if /i not "%confirm%"=="y" set GEMINI_KEY=
+    )
+)
+
+if not "%GEMINI_KEY%"=="" (
+    echo ✓ Gemini API key configured
+) else (
+    echo ⚠ Gemini API key skipped
+)
+
+REM Validate at least one key is provided
+if "%OPENAI_KEY%"=="" if "%GEMINI_KEY%"=="" (
+    echo.
+    echo ❌ Error: At least one API key (OpenAI or Gemini) is required!
+    echo Please run the setup again with at least one API key.
+    echo.
+    pause
+    exit /b 1
+)
+
+echo.
+echo ✓ API keys configured
 
 REM Generate random JWT secret (longer and more secure)
 set JWT_SECRET=TaskBossAI_%RANDOM%%RANDOM%%RANDOM%%RANDOM%%RANDOM%%RANDOM%%RANDOM%%RANDOM%_%RANDOM%%RANDOM%
@@ -98,8 +151,9 @@ REM Create main .env file
 echo # TaskBoss-AI Configuration > .env
 echo # Generated on %date% %time% >> .env
 echo. >> .env
-echo # OpenAI API Configuration >> .env
+echo # AI API Keys Configuration >> .env
 echo OPENAI_API_KEY=%OPENAI_KEY% >> .env
+echo GEMINI_API_KEY=%GEMINI_KEY% >> .env
 echo. >> .env
 echo # JWT Secret (auto-generated) >> .env
 echo JWT_SECRET=%JWT_SECRET% >> .env
@@ -116,8 +170,9 @@ if not exist "server" mkdir server
 echo # TaskBoss-AI Server Configuration > server\.env
 echo # Generated on %date% %time% >> server\.env
 echo. >> server\.env
-echo # OpenAI API Configuration >> server\.env
+echo # AI API Keys Configuration >> server\.env
 echo OPENAI_API_KEY=%OPENAI_KEY% >> server\.env
+echo GEMINI_API_KEY=%GEMINI_KEY% >> server\.env
 echo. >> server\.env
 echo # JWT Secret (auto-generated) >> server\.env
 echo JWT_SECRET=%JWT_SECRET% >> server\.env

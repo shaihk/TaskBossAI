@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,16 +18,17 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/context/ThemeContext';
+import PropTypes from 'prop-types';
 
 export default function FocusTimer({ task, isOpen, onClose }) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { isDarkMode } = useTheme();
   
   // Timer state
   const [timeLeft, setTimeLeft] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const [customMinutes, setCustomMinutes] = useState(task?.estimated_time || 25);
+  const [customMinutes, setCustomMinutes] = useState(task?.estimated_time || task?.estimatedTime || 25);
   const [totalTime, setTotalTime] = useState(0);
   const [isCompleted, setIsCompleted] = useState(false);
   
@@ -37,7 +38,7 @@ export default function FocusTimer({ task, isOpen, onClose }) {
   // Initialize timer when task changes
   useEffect(() => {
     if (task && isOpen) {
-      const initialMinutes = task.estimated_time || 25;
+      const initialMinutes = task.estimated_time || task.estimatedTime || 25;
       setCustomMinutes(initialMinutes);
       const initialSeconds = initialMinutes * 60;
       setTimeLeft(initialSeconds);
@@ -218,7 +219,7 @@ export default function FocusTimer({ task, isOpen, onClose }) {
                 <div className="flex items-center gap-4 mt-3 text-xs">
                   <div className="flex items-center gap-1">
                     <Clock className="w-3 h-3" />
-                    <span>{task.estimated_time || 25} {t('focus.minutes')}</span>
+                    <span>{task.estimated_time || task.estimatedTime || 25} {t('focus.minutes')}</span>
                   </div>
                   <div className={`px-2 py-1 rounded text-xs ${
                     task.priority === 'high' 
@@ -389,3 +390,16 @@ export default function FocusTimer({ task, isOpen, onClose }) {
     </>
   );
 }
+
+FocusTimer.propTypes = {
+  task: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    title: PropTypes.string,
+    description: PropTypes.string,
+    priority: PropTypes.string,
+    estimated_time: PropTypes.number,
+    estimatedTime: PropTypes.number
+  }),
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired
+};

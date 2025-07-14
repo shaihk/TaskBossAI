@@ -7,7 +7,7 @@
     "profile": "Profile"
   },
   "home": {
-    "welcome": "Wellcome {{username}} To Your Control Dashboard",
+    "welcome": "Welcome, {{username}}!",
     "newGoal": "New Goal",
     "quickActions": "Quick Actions",
     "addNewGoal": "Add New Goal",
@@ -35,7 +35,16 @@
     "goalProgress": "Goal Progress",
     "goalCompleted": "Goal Completed!",
     "noActiveGoals": "No active goals",
-    "addGoalsToTrack": "Add goals to track progress"
+    "addGoalsToTrack": "Add goals to track progress",
+    "motivationQuote": "Quote of the Day",
+    "saveQuote": "Save to Favorites",
+    "newQuote": "New Quote",
+    "favoriteQuotes": "Favorite Quotes",
+    "noFavoriteQuotes": "You have no favorite quotes yet.",
+    "saved": "Saved",
+    "generating": "Generating...",
+    "generatingQuote": "Generating new quote...",
+    "deleteQuoteConfirm": "Are you sure you want to delete this quote from your favorites? This action cannot be undone."
   },
   "goals": {
     "title": "Goal Management",
@@ -128,6 +137,41 @@
     "allGoals": "All Goals",
     "activeFilters": "{{count}} active filters"
   },
+  "taskPlanning": {
+    "greeting": "Hello! I'm your digital planner. I'm here to help you with the task \"{{title}}\".\n\nI can help you with:\n🎯 Step-by-step guidance\n📋 Breakdown into sub-tasks\n💡 Professional tips and guidance\n🔧 Troubleshooting and problem-solving\n\nHow would you like to start?",
+    "stepGuide": "Step-by-step guide",
+    "breakdown": "Breakdown into sub-tasks",
+    "tips": "Tips and advice",
+    "troubleshoot": "Troubleshooting",
+    "title": "AI Task Planner",
+    "stepGuideTitle": "Step-by-step guide",
+    "importantTips": "Important tips",
+    "suggestedSubTasks": "Suggested sub-tasks",
+    "addTask": "Add as task",
+    "recommendedActions": "Recommended actions",
+    "inputPlaceholder": "Ask me any question about the task or ask for help...",
+    "problem": "Problem",
+    "solution": "Solution",
+    "context": {
+      "task": "Task",
+      "description": "Description",
+      "noDescription": "No description",
+      "mainGoal": "Main goal",
+      "notAssociated": "Not associated with a goal",
+      "category": "Category",
+      "notSpecified": "Not specified",
+      "difficulty": "Difficulty",
+      "estimatedTime": "Estimated time",
+      "minutes": "minutes"
+    },
+    "prompts": {
+      "stepGuide": "Based on the task \"{{title}}\", give me a detailed step-by-step guide on how to accomplish this task.\n\nThe guide should be:\n- Detailed and concrete with at least 5-8 steps\n- With clear and numbered steps\n- Including precise instructions (where to click, what to choose, how to access)\n- With important tips for each step\n\nFor example, if it's a digital task - give precise instructions on where to click, which menus to open, what to choose.\n\nAlways answer in the user's language and in a professional manner.",
+      "breakdown": "Based on the task \"{{title}}\", break it down into 4-7 small, manageable sub-tasks.\n\nEach sub-task should be:\n- Concrete and clear\n- Achievable in 15-45 minutes\n- With a measurable and clear outcome\n- Logically progressing one after the other\n\nAlways answer in the user's language.",
+      "tips": "Give me professional and practical tips for completing the task \"{{title}}\".\n\nInclude:\n- 4-6 important tips for success\n- Common pitfalls to avoid\n- Recommended tools or resources\n- Ways to improve the results\n- Time-saving tips\n\nAlways answer in the user's language.",
+      "troubleshoot": "What are the most common problems and difficulties in completing the task \"{{title}}\" and how to solve them?\n\nInclude:\n- 3-5 common technical problems and solutions\n- Procedural difficulties and how to deal with them\n- Practical solutions for each problem\n- Ways to prevent problems in advance\n- What to do when things don't work\n\nAlways answer in the user's language.",
+      "default": "You are a professional consultant and expert task planner. Your context is:\n{{context}}\n\nThe user asked: \"{{message}}\"\n\nProvide a helpful, professional, and detailed answer that will help the user succeed in the task. If appropriate, suggest concrete steps or sub-tasks.\n\nAlways answer in the user's language in a clear and practical way."
+    }
+  },
   "profile": {
     "editProfile": "Edit Profile",
     "level": "Level {{level}}",
@@ -178,33 +222,37 @@
   },
   "common": {
     "language": "Language",
-    "selectLanguage": "Select Language"
+    "selectLanguage": "Select Language",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "confirmDelete": "Confirm Delete"
   },
   "form": {
     "taskTitle": "Task Title",
     "goalTitle": "Goal Title",
+    "goalTitlePlaceholder": "Write a short and clear headline",
+    "descriptionPlaceholder": "Provide a clear and detailed description",
     "description": "Description",
     "detailedDescription": "Detailed Description",
-    "priority": "Priority",
-    "category": "Category",
     "difficulty": "Difficulty",
     "estimatedTime": "Estimated Time",
     "dueDate": "Due Date",
     "tags": "Tags",
     "subtasks": "Subtasks",
-    "status": "Status",
     "cancel": "Cancel",
     "create": "Create",
     "update": "Update",
     "save": "Save Changes",
     "edit": "Edit",
     "priority": {
+      "title": "Priority",
       "low": "Low",
       "medium": "Medium",
       "high": "High",
       "urgent": "Urgent"
     },
     "category": {
+      "title": "Category",
       "work": "Work",
       "personal": "Personal",
       "health": "Health",
@@ -213,6 +261,7 @@
       "creative": "Creative"
     },
     "status": {
+      "title": "Status",
       "pending": "Pending",
       "inProgress": "In Progress",
       "completed": "Completed",
@@ -222,6 +271,7 @@
     "adviseMe": "Advise Me",
     "addSelectedTasks": "Add Selected Tasks",
     "minutes": "minutes",
+    "addTagPlaceholder": "Choose tags for the goal",
     "editTask": "Edit Task",
     "editGoal": "Edit Goal"
   },

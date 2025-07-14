@@ -12,8 +12,37 @@ const createAuthHeaders = () => {
   };
 };
 
-// LLM integration for AI features
-export const InvokeLLM = async ({ prompt, response_json_schema, model = 'gpt-3.5-turbo' }) => {
+// Get user's AI model preferences
+const getUserModelPreferences = () => {
+  const saved = localStorage.getItem('aiModelPreferences');
+  return saved ? JSON.parse(saved) : {
+    chatModel: 'gemini-2.5-flash',
+    quoteModel: 'gemini-2.5-flash',
+    fallbackModel: 'gpt-4o-mini'
+  };
+};
+
+// LLM integration for AI features with fallback support
+export const InvokeLLM = async ({ prompt, response_json_schema, model = null, useCase = 'chat' }) => {
+  const preferences = getUserModelPreferences();
+  
+  // Determine which model to use based on use case
+  let primaryModel = model;
+  if (!primaryModel) {
+    switch (useCase) {
+      case 'quote':
+        primaryModel = preferences.quoteModel;
+        break;
+      case 'chat':
+      default:
+        primaryModel = preferences.chatModel;
+        break;
+    }
+  }
+  
+  const fallbackModel = preferences.fallbackModel;
+  
+  // Try primary model first
   try {
     const response = await fetch(`${API_URL}/llm/invoke`, {
       method: 'POST',
@@ -21,7 +50,7 @@ export const InvokeLLM = async ({ prompt, response_json_schema, model = 'gpt-3.5
       body: JSON.stringify({
         prompt,
         response_json_schema,
-        model
+        model: primaryModel
       }),
     });
     
@@ -31,7 +60,33 @@ export const InvokeLLM = async ({ prompt, response_json_schema, model = 'gpt-3.5
     
     return await response.json();
   } catch (error) {
-    console.error('Error invoking LLM:', error);
+    console.error(`Error with primary model ${primaryModel}:`, error);
+    
+    // Try fallback model if primary fails
+    if (fallbackModel && fallbackModel !== primaryModel) {
+      try {
+        console.log(`Trying fallback model: ${fallbackModel}`);
+        const fallbackResponse = await fetch(`${API_URL}/llm/invoke`, {
+          method: 'POST',
+          headers: createAuthHeaders(),
+          body: JSON.stringify({
+            prompt,
+            response_json_schema,
+            model: fallbackModel
+          }),
+        });
+        
+        if (!fallbackResponse.ok) {
+          throw new Error(`Fallback LLM API error: ${fallbackResponse.status}`);
+        }
+        
+        return await fallbackResponse.json();
+      } catch (fallbackError) {
+        console.error(`Error with fallback model ${fallbackModel}:`, fallbackError);
+        throw fallbackError;
+      }
+    }
+    
     throw error;
   }
 };

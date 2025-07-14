@@ -184,15 +184,25 @@ get_domain() {
     print_status "Domain configured: $DOMAIN"
 }
 
-# Get OpenAI API key from user
-get_openai_key() {
+# Get API keys from user
+get_api_keys() {
     echo
     echo "========================================"
-    echo "    OpenAI API Key Configuration"
+    echo "    AI API Keys Configuration"
     echo "========================================"
     echo
-    echo "To use the AI features (chat, task suggestions, consultation),"
-    echo "you need an OpenAI API key."
+    echo "TaskBoss-AI supports both OpenAI and Google Gemini for AI features"
+    echo "(chat, task suggestions, consultation, quote generation)."
+    echo
+    echo "You can configure one or both API keys:"
+    echo "- OpenAI: More advanced features, requires paid API"
+    echo "- Gemini: Free tier available, good performance"
+    echo
+    
+    # Get OpenAI API key
+    echo "========================================"
+    echo "    OpenAI API Key (Optional)"
+    echo "========================================"
     echo
     echo "How to get your OpenAI API key:"
     echo "1. Go to: https://platform.openai.com/account/api-keys"
@@ -203,27 +213,65 @@ get_openai_key() {
     echo "IMPORTANT: Keep this key secure and never share it publicly!"
     echo
     
-    while true; do
-        read -p "Please enter your OpenAI API key: " OPENAI_KEY
-        
-        if [[ -z "$OPENAI_KEY" ]]; then
-            print_error "API key cannot be empty!"
-            continue
-        fi
-        
+    read -p "Enter your OpenAI API key (or press Enter to skip): " OPENAI_KEY
+    
+    if [[ -n "$OPENAI_KEY" ]]; then
         # Basic validation - check if key starts with sk-
         if [[ ! "$OPENAI_KEY" =~ ^sk- ]]; then
             print_warning "API key should start with 'sk-'"
             read -p "Continue anyway? (y/n): " confirm
             if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
-                continue
+                OPENAI_KEY=""
             fi
         fi
-        
-        break
-    done
+    fi
     
-    print_status "OpenAI API key configured"
+    if [[ -n "$OPENAI_KEY" ]]; then
+        print_status "OpenAI API key configured"
+    else
+        print_warning "OpenAI API key skipped"
+    fi
+    
+    # Get Gemini API key
+    echo
+    echo "========================================"
+    echo "    Google Gemini API Key (Optional)"
+    echo "========================================"
+    echo
+    echo "How to get your Gemini API key:"
+    echo "1. Go to: https://aistudio.google.com/app/apikey"
+    echo "2. Sign in to your Google account"
+    echo "3. Click 'Create API key'"
+    echo "4. Copy the key (it starts with AIza...)"
+    echo
+    echo "IMPORTANT: Keep this key secure and never share it publicly!"
+    echo
+    
+    read -p "Enter your Gemini API key (or press Enter to skip): " GEMINI_KEY
+    
+    if [[ -n "$GEMINI_KEY" ]]; then
+        # Basic validation - check if key starts with AIza
+        if [[ ! "$GEMINI_KEY" =~ ^AIza ]]; then
+            print_warning "Gemini API key should start with 'AIza'"
+            read -p "Continue anyway? (y/n): " confirm
+            if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
+                GEMINI_KEY=""
+            fi
+        fi
+    fi
+    
+    if [[ -n "$GEMINI_KEY" ]]; then
+        print_status "Gemini API key configured"
+    else
+        print_warning "Gemini API key skipped"
+    fi
+    
+    # Validate at least one key is provided
+    if [[ -z "$OPENAI_KEY" && -z "$GEMINI_KEY" ]]; then
+        print_error "At least one API key (OpenAI or Gemini) is required!"
+        echo "Please run the setup again with at least one API key."
+        exit 1
+    fi
 }
 
 # Create environment files
@@ -238,8 +286,9 @@ create_env_files() {
 # TaskBoss-AI Configuration
 # Generated on $(date)
 
-# OpenAI API Configuration
+# AI API Keys Configuration
 OPENAI_API_KEY=$OPENAI_KEY
+GEMINI_API_KEY=$GEMINI_KEY
 
 # JWT Secret (auto-generated)
 JWT_SECRET=$JWT_SECRET
@@ -258,8 +307,9 @@ EOF
 # TaskBoss-AI Server Configuration
 # Generated on $(date)
 
-# OpenAI API Configuration
+# AI API Keys Configuration
 OPENAI_API_KEY=$OPENAI_KEY
+GEMINI_API_KEY=$GEMINI_KEY
 
 # JWT Secret (auto-generated)
 JWT_SECRET=$JWT_SECRET
@@ -555,7 +605,7 @@ main() {
     
     check_root
     get_domain
-    get_openai_key
+    get_api_keys
     stop_existing_processes
     clean_previous_installation
     update_system

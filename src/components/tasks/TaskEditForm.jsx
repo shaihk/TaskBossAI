@@ -1,16 +1,18 @@
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { Task } from "@/api/entities";
+import { tasksAPI } from "@/services/api";
 import { X, Save, Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
+
+import PropTypes from 'prop-types';
 
 export default function TaskEditForm({ task, goal, onClose, onTaskUpdate }) {
   const { t } = useTranslation();
@@ -19,11 +21,13 @@ export default function TaskEditForm({ task, goal, onClose, onTaskUpdate }) {
     description: task.description || "",
     priority: task.priority || "medium",
     difficulty: task.difficulty || 5,
-    estimated_time: task.estimated_time || 30,
-    due_date: task.due_date ? task.due_date.split('T')[0] : "",
+    estimatedTime: task.estimatedTime || task.estimated_time || 30,
+    dueDate: task.dueDate ? task.dueDate.split('T')[0] : (task.due_date ? task.due_date.split('T')[0] : new Date().toISOString().split('T')[0]),
     status: task.status || "pending"
   });
   const [isUpdating, setIsUpdating] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -32,12 +36,19 @@ export default function TaskEditForm({ task, goal, onClose, onTaskUpdate }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsUpdating(true);
+    setError(null);
+    setSuccess(false);
 
     try {
-      await Task.update(task.id, formData);
-      onTaskUpdate();
+      await tasksAPI.update(task.id, formData);
+      setSuccess(true);
+      setTimeout(() => {
+        onTaskUpdate();
+        onClose();
+      }, 1000);
     } catch (error) {
       console.error("Error updating task:", error);
+      setError(error.message || t('form.updateError'));
     } finally {
       setIsUpdating(false);
     }
@@ -57,6 +68,16 @@ export default function TaskEditForm({ task, goal, onClose, onTaskUpdate }) {
         )}
       </CardHeader>
       <CardContent>
+        {error && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
+            <p className="text-red-700 text-sm">{error}</p>
+          </div>
+        )}
+        {success && (
+          <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-md">
+            <p className="text-green-700 text-sm">{t('form.updateSuccess')}</p>
+          </div>
+        )}
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Title */}
           <div className="space-y-2">
@@ -65,7 +86,7 @@ export default function TaskEditForm({ task, goal, onClose, onTaskUpdate }) {
               id="title"
               value={formData.title}
               onChange={(e) => handleInputChange("title", e.target.value)}
-              placeholder={t('form.taskTitlePlaceholder')}
+              placeholder={t('form.taskTitle')}
               required
             />
           </div>
@@ -77,7 +98,7 @@ export default function TaskEditForm({ task, goal, onClose, onTaskUpdate }) {
               id="description"
               value={formData.description}
               onChange={(e) => handleInputChange("description", e.target.value)}
-              placeholder={t('form.descriptionPlaceholder')}
+              placeholder={t('form.description')}
               rows={4}
             />
           </div>
@@ -130,12 +151,12 @@ export default function TaskEditForm({ task, goal, onClose, onTaskUpdate }) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="estimated_time">{t('form.estimatedTime')} ({t('form.minutes')})</Label>
+              <Label htmlFor="estimatedTime">{t('form.estimatedTime')} ({t('form.minutes')})</Label>
               <Input
-                id="estimated_time"
+                id="estimatedTime"
                 type="number"
-                value={formData.estimated_time}
-                onChange={(e) => handleInputChange("estimated_time", parseInt(e.target.value))}
+                value={formData.estimatedTime}
+                onChange={(e) => handleInputChange("estimatedTime", parseInt(e.target.value))}
                 min={1}
               />
             </div>
@@ -143,12 +164,13 @@ export default function TaskEditForm({ task, goal, onClose, onTaskUpdate }) {
 
           {/* Due Date */}
           <div className="space-y-2">
-            <Label htmlFor="due_date">{t('form.dueDate')}</Label>
+            <Label htmlFor="dueDate">{t('form.dueDate')}</Label>
             <Input
-              id="due_date"
+              id="dueDate"
               type="date"
-              value={formData.due_date}
-              onChange={(e) => handleInputChange("due_date", e.target.value)}
+              value={formData.dueDate}
+              onChange={(e) => handleInputChange("dueDate", e.target.value)}
+              min={new Date().toISOString().split('T')[0]}
             />
           </div>
 
@@ -165,7 +187,7 @@ export default function TaskEditForm({ task, goal, onClose, onTaskUpdate }) {
               {isUpdating ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  {t('form.saving')}...
+                  {t('form.update')}...
                 </>
               ) : (
                 <>
@@ -180,3 +202,23 @@ export default function TaskEditForm({ task, goal, onClose, onTaskUpdate }) {
     </Card>
   );
 }
+
+TaskEditForm.propTypes = {
+  task: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    title: PropTypes.string,
+    description: PropTypes.string,
+    priority: PropTypes.string,
+    difficulty: PropTypes.number,
+    estimatedTime: PropTypes.number,
+    estimated_time: PropTypes.number,
+    dueDate: PropTypes.string,
+    due_date: PropTypes.string,
+    status: PropTypes.string
+  }).isRequired,
+  goal: PropTypes.shape({
+    title: PropTypes.string
+  }),
+  onClose: PropTypes.func.isRequired,
+  onTaskUpdate: PropTypes.func.isRequired
+};

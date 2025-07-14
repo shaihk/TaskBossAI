@@ -1,16 +1,13 @@
 
-import React, { useState, useEffect } from 'react';
-import { goalsAPI, tasksAPI } from '@/services/api';
+import { useState, useEffect } from 'react';
+import { goalsAPI, tasksAPI, userStatsAPI } from '@/services/api';
 import { UserStats } from '@/api/entities';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Plus, Target, Play, Edit, Trash2, CheckCircle2, Circle, ArrowUpDown, Trophy } from 'lucide-react'; // Added Trophy
-import { Link } from 'react-router-dom';
-import { createPageUrl } from '@/utils';
+import { Plus, Target, Play, Edit, Trash2, ArrowUpDown, Trophy } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
 import { useTranslation } from 'react-i18next';
 
 import GoalForm from '../components/goals/GoalForm';
@@ -137,9 +134,8 @@ export default function Goals() {
       });
 
       // Update user stats
-      const statsList = await UserStats.list();
-      if (statsList.length > 0) {
-        const userStats = statsList[0];
+      const userStats = await userStatsAPI.get();
+      if (userStats) {
         const newPoints = userStats.total_points + points;
         const newLevel = Math.floor(newPoints / 1000) + 1;
         
@@ -161,7 +157,7 @@ export default function Goals() {
   };
 
   const getGoalTasks = (goalId) => {
-    return tasks.filter(task => task.goal_id === goalId);
+    return tasks.filter(task => (task.goalId || task.goal_id) === goalId);
   };
 
   const getGoalProgress = (goal) => {
@@ -197,10 +193,11 @@ export default function Goals() {
       case 'time_desc':
         return (b.estimated_time || 0) - (a.estimated_time || 0);
       case '-created_date':
-      default:
+      default: {
         const dateA = a.created_date ? new Date(a.created_date) : new Date(0);
         const dateB = b.created_date ? new Date(b.created_date) : new Date(0);
         return dateB.getTime() - dateA.getTime();
+      }
     }
   });
 
@@ -341,8 +338,8 @@ export default function Goals() {
                     <p className="text-xs text-green-700 font-medium mb-1">{t('goals.goalMemory')}</p>
                     {goal.completion_memo.final_thoughts && (
                       <p className="text-sm text-green-800 italic">
-                        "{goal.completion_memo.final_thoughts.substring(0, 100)}
-                        {goal.completion_memo.final_thoughts.length > 100 ? '...' : ''}"
+                        &ldquo;{goal.completion_memo.final_thoughts.substring(0, 100)}
+                        {goal.completion_memo.final_thoughts.length > 100 ? '...' : ''}&rdquo;
                       </p>
                     )}
                     <div className="flex items-center gap-2 mt-2">

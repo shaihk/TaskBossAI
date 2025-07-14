@@ -13,8 +13,6 @@ import {
   Calendar,
   Award,
   ArrowRight,
-  Lightbulb,
-  Loader2,
   Settings,
   Edit,
   Timer
@@ -23,7 +21,6 @@ import { format } from "date-fns";
 import { he } from "date-fns/locale";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { InvokeLLM } from "@/api/integrations";
 import { useTheme } from "@/context/ThemeContext";
 
 import TaskPlanningChat from "./TaskPlanningChat";
@@ -44,19 +41,119 @@ const statusColors = {
   paused: "text-orange-500"
 };
 
+// Priority color schemes for light and dark modes
+const priorityColors = {
+  low: {
+    light: "border-l-emerald-300 bg-gradient-to-r from-emerald-50 to-teal-50 hover:from-emerald-100 hover:to-teal-100",
+    dark: "border-l-emerald-400 bg-gradient-to-r from-emerald-900/30 to-teal-900/30 hover:from-emerald-800/40 hover:to-teal-800/40"
+  },
+  medium: {
+    light: "border-l-amber-300 bg-gradient-to-r from-amber-50 to-yellow-50 hover:from-amber-100 hover:to-yellow-100",
+    dark: "border-l-amber-400 bg-gradient-to-r from-amber-900/30 to-yellow-900/30 hover:from-amber-800/40 hover:to-yellow-800/40"
+  },
+  high: {
+    light: "border-l-orange-400 bg-gradient-to-r from-orange-100 to-red-100 hover:from-orange-200 hover:to-red-200",
+    dark: "border-l-orange-400 bg-gradient-to-r from-orange-900/40 to-red-900/40 hover:from-orange-800/50 hover:to-red-800/50"
+  },
+  urgent: {
+    light: "border-l-red-500 bg-gradient-to-r from-red-200 to-pink-200 hover:from-red-300 hover:to-pink-300 shadow-red-200/50",
+    dark: "border-l-red-400 bg-gradient-to-r from-red-900/50 to-pink-900/50 hover:from-red-800/60 hover:to-pink-800/60 shadow-red-900/30"
+  }
+};
+
+const priorityBadgeColors = {
+  low: {
+    light: "bg-green-100 text-green-800",
+    dark: "bg-green-900/50 text-green-300"
+  },
+  medium: {
+    light: "bg-yellow-100 text-yellow-800",
+    dark: "bg-yellow-900/50 text-yellow-300"
+  },
+  high: {
+    light: "bg-orange-100 text-orange-800",
+    dark: "bg-orange-900/50 text-orange-300"
+  },
+  urgent: {
+    light: "bg-red-100 text-red-800",
+    dark: "bg-red-900/50 text-red-300"
+  }
+};
+
 export default function TaskItem({ task, goal, onStatusChange, showGoalInfo = true, onCreateSubTask, onTaskUpdate }) {
   const { t, i18n } = useTranslation();
   const StatusIcon = statusIcons[task.status];
   const isCompleted = task.status === "completed";
-  const isOverdue = task.due_date && new Date(task.due_date) < new Date() && !isCompleted;
-  
-  const [showAdvice, setShowAdvice] = useState(false);
-  const [taskAdvice, setTaskAdvice] = useState(null);
-  const [isGettingAdvice, setIsGettingAdvice] = useState(false);
+  const isOverdue = (task.dueDate || task.due_date) && new Date(task.dueDate || task.due_date) < new Date() && !isCompleted;
+  const priority = task.priority || 'medium';
+
+  // Text colors based on priority and theme
+  const getTextColors = () => {
+    if (isCompleted) {
+      return {
+        textColor: 'text-gray-500',
+        secondaryTextColor: 'text-gray-400',
+        linkColor: 'text-blue-600 hover:text-blue-800',
+        dateColor: 'text-gray-400',
+        overdueColor: 'text-red-600'
+      };
+    }
+    
+    // For urgent and high priority, use contrasting colors
+    if (priority === 'urgent') {
+      return isDarkMode ? {
+        textColor: 'text-white',
+        secondaryTextColor: 'text-gray-100',
+        linkColor: 'text-white hover:text-gray-200 underline',
+        dateColor: 'text-gray-100',
+        overdueColor: 'text-yellow-300'
+      } : {
+        textColor: 'text-gray-900',
+        secondaryTextColor: 'text-gray-700',
+        linkColor: 'text-blue-700 hover:text-blue-900',
+        dateColor: 'text-gray-700',
+        overdueColor: 'text-red-800'
+      };
+    }
+    
+    if (priority === 'high') {
+      return isDarkMode ? {
+        textColor: 'text-white',
+        secondaryTextColor: 'text-gray-100',
+        linkColor: 'text-white hover:text-gray-200 underline',
+        dateColor: 'text-gray-100',
+        overdueColor: 'text-yellow-300'
+      } : {
+        textColor: 'text-gray-900',
+        secondaryTextColor: 'text-gray-700',
+        linkColor: 'text-blue-700 hover:text-blue-900',
+        dateColor: 'text-gray-700',
+        overdueColor: 'text-red-800'
+      };
+    }
+    
+    // For medium and low priority, use default colors
+    return isDarkMode ? {
+      textColor: 'text-gray-200',
+      secondaryTextColor: 'text-gray-300',
+      linkColor: 'text-blue-400 hover:text-blue-300',
+      dateColor: 'text-gray-300',
+      overdueColor: 'text-yellow-400'
+    } : {
+      textColor: 'text-gray-900',
+      secondaryTextColor: 'text-gray-600',
+      linkColor: 'text-blue-600 hover:text-blue-800',
+      dateColor: 'text-gray-500',
+      overdueColor: 'text-red-600'
+    };
+  };
+
   const [showPlanningChat, setShowPlanningChat] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
   const [showFocusTimer, setShowFocusTimer] = useState(false);
   const { isDarkMode } = useTheme();
+
+  const { textColor, secondaryTextColor, linkColor, dateColor, overdueColor } = getTextColors();
 
   const getNextStatus = () => {
     switch (task.status) {
@@ -78,37 +175,6 @@ export default function TaskItem({ task, goal, onStatusChange, showGoalInfo = tr
     }
   };
 
-  const getTaskAdvice = async () => {
-    setIsGettingAdvice(true);
-    try {
-      const context = goal ? `היעד הראשי: ${goal.title}. ` : '';
-      const result = await InvokeLLM({
-        prompt: `${context}אני צריך עצות איך להשלים את המשימה: "${task.title}". ${task.description ? `תיאור: ${task.description}` : ''}
-
-תן לי עצות מעשיות ופעולות קונקרטיות שיעזרו לי להצליח במשימה. כלול טיפים להתמודדות עם קשיים ודרכים לשמור על מוטיבציה.
-
-תמיד תענה בעברית בצורה ידידותית ומעשית.`,
-        response_json_schema: {
-          type: "object",
-          properties: {
-            advice_tips: { type: "array", items: { type: "string" } },
-            action_steps: { type: "array", items: { type: "string" } },
-            motivation_tips: { type: "array", items: { type: "string" } }
-          }
-        }
-      });
-
-      console.log("Task advice result:", result);
-      setTaskAdvice(result);
-      setShowAdvice(true);
-    } catch (error) {
-      console.error("Error getting task advice:", error);
-      alert("שגיאה בקבלת עצות מהמערכת. אנא נסה שוב.");
-    } finally {
-      setIsGettingAdvice(false);
-    }
-  };
-
   const handleTaskUpdate = () => {
     setShowEditForm(false);
     if (onTaskUpdate) {
@@ -118,8 +184,9 @@ export default function TaskItem({ task, goal, onStatusChange, showGoalInfo = tr
 
   return (
     <>
-      <Card className={`glass-effect border-0 shadow-lg hover:shadow-xl transition-all duration-300 ${
-        isCompleted ? "bg-green-50" : isOverdue ? "bg-red-50" : ""
+      <Card className={`border-0 border-l-4 shadow-lg hover:shadow-xl transition-all duration-300 ${
+        isCompleted ? "bg-green-50 border-l-green-400" :
+        priorityColors[priority]?.[isDarkMode ? 'dark' : 'light'] || 'bg-white border-l-gray-300'
       }`}>
         <CardContent className="p-4">
           <div className="flex items-start gap-4">
@@ -127,7 +194,14 @@ export default function TaskItem({ task, goal, onStatusChange, showGoalInfo = tr
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => onStatusChange(task, getNextStatus())}
+              onClick={async () => {
+                try {
+                  await onStatusChange(task, getNextStatus());
+                } catch (error) {
+                  console.error("Error changing task status:", error);
+                  alert("שגיאה בעדכון סטטוס המשימה. אנא נסה שוב.");
+                }
+              }}
               className="p-1 hover:bg-transparent"
             >
               <StatusIcon className={`w-6 h-6 ${statusColors[task.status]}`} />
@@ -137,7 +211,7 @@ export default function TaskItem({ task, goal, onStatusChange, showGoalInfo = tr
             <div className="flex-1 min-w-0">
               <div className="flex items-start justify-between mb-2">
                 <h3 className={`font-semibold ${
-                  isCompleted ? "line-through text-gray-500" : "text-gray-900"
+                  isCompleted ? "line-through text-gray-500" : textColor
                 }`}>
                   {task.title}
                 </h3>
@@ -151,13 +225,13 @@ export default function TaskItem({ task, goal, onStatusChange, showGoalInfo = tr
 
               {/* Task Description */}
               {task.description && (
-                <p className="text-sm text-gray-600 mb-2">{task.description}</p>
+                <p className={`text-sm mb-2 ${isCompleted ? 'text-gray-500' : secondaryTextColor}`}>{task.description}</p>
               )}
 
               {/* Goal Info */}
               {showGoalInfo && goal && (
                 <div className="mb-2">
-                  <Link to={createPageUrl(`Goals?goal=${goal.id}`)} className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800">
+                  <Link to={createPageUrl(`Goals?goal=${goal.id}`)} className={`flex items-center gap-1 text-sm ${linkColor}`}>
                     <span>{t('tasks.goalLabel', { title: goal.title })}</span>
                     <ArrowRight className="w-3 h-3" />
                   </Link>
@@ -166,27 +240,37 @@ export default function TaskItem({ task, goal, onStatusChange, showGoalInfo = tr
 
               {/* Task Meta */}
               <div className="flex flex-wrap gap-2 mb-2">
+                {/* Priority Badge */}
+                <Badge className={priorityBadgeColors[priority][isDarkMode ? 'dark' : 'light']}>
+                  {t(`form.priority.${priority}`)}
+                </Badge>
+                
+                {/* Status Badge */}
+                <Badge variant="outline" className={`${statusColors[task.status]} border-current`}>
+                  {t(`form.status.${task.status === 'in_progress' ? 'inProgress' : task.status}`)}
+                </Badge>
+                
                 {task.difficulty && (
                   <Badge variant="outline">
                     {t('tasks.difficulty', { level: task.difficulty })}
                   </Badge>
                 )}
-                {task.estimated_time && (
+                {(task.estimatedTime || task.estimated_time) && (
                   <Badge variant="outline" className="flex items-center gap-1">
                     <Clock className="w-3 h-3" />
-                    {t('tasks.estimatedTime', { time: task.estimated_time })}
+                    {t('tasks.estimatedTime', { time: task.estimatedTime || task.estimated_time })}
                   </Badge>
                 )}
               </div>
 
               {/* Due Date */}
-              {task.due_date && (
+              {(task.dueDate || task.due_date) && (
                 <div className={`flex items-center gap-1 text-sm ${
-                  isOverdue ? "text-red-600" : "text-gray-500"
+                  isOverdue ? overdueColor : dateColor
                 }`}>
                   <Calendar className="w-4 h-4" />
                   <span>
-                    {format(new Date(task.due_date), "d MMMM yyyy", { locale: i18n.language === 'he' ? he : undefined })}
+                    {format(new Date(task.dueDate || task.due_date), "d MMMM yyyy", { locale: i18n.language === 'he' ? he : undefined })}
                   </span>
                   {isOverdue && <span className="font-medium">{t('tasks.overdue')}</span>}
                 </div>
@@ -198,7 +282,14 @@ export default function TaskItem({ task, goal, onStatusChange, showGoalInfo = tr
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => onStatusChange(task, getNextStatus())}
+                onClick={async () => {
+                  try {
+                    await onStatusChange(task, getNextStatus());
+                  } catch (error) {
+                    console.error("Error changing task status:", error);
+                    alert("שגיאה בעדכון סטטוס המשימה. אנא נסה שוב.");
+                  }
+                }}
                 className="text-sm"
               >
                 {getStatusText()}
@@ -242,82 +333,10 @@ export default function TaskItem({ task, goal, onStatusChange, showGoalInfo = tr
               >
                 <Timer className="w-3 h-3" />
               </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={getTaskAdvice}
-                disabled={isGettingAdvice}
-                className={`text-sm ${
-                  isDarkMode 
-                    ? 'bg-gray-800 border-gray-600 text-gray-200 hover:bg-gray-700 hover:border-gray-500 disabled:bg-gray-800 disabled:text-gray-500' 
-                    : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
-                }`}
-                title={t('tasks.adviseMe')}
-              >
-                {isGettingAdvice ? <Loader2 className="w-3 h-3 animate-spin" /> : <Lightbulb className="w-3 h-3" />}
-              </Button>
             </div>
           </div>
 
-          {/* Task Advice */}
-          {showAdvice && taskAdvice && (
-            <div className="mt-4 p-4 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg border border-green-200">
-              <div className="flex justify-between items-center mb-3">
-                <h4 className="font-medium text-green-800 flex items-center gap-2">
-                  <Lightbulb className="w-4 h-4" />
-                  {t('tasks.taskCompletionAdvice')}
-                </h4>
-                <Button variant="ghost" size="sm" onClick={() => setShowAdvice(false)}>
-                  ×
-                </Button>
-              </div>
-              
-              <div className="space-y-3 text-sm">
-                {taskAdvice.advice_tips && taskAdvice.advice_tips.length > 0 && (
-                  <div>
-                    <h5 className="font-medium text-green-700 mb-1">{t('tasks.practicalAdvice')}</h5>
-                    <ul className="space-y-1">
-                      {taskAdvice.advice_tips.map((tip, i) => (
-                        <li key={i} className="text-gray-700 flex items-start gap-2">
-                          <span className="text-green-600">•</span>
-                          {tip}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                
-                {taskAdvice.action_steps && taskAdvice.action_steps.length > 0 && (
-                  <div>
-                    <h5 className="font-medium text-blue-700 mb-1">{t('tasks.recommendedActions')}</h5>
-                    <ul className="space-y-1">
-                      {taskAdvice.action_steps.map((step, i) => (
-                        <li key={i} className="text-gray-700 flex items-start gap-2">
-                          <span className="text-blue-600 font-bold">{i + 1}.</span>
-                          {step}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {taskAdvice.motivation_tips && taskAdvice.motivation_tips.length > 0 && (
-                  <div>
-                    <h5 className="font-medium text-purple-700 mb-1">{t('tasks.motivationTips')}</h5>
-                    <ul className="space-y-1">
-                      {taskAdvice.motivation_tips.map((tip, i) => (
-                        <li key={i} className="text-gray-700 flex items-start gap-2">
-                          <span className="text-purple-600">💡</span>
-                          {tip}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-        </CardContent>
+          </CardContent>
       </Card>
 
       {/* Task Planning Chat Modal */}
@@ -365,9 +384,12 @@ TaskItem.propTypes = {
     description: PropTypes.string,
     status: PropTypes.oneOf(['pending', 'in_progress', 'completed', 'paused']).isRequired,
     due_date: PropTypes.string,
-    difficulty: PropTypes.string,
-    estimated_time: PropTypes.string,
-    points_earned: PropTypes.number
+    dueDate: PropTypes.string,
+    difficulty: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    estimated_time: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    estimatedTime: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    points_earned: PropTypes.number,
+    priority: PropTypes.oneOf(['low', 'medium', 'high', 'urgent'])
   }).isRequired,
   goal: PropTypes.shape({
     id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),

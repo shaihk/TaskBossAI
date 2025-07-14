@@ -1,16 +1,18 @@
 
 import React, { useState, useEffect } from 'react';
 import { User, UserStats } from '@/api/entities';
-import { usersAPI } from '@/services/api';
+import { usersAPI, userStatsAPI } from '@/services/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Edit, Trophy, Star, TrendingUp, Flame, Zap, BarChart, HelpCircle } from 'lucide-react';
+import { Edit, Trophy, Star, TrendingUp, Flame, Zap, BarChart, HelpCircle, Bot, Settings } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import EditProfileModal from '../components/profile/EditProfileModal';
 import UsageInstructions from '../components/common/UsageInstructions';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 
 export default function Profile() {
   const [user, setUser] = useState(null);
@@ -18,10 +20,20 @@ export default function Profile() {
   const [isLoading, setIsLoading] = useState(true);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showUsageInstructions, setShowUsageInstructions] = useState(false);
+  const [aiPreferences, setAiPreferences] = useState({
+    chatModel: 'gemini-2.5-flash',
+    quoteModel: 'gemini-2.5-flash',
+    fallbackModel: 'gpt-4o-mini'
+  });
+  const [availableModels, setAvailableModels] = useState({
+    openai: [],
+    gemini: []
+  });
   const { t } = useTranslation();
 
   useEffect(() => {
     loadProfileData();
+    loadAiPreferences();
   }, []);
 
   const loadProfileData = async () => {
@@ -29,14 +41,82 @@ export default function Profile() {
       const currentUser = await User.me();
       setUser(currentUser);
 
-      const stats = await UserStats.list();
-      if (stats.length > 0) {
-        setUserStats(stats[0]);
+      const stats = await userStatsAPI.get();
+      if (stats) {
+        setUserStats(stats);
       }
     } catch (error) {
       console.error("Error loading profile data:", error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const loadAiPreferences = async () => {
+    try {
+      // Load preferences from server
+      const token = localStorage.getItem('token');
+      const prefResponse = await fetch('/api/user/preferences', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (prefResponse.ok) {
+        const prefData = await prefResponse.json();
+        setAiPreferences(prefData.aiModels);
+      }
+
+      // Get available models from the server
+      const modelsResponse = await fetch('/api/models/available', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (modelsResponse.ok) {
+        const models = await modelsResponse.json();
+        setAvailableModels(models);
+      } else {
+        // Fallback to default models if API fails
+        setAvailableModels({
+          openai: [
+            { id: 'gpt-4.1', name: 'GPT-4.1', provider: 'openai' },
+            { id: 'gpt-4o', name: 'ChatGPT-4o', provider: 'openai' },
+            { id: 'gpt-4.1-nano', name: 'GPT-4.1 Nano', provider: 'openai' },
+            { id: 'gpt-4o-mini', name: 'GPT-4o Mini', provider: 'openai' },
+            { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo', provider: 'openai' }
+          ],
+          gemini: [
+            { id: 'gemini-2.5-pro', name: 'Gemini 2.5 Pro', provider: 'gemini' },
+            { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash', provider: 'gemini' },
+            { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash', provider: 'gemini' },
+            { id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro', provider: 'gemini' },
+            { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash', provider: 'gemini' }
+          ]
+        });
+      }
+    } catch (error) {
+      console.error("Error loading AI preferences:", error);
+    }
+  };
+
+  const saveAiPreferences = async (newPreferences) => {
+    try {
+      // Save to server
+      const token = localStorage.getItem('token');
+      await fetch('/api/user/preferences', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ aiModels: newPreferences })
+      });
+
+      // Update local state
+      setAiPreferences(newPreferences);
+      
+      // Also save to localStorage as backup
+      localStorage.setItem('aiModelPreferences', JSON.stringify(newPreferences));
+    } catch (error) {
+      console.error("Error saving AI preferences:", error);
     }
   };
 
@@ -148,6 +228,167 @@ export default function Profile() {
               <div>
                 <p className="text-2xl font-bold">{userStats?.daily_goal_streak || 0}</p>
                 <p className="text-sm text-gray-600">{t('profile.consecutiveDays')}</p>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* AI Model Settings */}
+      <Card className="glass-effect border-0 shadow-lg">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Bot className="w-5 h-5 text-blue-500" />
+            AI Model Settings
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Chat and Task Advice Model */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Settings className="w-4 h-4 text-gray-500" />
+                <h3 className="font-medium text-gray-800">Chat & Task Advice</h3>
+              </div>
+              <p className="text-sm text-gray-600">
+                Choose the AI model for chat interactions, task suggestions, and advice.
+              </p>
+              <Select 
+                value={aiPreferences.chatModel} 
+                onValueChange={(value) => saveAiPreferences({...aiPreferences, chatModel: value})}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select model for chat" />
+                </SelectTrigger>
+                <SelectContent>
+                  <div className="px-2 py-1 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Google Gemini
+                  </div>
+                  {availableModels.gemini.map((model) => (
+                    <SelectItem key={model.id} value={model.id}>
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" className="text-xs">Gemini</Badge>
+                        {model.name}
+                      </div>
+                    </SelectItem>
+                  ))}
+                  <div className="px-2 py-1 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    OpenAI
+                  </div>
+                  {availableModels.openai.map((model) => (
+                    <SelectItem key={model.id} value={model.id}>
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" className="text-xs">OpenAI</Badge>
+                        {model.name}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Quote Generation Model */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Settings className="w-4 h-4 text-gray-500" />
+                <h3 className="font-medium text-gray-800">Quote Generation</h3>
+              </div>
+              <p className="text-sm text-gray-600">
+                Choose the AI model for generating daily motivational quotes.
+              </p>
+              <Select 
+                value={aiPreferences.quoteModel} 
+                onValueChange={(value) => saveAiPreferences({...aiPreferences, quoteModel: value})}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select model for quotes" />
+                </SelectTrigger>
+                <SelectContent>
+                  <div className="px-2 py-1 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Google Gemini
+                  </div>
+                  {availableModels.gemini.map((model) => (
+                    <SelectItem key={model.id} value={model.id}>
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" className="text-xs">Gemini</Badge>
+                        {model.name}
+                      </div>
+                    </SelectItem>
+                  ))}
+                  <div className="px-2 py-1 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    OpenAI
+                  </div>
+                  {availableModels.openai.map((model) => (
+                    <SelectItem key={model.id} value={model.id}>
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" className="text-xs">OpenAI</Badge>
+                        {model.name}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          {/* Fallback Model */}
+          <div className="space-y-3 border-t pt-6">
+            <div className="flex items-center gap-2">
+              <Settings className="w-4 h-4 text-gray-500" />
+              <h3 className="font-medium text-gray-800">Fallback Model</h3>
+            </div>
+            <p className="text-sm text-gray-600">
+              Choose the backup AI model to use when the primary model is unavailable.
+            </p>
+            <Select 
+              value={aiPreferences.fallbackModel} 
+              onValueChange={(value) => saveAiPreferences({...aiPreferences, fallbackModel: value})}
+            >
+              <SelectTrigger className="max-w-md">
+                <SelectValue placeholder="Select fallback model" />
+              </SelectTrigger>
+              <SelectContent>
+                <div className="px-2 py-1 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Google Gemini
+                </div>
+                {availableModels.gemini.map((model) => (
+                  <SelectItem key={model.id} value={model.id}>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className="text-xs">Gemini</Badge>
+                      {model.name}
+                    </div>
+                  </SelectItem>
+                ))}
+                <div className="px-2 py-1 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  OpenAI
+                </div>
+                {availableModels.openai.map((model) => (
+                  <SelectItem key={model.id} value={model.id}>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className="text-xs">OpenAI</Badge>
+                      {model.name}
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Model Status Information */}
+          <div className="bg-blue-50 p-4 rounded-lg">
+            <h4 className="font-medium text-blue-900 mb-2">Model Information</h4>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-blue-800">Current Chat Model:</span>
+                <Badge variant="secondary">{aiPreferences.chatModel}</Badge>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-blue-800">Current Quote Model:</span>
+                <Badge variant="secondary">{aiPreferences.quoteModel}</Badge>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-blue-800">Fallback Model:</span>
+                <Badge variant="secondary">{aiPreferences.fallbackModel}</Badge>
               </div>
             </div>
           </div>

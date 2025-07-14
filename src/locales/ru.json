@@ -7,7 +7,7 @@
     "profile": "Профиль"
   },
   "home": {
-    "welcome": "Добро пожаловать, {{username}}, в вашу панель управления",
+    "welcome": "Добро пожаловать, {{username}}!",
     "newGoal": "Новая цель",
     "quickActions": "Быстрые действия",
     "addNewGoal": "Добавить новую цель",
@@ -183,6 +183,8 @@
   "form": {
     "taskTitle": "Название задачи",
     "goalTitle": "Название цели",
+    "goalTitlePlaceholder": "напишите короткий и ясный заголовок",
+    "descriptionPlaceholder": "Дайте четкое и подробное описание",
     "description": "Описание",
     "detailedDescription": "Подробное описание",
     "priority": "Приоритет",
@@ -222,6 +224,7 @@
     "adviseMe": "Посоветуй мне",
     "addSelectedTasks": "Добавить выбранные задачи",
     "minutes": "минут",
+    "addTagPlaceholder": "Выберите теги для цели",
     "editTask": "Редактировать задачу",
     "editGoal": "Редактировать цель"
   },

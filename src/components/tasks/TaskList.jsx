@@ -1,6 +1,6 @@
 
-import React, { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
@@ -21,8 +21,10 @@ import {
 
 import TaskItem from "./TaskItem";
 
-export default function TaskList({ tasks, goals, onStatusChange, isLoading, getTaskGoal, onCreateSubTask, onBulkDelete, onTaskUpdate }) {
-  const { t } = useTranslation();
+import PropTypes from 'prop-types';
+
+export default function TaskList({ tasks, onStatusChange, isLoading, getTaskGoal, onCreateSubTask, onBulkDelete, onTaskUpdate }) {
+  const { t, i18n } = useTranslation();
   const [selectedTasks, setSelectedTasks] = useState(new Set());
   const [showBulkActions, setShowBulkActions] = useState(false);
 
@@ -229,3 +231,17 @@ export default function TaskList({ tasks, goals, onStatusChange, isLoading, getT
     </div>
   );
 }
+
+TaskList.propTypes = {
+  tasks: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    title: PropTypes.string,
+    status: PropTypes.string
+  })).isRequired,
+  onStatusChange: PropTypes.func.isRequired,
+  isLoading: PropTypes.bool,
+  getTaskGoal: PropTypes.func.isRequired,
+  onCreateSubTask: PropTypes.func.isRequired,
+  onBulkDelete: PropTypes.func.isRequired,
+  onTaskUpdate: PropTypes.func.isRequired
+};
