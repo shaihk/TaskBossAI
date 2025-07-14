@@ -36,24 +36,59 @@ A modern task management application with AI-powered features for productivity e
 
 1. **Clone the repository:**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/shaihk/TaskBossAI.git
    cd TaskBossAI
    ```
 
-2. **Make scripts executable:**
+2. **Run the setup script (includes all dependencies):**
    ```bash
-   chmod +x setup.sh start-server.sh
-   ```
-
-3. **Run the setup script:**
-   ```bash
+   chmod +x setup.sh
    ./setup.sh
    ```
 
-4. **Regular usage:**
+The setup script will automatically:
+- Install Node.js, npm, Git, curl, Nginx, and PM2 if missing
+- Install all application dependencies
+- Create environment files with your OpenAI API key
+- Initialize the database
+- Configure Nginx with security headers and rate limiting
+- Setup firewall rules
+- Start the application with PM2
+- Validate the setup
+
+3. **After setup, the application runs automatically with PM2 and Nginx**
+
+**Regular usage commands:**
+```bash
+pm2 status                 # Check application status
+pm2 logs                   # View application logs
+pm2 restart all            # Restart application
+pm2 stop all               # Stop application
+```
+
+**Access your application:**
+- Your application will be available at: `http://your-server-ip`
+- Nginx handles routing automatically
+- Both frontend and backend run through port 80
+
+### Fresh Installation (Clean Start)
+
+If you want to start completely fresh:
+
+1. **Remove existing installation:**
    ```bash
-   ./start-server.sh
+   rm -rf TaskBossAI
    ```
+
+2. **Clone and setup:**
+   ```bash
+   git clone https://github.com/shaihk/TaskBossAI.git
+   cd TaskBossAI
+   chmod +x setup.sh
+   ./setup.sh
+   ```
+
+This ensures you get all the latest updates and a clean configuration.
 
 ### What the setup script does:
 - Guide you through OpenAI API key configuration
