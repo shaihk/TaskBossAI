@@ -1,457 +1,220 @@
 # TaskBoss-AI
 
-A modern task management application with AI-powered features for productivity enhancement.
+TaskBoss-AI is a comprehensive task and goal management application with AI-powered assistance. The application uses React for the frontend, Express.js for the backend, and SQLite for data storage.
 
-## Features
+## 🚀 Quick Start
 
-- 📝 Task Management with categories and priorities
-- 🎯 Goal Setting and tracking
-- 🤖 AI Assistant for task suggestions and consultation
-- 📊 Progress tracking and statistics
-- 🏆 Achievement system
-- 🌐 Multi-language support (English/Hebrew)
-- 🎨 Modern UI with dark/light theme
+### Local Development (Windows)
 
-## Quick Start
-
-### Windows Setup
-
-1. **Clone the repository:**
-   ```bash
-   git clone <repository-url>
-   cd TaskBossAI
-   ```
-
-2. **Run the setup script:**
+1. **Complete Setup** (first time):
    ```bash
    setup.bat
    ```
+   This will install all dependencies, configure the database, and start the servers.
 
-3. **Regular usage:**
+2. **Start Servers** (after setup):
    ```bash
-   setrun.bat
+   run.bat
    ```
 
-### Ubuntu/Linux Setup
-
-1. **Clone the repository:**
+3. **Stop Servers**:
    ```bash
-   git clone https://github.com/shaihk/TaskBossAI.git
-   cd TaskBossAI
+   stop.bat
    ```
 
-2. **Run the setup script (includes all dependencies):**
+4. **Check Status**:
+   ```bash
+   status.bat
+   ```
+
+### VPS Deployment (Linux)
+
+1. **Complete Setup** (first time):
    ```bash
    chmod +x setup.sh
    ./setup.sh
    ```
+   This will install all dependencies, configure nginx, set up PM2, and deploy the application.
 
-The setup script will automatically:
-- Install Node.js, npm, Git, curl, Nginx, and PM2 if missing
-- Install all application dependencies
-- Create environment files with your OpenAI API key
-- Initialize the database
-- Configure Nginx with security headers and rate limiting
-- Setup firewall rules
-- Start the application with PM2
-- Validate the setup
-
-3. **After setup, the application runs automatically with PM2 and Nginx**
-
-**Pre-deployment validation:**
-```bash
-./pre-check.sh             # Validate dependencies and configuration before deployment
-```
-
-**Regular usage commands:**
-```bash
-./status.sh                # Check application status (comprehensive)
-./stop.sh                  # Stop all application processes
-./start-server.sh          # Start application
-pm2 status                 # Check PM2 status
-pm2 logs                   # View PM2 logs
-pm2 restart all            # Restart application
-```
-
-**Access your application:**
-- Your application will be available at: `http://your-server-ip`
-- Nginx handles routing automatically
-- Both frontend and backend run through port 80
-
-### Fresh Installation (Clean Start)
-
-If you want to start completely fresh:
-
-1. **Remove existing installation:**
+2. **Start Servers** (after setup):
    ```bash
-   rm -rf TaskBossAI
+   ./run.sh
    ```
 
-2. **Clone and setup:**
+3. **Stop Servers**:
    ```bash
-   git clone https://github.com/shaihk/TaskBossAI.git
-   cd TaskBossAI
-   chmod +x setup.sh
-   ./setup.sh
+   ./stop.sh
    ```
 
-This ensures you get all the latest updates and a clean configuration.
-
-### What the setup script does:
-- Guide you through OpenAI API key configuration
-- Validate your API key
-- Generate secure JWT secrets
-- Create environment files
-- Install Node.js (Ubuntu/Linux only)
-- Install dependencies
-- Start the application
-
-### Get your OpenAI API Key:
-- Visit: https://platform.openai.com/account/api-keys
-- Sign in to your OpenAI account
-- Click "Create new secret key"
-- Copy the key (starts with `sk-...`)
-
-## Manual Setup (Advanced)
-
-If you prefer manual setup:
-
-1. **Install dependencies:**
+4. **Check Status**:
    ```bash
-   npm install
-   cd server
-   npm install
-   cd ..
+   ./status.sh
    ```
 
-2. **Create environment files:**
-   
-   Create `.env` in root directory:
-   ```env
-   OPENAI_API_KEY=your_openai_api_key_here
-   JWT_SECRET=your_secure_jwt_secret_here
-   PORT=3001
-   NODE_ENV=development
-   ```
-   
-   Create `server/.env` with the same content.
+## 📁 File Structure
 
-3. **Start the servers:**
-   ```bash
-   # Terminal 1 - Backend
-   cd server
-   npm start
-   
-   # Terminal 2 - Frontend
-   npm run dev
-   ```
+### Setup Scripts
+- **`setup.bat`** - Complete Windows setup (installs dependencies, configures database, starts servers)
+- **`setup.sh`** - Complete VPS setup (installs dependencies, configures nginx/PM2, deploys application)
 
-## Configuration
+### Runtime Scripts
+- **`run.bat`** - Start servers locally (Windows)
+- **`run.sh`** - Start servers on VPS (Linux)
+- **`stop.bat`** - Stop all servers locally (Windows)
+- **`stop.sh`** - Stop all servers on VPS (Linux)
+- **`status.bat`** - Check system status locally (Windows)
+- **`status.sh`** - Check system status on VPS (Linux)
+
+### Database Helper Scripts
+- **`server/migrate-from-json.js`** - Migrate data from JSON to SQLite
+- **`server/create-new-db.js`** - Create new SQLite database
+
+### Core Application
+- **`server/`** - Backend Express.js application
+  - **`server.js`** - Main server file
+  - **`database.js`** - SQLite database helper functions
+  - **`taskboss.db`** - SQLite database file
+  - **`package.json`** - Server dependencies
+- **`src/`** - Frontend React application
+- **`package.json`** - Frontend dependencies
+
+## 🔧 Configuration
 
 ### Environment Variables
 
-- `OPENAI_API_KEY`: Your OpenAI API key for AI features
-- `JWT_SECRET`: Secret key for JWT token generation (auto-generated)
-- `PORT`: Server port (default: 3001)
-- `NODE_ENV`: Environment mode (development/production)
+The setup scripts automatically create `.env` files with the following variables:
 
-### Security
+```env
+# OpenAI API Configuration
+OPENAI_API_KEY=your-api-key-here
 
-- Environment files (`.env`) are automatically excluded from Git
-- Each deployment uses its own API keys and secrets
-- JWT secrets are auto-generated for security
+# JWT Secret (auto-generated)
+JWT_SECRET=auto-generated-secret
 
-### 🔒 Git Security - Important!
+# Server Configuration
+PORT=3001
+NODE_ENV=development
 
-**Before pushing to Git, ensure sensitive data is protected:**
-
-1. **Check what will be committed:**
-   ```bash
-   git status
-   ```
-
-2. **Verify sensitive files are ignored:**
-   - `.env` files should NOT appear in git status
-   - Both `server/db.json` and `server/db.example.json` are safe to track
-
-3. **If sensitive files appear in git status:**
-   ```bash
-   # Remove from Git tracking (keeps local file)
-   git rm --cached .env
-   git rm --cached server/.env
-   ```
-
-4. **Safe commit process:**
-   ```bash
-   git add .
-   git commit -m "Your commit message"
-   git push origin main
-   ```
-
-**Protected files (automatically ignored):**
-- `.env` and `server/.env` - Contains API keys
-- `*.log` files - Contains runtime logs
-- `node_modules/` - Dependencies
-
-**Safe files to commit:**
-- `.env.example` - Template without real keys
-- `server/db.json` - Database with application data
-- `server/db.example.json` - Database structure template
-
-## Development
-
-### Project Structure
-
-```
-TaskBossAI/
-├── src/                    # Frontend React application
-│   ├── components/         # React components
-│   ├── pages/             # Page components
-│   ├── services/          # API services
-│   └── utils/             # Utility functions
-├── server/                # Backend Node.js server
-│   ├── server.js          # Main server file
-│   ├── validate-setup.js  # Setup validation
-│   └── db.json           # JSON database
-├── setup.bat             # First-time setup script
-├── setrun.bat           # Regular startup script
-└── README.md            # This file
+# Database Configuration
+DB_PATH=./server/taskboss.db
 ```
 
-### API Endpoints
+### Database
 
-- `POST /api/auth/register` - User registration
-- `POST /api/auth/login` - User login
-- `GET /api/tasks` - Get user tasks
-- `POST /api/tasks` - Create new task
-- `PUT /api/tasks/:id` - Update task
-- `DELETE /api/tasks/:id` - Delete task
-- `POST /api/llm/invoke` - AI assistant
-- `POST /api/chat` - AI chat
+TaskBoss-AI uses SQLite for data storage with the following tables:
+- **users** - User accounts and authentication
+- **goals** - User goals and objectives
+- **tasks** - Individual tasks linked to goals
+- **user_stats** - User statistics and achievements
 
-### AI Features
+## 🌐 Application URLs
 
-The application includes several AI-powered features:
+### Local Development
+- Frontend: http://localhost:5173
+- Backend API: http://localhost:3001
 
-- **Task Assistant**: Suggests tasks based on user input
-- **Task Planning**: Helps break down large tasks
-- **Consultation**: Provides productivity advice
-- **Smart Categorization**: Auto-categorizes tasks
+### VPS Deployment
+- Frontend: http://your-domain.com
+- Backend API: http://your-domain.com/api
 
-## Deployment
+## 📋 Requirements
 
 ### Local Development (Windows)
-```bash
-setup.bat          # First time setup
-setrun.bat         # Regular usage
-```
+- Node.js 18+ and npm
+- Windows 10/11
+- OpenAI API key
 
-### Local Development (Ubuntu/Linux)
-```bash
-chmod +x setup.sh start-server.sh
-./setup.sh         # First time setup
-./start-server.sh  # Regular usage
-```
+### VPS Deployment (Linux)
+- Ubuntu 20.04+ or similar Linux distribution
+- Node.js 18+ and npm
+- nginx
+- PM2
+- OpenAI API key
+- Domain name (optional, for SSL)
 
-### Production Deployment (Ubuntu/Linux VPS)
+## 🔄 Migration from JSON
 
-**🚀 Automated VPS Setup (Recommended)**
+If you have an existing JSON database (`server/db.json`), the setup scripts will automatically migrate your data to SQLite while preserving all:
+- User accounts and passwords
+- Goals and tasks
+- User statistics and achievements
+- Hebrew/RTL content
 
-Use our comprehensive VPS setup script that includes Nginx, SSL, security, and PM2:
-
-1. **Validate your setup before deployment (recommended):**
-   ```bash
-   ./pre-check.sh
-   ```
-   This will check all dependencies, configuration files, and project structure.
-
-2. **Upload and run the VPS setup script:**
-   ```bash
-   sudo chmod +x vps-setup.sh
-   sudo ./vps-setup.sh
-   ```
-
-The script will:
-- Install Node.js, Git, PM2, and Nginx
-- Clone your repository
-- Setup environment variables securely
-- Configure Nginx with security headers and rate limiting
-- Setup SSL certificate (optional)
-- Configure firewall
-- Start the application with PM2
-
-**🔄 Updating Your VPS Application**
-
-**Option 1: Automated Update (Recommended)**
-
-Use the automated update script:
-
-1. **Upload the update script to your VPS:**
-   ```bash
-   scp vps-update.sh your-username@your-vps-ip:/tmp/
-   ```
-
-2. **Connect to your VPS and run the update:**
-   ```bash
-   ssh your-username@your-vps-ip
-   sudo chmod +x /tmp/vps-update.sh
-   sudo /tmp/vps-update.sh
-   ```
-
-The script will automatically:
-- Create a backup of current state
-- Pull latest changes from Git
-- Update dependencies
-- Restart the application with PM2
-- Test the application
-- Reload Nginx configuration
-
-**Option 2: Manual Update**
-
-1. **Connect to your VPS:**
-   ```bash
-   ssh your-username@your-vps-ip
-   ```
-
-2. **Navigate to application directory:**
-   ```bash
-   cd /var/www/taskboss-ai
-   ```
-
-3. **Pull latest changes:**
-   ```bash
-   git pull origin main
-   ```
-
-4. **Update dependencies:**
-   ```bash
-   npm install
-   cd server && npm install && cd ..
-   ```
-
-5. **Restart the application:**
-   ```bash
-   pm2 restart taskboss-ai
-   ```
-
-6. **Check status:**
-   ```bash
-   pm2 status
-   pm2 logs taskboss-ai --lines 20
-   ```
-
-**📋 Manual VPS Setup**
-
-1. **Clone and setup:**
-   ```bash
-   git clone <repository-url>
-   cd TaskBossAI
-   chmod +x setup.sh start-server.sh
-   ./setup.sh
-   ```
-
-2. **Run in background:**
-   ```bash
-   nohup ./start-server.sh > app.log 2>&1 &
-   ```
-
-3. **Check if running:**
-   ```bash
-   curl http://localhost:3001/api/test/openai -X POST -H 'Content-Type: application/json' -d '{"prompt":"Hello"}'
-   ```
-
-4. **Stop the application:**
-   ```bash
-   pkill -f "node.*server.js"
-   pkill -f "npm.*dev"
-   ```
-
-5. **View logs:**
-   ```bash
-   tail -f app.log
-   ```
-
-### Using PM2 (Recommended for Production)
-
-1. **Install PM2:**
-   ```bash
-   npm install -g pm2
-   ```
-
-2. **Create PM2 ecosystem file:**
-   ```bash
-   cat > ecosystem.config.js << 'EOF'
-   module.exports = {
-     apps: [{
-       name: 'taskflow-ai',
-       script: 'server/server.js',
-       cwd: '/path/to/TaskBossAI',
-       env: {
-         NODE_ENV: 'production',
-         PORT: 3001
-       },
-       instances: 1,
-       autorestart: true,
-       watch: false,
-       max_memory_restart: '1G'
-     }]
-   };
-   EOF
-   ```
-
-3. **Start with PM2:**
-   ```bash
-   pm2 start ecosystem.config.js
-   pm2 save
-   pm2 startup
-   ```
-
-### Nginx Configuration (Optional)
-
-```nginx
-server {
-    listen 80;
-    server_name your-domain.com;
-
-    location / {
-        proxy_pass http://localhost:3001;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_cache_bypass $http_upgrade;
-    }
-}
-```
-
-## Troubleshooting
+## 🛠️ Troubleshooting
 
 ### Common Issues
 
-1. **AI features not working:**
-   - Check if OpenAI API key is valid
-   - Ensure you have sufficient OpenAI credits
-   - Run setup.bat to reconfigure
+1. **Port already in use**:
+   - Run `stop.bat` (Windows) or `./stop.sh` (Linux) to stop all servers
+   - Check `status.bat` or `./status.sh` for detailed information
 
-2. **Server won't start:**
-   - Check if ports 3001 and 5173 are available
-   - Verify environment files exist
-   - Run setup validation: `node server/validate-setup.js`
+2. **Database not found**:
+   - Run the complete setup script again
+   - Check if `server/taskboss.db` exists
 
-3. **Authentication issues:**
-   - Check JWT_SECRET configuration
-   - Clear browser localStorage and re-login
+3. **Dependencies missing**:
+   - Delete `node_modules` folders and run setup script again
+   - Ensure you have Node.js 18+ installed
 
-### Getting Help
+4. **API key issues**:
+   - Verify your OpenAI API key starts with `sk-`
+   - Check `.env` files for correct configuration
 
-If you encounter issues:
-1. Check the console for error messages
-2. Verify your OpenAI API key at: https://platform.openai.com/account/api-keys
-3. Run the setup script again to reconfigure
+### Logs and Debugging
 
-## License
+#### Local Development
+- Check terminal output where servers are running
+- Look for error messages in the command windows
+
+#### VPS Deployment
+- Application logs: `pm2 logs taskboss-ai`
+- Nginx logs: `sudo tail -f /var/log/nginx/error.log`
+- System status: `./status.sh`
+
+## 🔒 Security
+
+- Environment variables are stored locally and not committed to Git
+- JWT tokens are auto-generated with high entropy
+- SQLite database is stored locally with appropriate permissions
+- nginx configuration includes security headers
+- Firewall is configured to allow only necessary ports
+
+## 📈 Performance
+
+### SQLite Benefits
+- Faster queries compared to JSON file storage
+- ACID compliance for data integrity
+- Automatic indexing on primary keys
+- Efficient storage and retrieval
+- Support for complex queries
+
+### Production Optimizations
+- Frontend is built and served as static files
+- nginx handles static file serving and API proxying
+- PM2 manages process monitoring and auto-restart
+- Gzip compression enabled
+- Static asset caching configured
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test with both `setup.bat` and `setup.sh`
+5. Submit a pull request
+
+## 📄 License
 
 This project is licensed under the MIT License.
+
+## 🆘 Support
+
+For support and questions:
+1. Check the troubleshooting section above
+2. Run `status.bat` or `./status.sh` for system diagnostics
+3. Check application logs for error details
+4. Ensure all requirements are met
+
+---
+
+**TaskBoss-AI** - Manage your tasks and goals with AI-powered assistance! 🎯

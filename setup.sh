@@ -1,5 +1,15 @@
 #!/bin/bash
 
+# TaskBoss-AI - Complete VPS Setup Script
+# This script sets up the TaskBoss-AI application on a VPS server with nginx and pm2
+
+set -e  # Exit on any error
+
+echo "========================================"
+echo "    TaskBoss-AI - Complete VPS Setup"
+echo "========================================"
+echo
+
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -7,407 +17,566 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-echo -e "${BLUE}========================================"
-echo -e "    TaskBoss-AI - Setup Script"
-echo -e "========================================${NC}"
-echo ""
+# Configuration variables
+APP_NAME="taskboss-ai"
+APP_DIR="/var/www/$APP_NAME"
+NGINX_CONF="/etc/nginx/sites-available/$APP_NAME"
+NGINX_ENABLED="/etc/nginx/sites-enabled/$APP_NAME"
+DOMAIN="your-domain.com"  # Will be asked from user
+PORT=3001
+FRONTEND_PORT=80
 
-# Check if .env files exist
-if [ -f ".env" ] && [ -f "server/.env" ]; then
-    echo -e "${YELLOW}Configuration files already exist.${NC}"
-    echo "If you want to reconfigure, delete .env and server/.env files and run this script again."
-    echo ""
-    read -p "Do you want to start the application? (y/n): " start_app
-    if [[ $start_app =~ ^[Yy]$ ]]; then
-        ./start-server.sh
-    fi
-    exit 0
-fi
+# Function to print colored output
+print_status() {
+    echo -e "${GREEN}✓${NC} $1"
+}
 
-echo "Setting up TaskBoss-AI for the first time..."
-echo ""
+print_warning() {
+    echo -e "${YELLOW}⚠${NC} $1"
+}
 
-# Create server directory if it doesn't exist
-mkdir -p server
+print_error() {
+    echo -e "${RED}✗${NC} $1"
+}
 
-# Update system packages first
-echo "Updating system packages..."
-sudo apt update
+print_info() {
+    echo -e "${BLUE}ℹ${NC} $1"
+}
 
-# Check if Git is installed
-if ! command -v git &> /dev/null; then
-    echo -e "${RED}❌ Git is not installed!${NC}"
-    echo "Installing Git..."
-    sudo apt-get install -y git
-    
-    if ! command -v git &> /dev/null; then
-        echo -e "${RED}Failed to install Git. Please install it manually.${NC}"
+# Check if running as root
+check_root() {
+    if [[ $EUID -eq 0 ]]; then
+        print_error "This script should not be run as root for security reasons."
+        print_info "Please run as a regular user with sudo privileges."
         exit 1
     fi
-    
-    echo -e "${GREEN}✅ Git installed successfully!${NC}"
-fi
+}
 
-# Check if curl is installed
-if ! command -v curl &> /dev/null; then
-    echo -e "${RED}❌ curl is not installed!${NC}"
-    echo "Installing curl..."
-    sudo apt-get install -y curl
+# Stop all running processes
+stop_existing_processes() {
+    print_info "Stopping existing processes..."
     
-    echo -e "${GREEN}✅ curl installed successfully!${NC}"
-fi
+    # Stop PM2 processes
+    pm2 stop all 2>/dev/null || true
+    pm2 delete all 2>/dev/null || true
+    
+    # Kill any remaining node processes
+    sudo pkill -f "node" 2>/dev/null || true
+    sudo pkill -f "npm" 2>/dev/null || true
+    
+    print_status "All existing processes stopped"
+}
 
-# Check if Node.js is installed
-if ! command -v node &> /dev/null; then
-    echo -e "${RED}❌ Node.js is not installed!${NC}"
-    echo "Installing Node.js..."
+# Clean previous installation
+clean_previous_installation() {
+    print_info "Cleaning previous installation..."
     
-    # Install Node.js (using NodeSource repository)
+    # Remove application directory if exists
+    if [[ -d "$APP_DIR" ]]; then
+        print_warning "Removing existing application directory..."
+        sudo rm -rf "$APP_DIR"
+    fi
+    
+    # Remove nginx configuration if exists
+    if [[ -f "$NGINX_CONF" ]]; then
+        sudo rm -f "$NGINX_CONF"
+        sudo rm -f "$NGINX_ENABLED"
+    fi
+    
+    print_status "Previous installation cleaned"
+}
+
+# Update system packages
+update_system() {
+    print_info "Updating system packages..."
+    sudo apt update && sudo apt upgrade -y
+    print_status "System packages updated"
+}
+
+# Install Node.js and npm
+install_nodejs() {
+    print_info "Installing Node.js and npm..."
+    
+    # Remove old Node.js if exists
+    sudo apt remove -y nodejs npm 2>/dev/null || true
+    
+    # Install Node.js 18.x (LTS)
     curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
     sudo apt-get install -y nodejs
     
-    if ! command -v node &> /dev/null; then
-        echo -e "${RED}Failed to install Node.js. Please install it manually and run this script again.${NC}"
-        exit 1
-    fi
+    # Verify installation
+    node_version=$(node --version)
+    npm_version=$(npm --version)
     
-    echo -e "${GREEN}✅ Node.js installed successfully!${NC}"
-fi
+    print_status "Node.js $node_version installed"
+    print_status "npm $npm_version installed"
+}
 
-# Check if npm is installed
-if ! command -v npm &> /dev/null; then
-    echo -e "${RED}❌ npm is not installed!${NC}"
-    sudo apt-get install -y npm
-fi
-
-# Check if Nginx is installed
-if ! command -v nginx &> /dev/null; then
-    echo -e "${RED}❌ Nginx is not installed!${NC}"
-    echo "Installing Nginx..."
-    sudo apt-get install -y nginx
-    sudo systemctl enable nginx
-    sudo systemctl start nginx
+# Install PM2 globally
+install_pm2() {
+    print_info "Installing PM2 process manager..."
     
-    if ! command -v nginx &> /dev/null; then
-        echo -e "${RED}Failed to install Nginx. Please install it manually.${NC}"
-        exit 1
-    fi
+    # Remove old PM2 if exists
+    sudo npm uninstall -g pm2 2>/dev/null || true
     
-    echo -e "${GREEN}✅ Nginx installed successfully!${NC}"
-fi
-
-# Check if PM2 is installed
-if ! command -v pm2 &> /dev/null; then
-    echo -e "${RED}❌ PM2 is not installed!${NC}"
-    echo "Installing PM2..."
+    # Install PM2
     sudo npm install -g pm2
     
-    echo -e "${GREEN}✅ PM2 installed successfully!${NC}"
-fi
-
-echo -e "${GREEN}Node.js version: $(node --version)${NC}"
-echo -e "${GREEN}npm version: $(npm --version)${NC}"
-echo -e "${GREEN}Nginx version: $(nginx -v 2>&1)${NC}"
-echo -e "${GREEN}PM2 version: $(pm2 --version)${NC}"
-echo ""
-
-echo -e "${BLUE}========================================"
-echo -e "    OpenAI API Key Configuration"
-echo -e "========================================${NC}"
-echo ""
-echo "To use the AI features (chat, task suggestions, consultation),"
-echo "you need an OpenAI API key."
-echo ""
-echo -e "${YELLOW}How to get your OpenAI API key:${NC}"
-echo "1. Go to: https://platform.openai.com/account/api-keys"
-echo "2. Sign in to your OpenAI account (or create one)"
-echo "3. Click \"Create new secret key\""
-echo "4. Copy the key (it starts with sk-...)"
-echo ""
-echo -e "${RED}IMPORTANT: Keep this key secure and never share it publicly!${NC}"
-echo ""
-
-while true; do
-    read -p "Please enter your OpenAI API key: " OPENAI_KEY
+    # Setup PM2 to start on boot
+    sudo pm2 startup
     
-    if [ -z "$OPENAI_KEY" ]; then
-        echo -e "${RED}Error: API key cannot be empty!${NC}"
-        echo ""
-        continue
-    fi
+    print_status "PM2 installed and configured for startup"
+}
+
+# Install and configure nginx
+install_nginx() {
+    print_info "Installing and configuring nginx..."
     
-    # Basic validation - check if key starts with sk-
-    if [[ $OPENAI_KEY != sk-* ]]; then
-        echo -e "${YELLOW}Warning: API key should start with 'sk-'${NC}"
-        read -p "Are you sure this is correct? (y/n): " confirm
-        if [[ ! $confirm =~ ^[Yy]$ ]]; then
+    # Remove old nginx configuration
+    sudo apt remove -y nginx nginx-common 2>/dev/null || true
+    sudo apt autoremove -y
+    
+    # Install nginx
+    sudo apt install -y nginx
+    
+    # Start and enable nginx
+    sudo systemctl start nginx
+    sudo systemctl enable nginx
+    
+    print_status "Nginx installed and started"
+}
+
+# Install other dependencies
+install_dependencies() {
+    print_info "Installing additional dependencies..."
+    sudo apt install -y git curl wget unzip build-essential python3-dev
+    print_status "Additional dependencies installed"
+}
+
+# Create application directory and set permissions
+setup_app_directory() {
+    print_info "Setting up application directory..."
+    
+    # Create app directory
+    sudo mkdir -p $APP_DIR
+    sudo chown -R $USER:$USER $APP_DIR
+    
+    print_status "Application directory created at $APP_DIR"
+}
+
+# Get domain name from user
+get_domain() {
+    echo
+    echo "========================================"
+    echo "    Domain Configuration"
+    echo "========================================"
+    echo
+    
+    while true; do
+        read -p "Enter your domain name (e.g., example.com): " DOMAIN
+        if [[ -z "$DOMAIN" ]]; then
+            print_warning "Domain cannot be empty!"
             continue
         fi
+        break
+    done
+    
+    print_status "Domain configured: $DOMAIN"
+}
+
+# Get OpenAI API key from user
+get_openai_key() {
+    echo
+    echo "========================================"
+    echo "    OpenAI API Key Configuration"
+    echo "========================================"
+    echo
+    echo "To use the AI features (chat, task suggestions, consultation),"
+    echo "you need an OpenAI API key."
+    echo
+    echo "How to get your OpenAI API key:"
+    echo "1. Go to: https://platform.openai.com/account/api-keys"
+    echo "2. Sign in to your OpenAI account (or create one)"
+    echo "3. Click 'Create new secret key'"
+    echo "4. Copy the key (it starts with sk-...)"
+    echo
+    echo "IMPORTANT: Keep this key secure and never share it publicly!"
+    echo
+    
+    while true; do
+        read -p "Please enter your OpenAI API key: " OPENAI_KEY
+        
+        if [[ -z "$OPENAI_KEY" ]]; then
+            print_error "API key cannot be empty!"
+            continue
+        fi
+        
+        # Basic validation - check if key starts with sk-
+        if [[ ! "$OPENAI_KEY" =~ ^sk- ]]; then
+            print_warning "API key should start with 'sk-'"
+            read -p "Continue anyway? (y/n): " confirm
+            if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
+                continue
+            fi
+        fi
+        
+        break
+    done
+    
+    print_status "OpenAI API key configured"
+}
+
+# Create environment files
+create_env_files() {
+    print_info "Creating environment configuration files..."
+    
+    # Generate JWT secret
+    JWT_SECRET="TaskBossAI_$(openssl rand -hex 32)_$(date +%s)"
+    
+    # Create main .env file
+    cat > $APP_DIR/.env << EOF
+# TaskBoss-AI Configuration
+# Generated on $(date)
+
+# OpenAI API Configuration
+OPENAI_API_KEY=$OPENAI_KEY
+
+# JWT Secret (auto-generated)
+JWT_SECRET=$JWT_SECRET
+
+# Server Configuration
+PORT=$PORT
+NODE_ENV=production
+
+# Database Configuration
+DB_PATH=./server/taskboss.db
+EOF
+
+    # Create server .env file
+    mkdir -p $APP_DIR/server
+    cat > $APP_DIR/server/.env << EOF
+# TaskBoss-AI Server Configuration
+# Generated on $(date)
+
+# OpenAI API Configuration
+OPENAI_API_KEY=$OPENAI_KEY
+
+# JWT Secret (auto-generated)
+JWT_SECRET=$JWT_SECRET
+
+# Server Configuration
+PORT=$PORT
+NODE_ENV=production
+
+# Database Configuration
+DB_PATH=./taskboss.db
+EOF
+
+    print_status "Environment files created"
+}
+
+# Copy application files (assuming they're in current directory)
+copy_app_files() {
+    print_info "Copying application files..."
+    
+    # Copy all files except node_modules and .git
+    rsync -av --exclude='node_modules' --exclude='.git' --exclude='dist' ./ $APP_DIR/
+    
+    # Ensure proper ownership
+    sudo chown -R $USER:$USER $APP_DIR
+    
+    print_status "Application files copied"
+}
+
+# Setup database
+setup_database() {
+    print_info "Setting up SQLite database..."
+    
+    cd $APP_DIR/server
+    
+    # Check if SQLite database already exists
+    if [[ -f "taskboss.db" ]]; then
+        print_status "Using existing SQLite database"
+    elif [[ -f "db.json" ]]; then
+        print_info "JSON database found, migrating to SQLite..."
+        
+        # Run migration script
+        node migrate-from-json.js
+        
+        print_status "Data migrated from JSON to SQLite successfully"
+    else
+        print_info "No existing database found, creating new SQLite database..."
+        
+        # Create new SQLite database
+        node create-new-db.js
+        
+        print_status "New SQLite database initialized"
     fi
     
-    break
-done
-
-echo ""
-echo "Testing API key..."
-
-# Generate random JWT secret (ensure it's long enough)
-JWT_SECRET="TaskFlowAI_$(openssl rand -base64 48 2>/dev/null || head -c 48 /dev/urandom | base64 | tr -d '\n')"
-
-# Create main .env file
-cat > .env << EOF
-# OpenAI API Configuration
-OPENAI_API_KEY=$OPENAI_KEY
-
-# JWT Secret (auto-generated)
-JWT_SECRET=$JWT_SECRET
-
-# Server Configuration
-PORT=3001
-NODE_ENV=production
-EOF
-
-# Create server .env file
-cat > server/.env << EOF
-# OpenAI API Configuration
-OPENAI_API_KEY=$OPENAI_KEY
-
-# JWT Secret (auto-generated)
-JWT_SECRET=$JWT_SECRET
-
-# Server Configuration
-PORT=3001
-NODE_ENV=production
-EOF
-
-echo ""
-echo -e "${GREEN}✅ Configuration files created successfully!${NC}"
-echo -e "${GREEN}✅ JWT secret generated automatically${NC}"
-echo -e "${GREEN}✅ Environment variables configured${NC}"
-echo ""
-
-echo -e "${BLUE}========================================"
-echo -e "    Installing Dependencies..."
-echo -e "========================================${NC}"
-echo ""
-
-echo "Installing main app dependencies..."
-npm install
-
-if [ $? -ne 0 ]; then
-    echo -e "${RED}❌ Failed to install main dependencies${NC}"
-    exit 1
-fi
-
-echo ""
-echo "Installing server dependencies..."
-cd server
-npm install
-
-if [ $? -ne 0 ]; then
-    echo -e "${RED}❌ Failed to install server dependencies${NC}"
-    exit 1
-fi
-
-cd ..
-
-echo ""
-echo -e "${GREEN}✅ All dependencies installed successfully!${NC}"
-
-# Check and create database file
-echo ""
-echo "Setting up database..."
-if [ ! -f "server/db.json" ]; then
-    if [ -f "server/db.example.json" ]; then
-        cp server/db.example.json server/db.json
-        echo -e "${GREEN}✅ Database initialized from example${NC}"
-    else
-        # Create basic database structure
-        cat > server/db.json << 'EOF'
-{
-  "users": [],
-  "tasks": [],
-  "goals": [],
-  "achievements": []
+    cd $APP_DIR
+    
+    # Set proper permissions
+    chmod 644 $APP_DIR/server/taskboss.db 2>/dev/null || true
 }
-EOF
-        echo -e "${GREEN}✅ Database created with basic structure${NC}"
-    fi
-else
-    echo -e "${GREEN}✅ Database file already exists${NC}"
-fi
 
-# Make scripts executable
-chmod +x start-server.sh
-chmod +x setup.sh
-chmod +x stop.sh
-chmod +x status.sh
-chmod +x pre-check.sh
-chmod +x vps-setup.sh 2>/dev/null || true
-chmod +x vps-update.sh 2>/dev/null || true
-
-echo ""
-echo -e "${BLUE}========================================"
-echo -e "    TaskBoss-AI Setup Complete!"
-echo -e "========================================${NC}"
-echo ""
-echo -e "${GREEN}✅ Configuration completed successfully${NC}"
-echo -e "${GREEN}✅ Dependencies installed${NC}"
-echo -e "${GREEN}✅ Environment configured for production${NC}"
-echo ""
-echo "Your API key and configuration are stored locally"
-echo "and will not be uploaded to Git."
-echo ""
-echo -e "${YELLOW}To start the application:${NC}"
-echo "./start-server.sh"
-echo ""
-echo -e "${YELLOW}To run in background:${NC}"
-echo "nohup ./start-server.sh > app.log 2>&1 &"
-echo ""
-echo -e "${YELLOW}To check if it's running:${NC}"
-echo "curl http://localhost:3001/api/test/openai -X POST -H 'Content-Type: application/json' -d '{\"prompt\":\"Hello\"}'"
-echo ""
-echo -e "${YELLOW}To update the application later:${NC}"
-echo "git pull && npm install && cd server && npm install && cd .. && pm2 restart all"
-echo ""
-
-# Validate setup
-echo "Validating setup..."
-if [ -f "server/validate-setup.js" ]; then
+# Install application dependencies
+install_app_dependencies() {
+    print_info "Installing application dependencies..."
+    
+    cd $APP_DIR
+    
+    # Clean any existing node_modules
+    rm -rf node_modules package-lock.json
+    rm -rf server/node_modules server/package-lock.json
+    
+    # Install frontend dependencies
+    print_info "Installing frontend dependencies..."
+    npm install
+    
+    # Install server dependencies
+    print_info "Installing server dependencies..."
     cd server
-    node validate-setup.js
-    cd ..
-else
-    echo -e "${YELLOW}Setup validation script not found, skipping validation${NC}"
-fi
+    npm install
+    
+    # Install SQLite3
+    print_info "Installing SQLite3..."
+    npm install sqlite3@^5.1.6
+    
+    cd $APP_DIR
+    
+    print_status "Application dependencies installed"
+}
 
-# Build the frontend application
-echo ""
-echo -e "${BLUE}========================================"
-echo -e "    Building Frontend Application..."
-echo -e "========================================${NC}"
-echo ""
-npm run build
-if [ $? -ne 0 ]; then
-    echo -e "${RED}❌ Frontend build failed!${NC}"
-    exit 1
-fi
-echo -e "${GREEN}✅ Frontend built successfully!${NC}"
+# Build frontend application
+build_frontend() {
+    print_info "Building frontend application..."
+    
+    cd $APP_DIR
+    npm run build
+    
+    print_status "Frontend application built"
+}
 
-
-# Setup Nginx configuration
-echo ""
-echo -e "${BLUE}========================================"
-echo -e "    Configuring Nginx..."
-echo -e "========================================${NC}"
-echo ""
-
-# Get server IP
-SERVER_IP=$(curl -s ifconfig.me 2>/dev/null || hostname -I | awk '{print $1}')
-echo "Server IP: $SERVER_IP"
-
-# Set project directory permissions
-echo "Setting project file permissions..."
-sudo chown -R www-data:www-data $PWD
-sudo chmod -R 775 $PWD
-echo "✅ File permissions set."
-
-# Create Nginx configuration
-sudo tee /etc/nginx/sites-available/taskboss-ai > /dev/null << EOF
+# Configure nginx
+configure_nginx() {
+    print_info "Configuring nginx..."
+    
+    # Create nginx configuration
+    sudo tee $NGINX_CONF > /dev/null << EOF
 server {
     listen 80;
-    server_name $SERVER_IP;
-    root $PWD/dist; # Use the current directory for the root
-    index index.html;
-
+    server_name $DOMAIN www.$DOMAIN;
+    
+    # Serve static files from React build
+    location / {
+        root $APP_DIR/dist;
+        try_files \$uri \$uri/ /index.html;
+        
+        # Cache static assets
+        location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+            expires 1y;
+            add_header Cache-Control "public, immutable";
+        }
+    }
+    
+    # Proxy API requests to backend
+    location /api/ {
+        proxy_pass http://localhost:$PORT;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_cache_bypass \$http_upgrade;
+        
+        # Increase timeout for AI requests
+        proxy_read_timeout 300s;
+        proxy_connect_timeout 75s;
+    }
+    
     # Security headers
     add_header X-Frame-Options "SAMEORIGIN" always;
     add_header X-XSS-Protection "1; mode=block" always;
     add_header X-Content-Type-Options "nosniff" always;
     add_header Referrer-Policy "no-referrer-when-downgrade" always;
-
+    add_header Content-Security-Policy "default-src 'self' http: https: data: blob: 'unsafe-inline'" always;
+    
     # Gzip compression
     gzip on;
     gzip_vary on;
     gzip_min_length 1024;
-    gzip_types text/plain text/css text/xml text/javascript application/javascript application/json;
-
-    # Main application (frontend)
-    location / {
-        try_files \$uri \$uri/ /index.html;
-    }
-
-    # API endpoints (backend)
-    location /api/ {
-        limit_req zone=api burst=20 nodelay;
-        proxy_pass http://localhost:3001;
-        proxy_http_version 1.1;
-        proxy_set_header Host \$host;
-        proxy_set_header X-Real-IP \$remote_addr;
-        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto \$scheme;
-    }
-
-    # Block access to sensitive files
-    location ~ /\. {
-        deny all;
-    }
-
-    location ~ \.(env|log|config)$ {
-        deny all;
-    }
+    gzip_proxied expired no-cache no-store private must-revalidate auth;
+    gzip_types text/plain text/css text/xml text/javascript application/x-javascript application/xml+rss application/javascript application/json;
 }
 EOF
 
-# Add rate limiting zone to main nginx.conf if not present
-if ! grep -q "limit_req_zone" /etc/nginx/nginx.conf; then
-    sudo sed -i '/http {/a \    limit_req_zone $binary_remote_addr zone=api:10m rate=10r/s;' /etc/nginx/nginx.conf
-fi
-
-# Enable the site
-sudo ln -sf /etc/nginx/sites-available/taskboss-ai /etc/nginx/sites-enabled/
-sudo rm -f /etc/nginx/sites-enabled/default
-
-# Test Nginx configuration
-if sudo nginx -t; then
+    # Enable the site
+    sudo ln -sf $NGINX_CONF $NGINX_ENABLED
+    
+    # Remove default nginx site
+    sudo rm -f /etc/nginx/sites-enabled/default
+    
+    # Test nginx configuration
+    sudo nginx -t
+    
+    # Reload nginx
     sudo systemctl reload nginx
-    echo -e "${GREEN}✅ Nginx configured and reloaded successfully${NC}"
-else
-    echo -e "${RED}❌ Nginx configuration test failed${NC}"
-    exit 1
-fi
-
-# Setup firewall (optional)
-if command -v ufw &> /dev/null; then
-    echo "Configuring firewall..."
-    sudo ufw --force enable
-    sudo ufw allow 22/tcp    # SSH
-    sudo ufw allow 80/tcp    # HTTP
-    sudo ufw allow 443/tcp   # HTTPS
-    echo -e "${GREEN}✅ Firewall configured${NC}"
-fi
-
-echo ""
-read -p "Do you want to start the application now? (y/n): " start_now
-if [[ $start_now =~ ^[Yy]$ ]]; then
-    echo ""
-    echo "Starting TaskBoss-AI with PM2..."
     
-    # Start with PM2
-    pm2 start server/server.js --name "taskboss-ai-backend"
+    print_status "Nginx configured and reloaded"
+}
+
+# Setup PM2 configuration
+setup_pm2() {
+    print_info "Setting up PM2 configuration..."
+    
+    cd $APP_DIR
+    
+    # Create PM2 ecosystem file
+    cat > ecosystem.config.js << EOF
+module.exports = {
+  apps: [{
+    name: '$APP_NAME',
+    script: './server/server.js',
+    cwd: '$APP_DIR',
+    instances: 1,
+    autorestart: true,
+    watch: false,
+    max_memory_restart: '1G',
+    env: {
+      NODE_ENV: 'production',
+      PORT: $PORT
+    },
+    error_file: './logs/err.log',
+    out_file: './logs/out.log',
+    log_file: './logs/combined.log',
+    time: true
+  }]
+};
+EOF
+
+    # Create logs directory
+    mkdir -p logs
+    
+    # Start the application with PM2
+    pm2 start ecosystem.config.js
+    
+    # Save PM2 configuration
     pm2 save
-    sudo env PATH=$PATH:/usr/bin /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u $(whoami) --hp /home/$(whoami)
     
-    echo ""
-    echo -e "${GREEN}✅ Application started with PM2!${NC}"
-    echo ""
-    echo "🌐 Application URL: http://$SERVER_IP"
-    echo "🔧 PM2 commands:"
-    echo "   pm2 status                 - Check status"
-    echo "   pm2 logs                   - View logs"
-    echo "   pm2 restart all            - Restart all"
-    echo "   pm2 stop all               - Stop all"
+    print_status "PM2 configured and application started"
+}
+
+# Setup firewall
+setup_firewall() {
+    print_info "Configuring firewall..."
     
-    echo ""
-    pm2 status
-fi
+    # Enable UFW if not already enabled
+    sudo ufw --force enable
+    
+    # Allow SSH (important!)
+    sudo ufw allow ssh
+    
+    # Allow HTTP and HTTPS
+    sudo ufw allow 80
+    sudo ufw allow 443
+    
+    # Show firewall status
+    sudo ufw status
+    
+    print_status "Firewall configured"
+}
+
+# Setup SSL with Let's Encrypt (optional)
+setup_ssl() {
+    read -p "Do you want to setup SSL with Let's Encrypt? (y/n): " setup_ssl_choice
+    
+    if [[ "$setup_ssl_choice" =~ ^[Yy]$ ]]; then
+        print_info "Setting up SSL with Let's Encrypt..."
+        
+        # Install certbot
+        sudo apt install -y certbot python3-certbot-nginx
+        
+        # Get SSL certificate
+        sudo certbot --nginx -d $DOMAIN -d www.$DOMAIN
+        
+        print_status "SSL certificate installed"
+    else
+        print_warning "SSL setup skipped. You can run 'sudo certbot --nginx -d $DOMAIN' later to enable SSL."
+    fi
+}
+
+# Final status check
+final_status() {
+    echo
+    echo "========================================"
+    echo "    Setup Complete!"
+    echo "========================================"
+    echo
+    
+    # Check if services are running
+    if systemctl is-active --quiet nginx; then
+        print_status "Nginx is running"
+    else
+        print_error "Nginx is not running"
+    fi
+    
+    if pm2 list | grep -q "$APP_NAME"; then
+        print_status "TaskBoss-AI application is running"
+    else
+        print_error "TaskBoss-AI application is not running"
+    fi
+    
+    echo
+    echo "Application URLs:"
+    echo "  Frontend: http://$DOMAIN"
+    echo "  Backend API: http://$DOMAIN/api"
+    echo
+    echo "Useful commands:"
+    echo "  run.sh      - Start servers (after setup)"
+    echo "  stop.sh     - Stop all servers"
+    echo "  status.sh   - Check server status"
+    echo "  pm2 logs $APP_NAME - View application logs"
+    echo "  pm2 restart $APP_NAME - Restart application"
+    echo "  sudo systemctl reload nginx - Reload nginx"
+    echo
+    echo "Configuration files:"
+    echo "  Application: $APP_DIR"
+    echo "  Nginx config: $NGINX_CONF"
+    echo "  Environment: $APP_DIR/.env"
+    echo "  Database: $APP_DIR/server/taskboss.db"
+    echo
+}
+
+# Main execution
+main() {
+    print_info "Starting TaskBoss-AI VPS complete setup..."
+    
+    check_root
+    get_domain
+    get_openai_key
+    stop_existing_processes
+    clean_previous_installation
+    update_system
+    install_dependencies
+    install_nodejs
+    install_pm2
+    install_nginx
+    setup_app_directory
+    create_env_files
+    copy_app_files
+    install_app_dependencies
+    setup_database
+    build_frontend
+    configure_nginx
+    setup_pm2
+    setup_firewall
+    setup_ssl
+    final_status
+    
+    print_status "TaskBoss-AI has been successfully deployed on VPS!"
+}
+
+# Run main function
+main "$@"
