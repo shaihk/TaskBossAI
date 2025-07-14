@@ -8,7 +8,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 echo -e "${BLUE}========================================"
-echo -e "    Task Flow AI - Stop Script"
+echo -e "    TaskBoss-AI - Stop Script"
 echo -e "========================================${NC}"
 echo ""
 
@@ -34,7 +34,7 @@ if command -v pm2 &> /dev/null; then
     print_status "Stopping PM2 processes..."
     
     # Stop specific processes
-    pm2 stop task-flow-ai 2>/dev/null || true
+    pm2 stop taskboss-ai 2>/dev/null || true
     pm2 stop taskflow-backend 2>/dev/null || true
     pm2 stop taskflow-frontend 2>/dev/null || true
     
@@ -59,7 +59,7 @@ pkill -f "vite" 2>/dev/null || true
 
 # Kill any remaining node processes related to the app
 pkill -f "TaskBossAI" 2>/dev/null || true
-pkill -f "task-flow-ai" 2>/dev/null || true
+pkill -f "taskboss-ai" 2>/dev/null || true
 
 print_success "Node.js processes stopped"
 
@@ -75,7 +75,7 @@ else
 fi
 
 echo ""
-echo -e "${GREEN}✅ Task Flow AI stopped successfully!${NC}"
+echo -e "${GREEN}✅ TaskBoss-AI stopped successfully!${NC}"
 echo ""
 echo -e "${YELLOW}To start again:${NC}"
 echo "./start-server.sh"

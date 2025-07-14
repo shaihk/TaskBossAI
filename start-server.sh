@@ -8,7 +8,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 echo -e "${BLUE}========================================"
-echo -e "    Task Flow AI - Starting Server"
+echo -e "    TaskBoss-AI - Starting Server"
 echo -e "========================================${NC}"
 echo ""
 
@@ -41,7 +41,7 @@ if [ ! -d "server/node_modules" ]; then
     cd ..
 fi
 
-echo -e "${GREEN}Starting Task Flow AI...${NC}"
+echo -e "${GREEN}Starting TaskBoss-AI...${NC}"
 echo ""
 
 # Function to cleanup processes on exit
@@ -85,7 +85,7 @@ if [ "$NODE_ENV" != "production" ]; then
     
     echo ""
     echo -e "${GREEN}========================================"
-    echo -e "    Task Flow AI is running!"
+    echo -e "    TaskBoss-AI is running!"
     echo -e "========================================${NC}"
     echo -e "${GREEN}✅ Backend server: http://localhost:3001${NC}"
     echo -e "${GREEN}✅ Frontend server: http://localhost:5173${NC}"
@@ -97,7 +97,7 @@ if [ "$NODE_ENV" != "production" ]; then
 else
     echo ""
     echo -e "${GREEN}========================================"
-    echo -e "    Task Flow AI Backend is running!"
+    echo -e "    TaskBoss-AI Backend is running!"
     echo -e "========================================${NC}"
     echo -e "${GREEN}✅ Backend server: http://localhost:3001${NC}"
     echo ""

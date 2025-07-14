@@ -8,7 +8,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 echo -e "${BLUE}========================================"
-echo -e "    Task Flow AI - Status Check"
+echo -e "    TaskBoss-AI - Status Check"
 echo -e "========================================${NC}"
 echo ""
 

@@ -1,4 +1,4 @@
-# Task Flow AI
+# TaskBoss-AI
 
 A modern task management application with AI-powered features for productivity enhancement.
 
@@ -315,7 +315,7 @@ The script will automatically:
 
 2. **Navigate to application directory:**
    ```bash
-   cd /var/www/task-flow-ai
+   cd /var/www/taskboss-ai
    ```
 
 3. **Pull latest changes:**
@@ -331,13 +331,13 @@ The script will automatically:
 
 5. **Restart the application:**
    ```bash
-   pm2 restart task-flow-ai
+   pm2 restart taskboss-ai
    ```
 
 6. **Check status:**
    ```bash
    pm2 status
-   pm2 logs task-flow-ai --lines 20
+   pm2 logs taskboss-ai --lines 20
    ```
 
 **📋 Manual VPS Setup**

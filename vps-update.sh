@@ -1,12 +1,12 @@
 #!/bin/bash
 
-# Task Flow AI - VPS Update Script
+# TaskBoss-AI - VPS Update Script
 # This script updates the application on your VPS
 
 set -e  # Exit on any error
 
 echo "========================================="
-echo "    Task Flow AI - VPS Update Script"
+echo "    TaskBoss-AI - VPS Update Script"
 echo "========================================="
 echo ""
 
@@ -35,14 +35,14 @@ print_error() {
 }
 
 # Default application directory
-APP_DIR="/var/www/task-flow-ai"
+APP_DIR="/var/www/taskboss-ai"
 
 # Check if custom directory is provided
 if [ ! -z "$1" ]; then
     APP_DIR="$1"
 fi
 
-print_status "Updating Task Flow AI application..."
+print_status "Updating TaskBoss-AI application..."
 print_status "Application directory: $APP_DIR"
 
 # Check if directory exists
@@ -71,7 +71,7 @@ cp -r . "../$BACKUP_DIR/" 2>/dev/null || print_warning "Backup creation failed, 
 # Step 2: Stop the application
 print_status "Stopping application..."
 if command -v pm2 &> /dev/null; then
-    pm2 stop task-flow-ai 2>/dev/null || print_warning "Application may not be running"
+    pm2 stop taskboss-ai 2>/dev/null || print_warning "Application may not be running"
 else
     print_warning "PM2 not found, skipping application stop"
 fi
@@ -152,17 +152,17 @@ fi
 # Step 8: Restart the application
 print_status "Starting application..."
 if command -v pm2 &> /dev/null; then
-    pm2 start task-flow-ai 2>/dev/null || pm2 restart task-flow-ai
+    pm2 start taskboss-ai 2>/dev/null || pm2 restart taskboss-ai
     
     # Wait a moment for startup
     sleep 3
     
     # Check if application is running
-    if pm2 list | grep -q "task-flow-ai.*online"; then
+    if pm2 list | grep -q "taskboss-ai.*online"; then
         print_success "Application restarted successfully"
     else
         print_error "Application failed to start. Check PM2 logs:"
-        print_error "pm2 logs task-flow-ai"
+        print_error "pm2 logs taskboss-ai"
         exit 1
     fi
 else
@@ -185,7 +185,7 @@ print_status "Checking final status..."
 sleep 2
 
 if command -v pm2 &> /dev/null; then
-    PM2_STATUS=$(pm2 list | grep task-flow-ai | grep online || echo "")
+    PM2_STATUS=$(pm2 list | grep taskboss-ai | grep online || echo "")
     if [ -n "$PM2_STATUS" ]; then
         print_success "Application is running successfully!"
     else
@@ -206,12 +206,12 @@ echo "========================================="
 echo "           UPDATE COMPLETE!"
 echo "========================================="
 echo ""
-print_success "Task Flow AI has been updated successfully!"
+print_success "TaskBoss-AI has been updated successfully!"
 echo ""
 echo "🔧 Useful commands:"
 echo "   pm2 status                 - Check application status"
-echo "   pm2 logs task-flow-ai      - View application logs"
-echo "   pm2 restart task-flow-ai   - Restart application"
+echo "   pm2 logs taskboss-ai      - View application logs"
+echo "   pm2 restart taskboss-ai   - Restart application"
 echo "   pm2 monit                  - Monitor application"
 echo ""
 echo "📁 Backup created at: ../$BACKUP_DIR"

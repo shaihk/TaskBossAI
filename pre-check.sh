@@ -1,12 +1,12 @@
 #!/bin/bash
 
-# Task Flow AI - Pre-deployment Check Script
+# TaskBoss-AI - Pre-deployment Check Script
 # This script validates all dependencies and configuration files
 
 set -e
 
 echo "========================================="
-echo "    Task Flow AI - Pre-deployment Check"
+echo "    TaskBoss-AI - Pre-deployment Check"
 echo "========================================="
 echo ""
 

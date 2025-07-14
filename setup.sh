@@ -8,7 +8,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 echo -e "${BLUE}========================================"
-echo -e "    Task Flow AI - Setup Script"
+echo -e "    TaskBoss-AI - Setup Script"
 echo -e "========================================${NC}"
 echo ""
 
@@ -24,7 +24,7 @@ if [ -f ".env" ] && [ -f "server/.env" ]; then
     exit 0
 fi
 
-echo "Setting up Task Flow AI for the first time..."
+echo "Setting up TaskBoss-AI for the first time..."
 echo ""
 
 # Create server directory if it doesn't exist
@@ -248,7 +248,7 @@ chmod +x vps-update.sh 2>/dev/null || true
 
 echo ""
 echo -e "${BLUE}========================================"
-echo -e "    Task Flow AI Setup Complete!"
+echo -e "    TaskBoss-AI Setup Complete!"
 echo -e "========================================${NC}"
 echo ""
 echo -e "${GREEN}✅ Configuration completed successfully${NC}"
@@ -281,6 +281,20 @@ else
     echo -e "${YELLOW}Setup validation script not found, skipping validation${NC}"
 fi
 
+# Build the frontend application
+echo ""
+echo -e "${BLUE}========================================"
+echo -e "    Building Frontend Application..."
+echo -e "========================================${NC}"
+echo ""
+npm run build
+if [ $? -ne 0 ]; then
+    echo -e "${RED}❌ Frontend build failed!${NC}"
+    exit 1
+fi
+echo -e "${GREEN}✅ Frontend built successfully!${NC}"
+
+
 # Setup Nginx configuration
 echo ""
 echo -e "${BLUE}========================================"
@@ -292,11 +306,19 @@ echo ""
 SERVER_IP=$(curl -s ifconfig.me 2>/dev/null || hostname -I | awk '{print $1}')
 echo "Server IP: $SERVER_IP"
 
+# Set project directory permissions
+echo "Setting project file permissions..."
+sudo chown -R www-data:www-data $PWD
+sudo chmod -R 775 $PWD
+echo "✅ File permissions set."
+
 # Create Nginx configuration
-sudo tee /etc/nginx/sites-available/task-flow-ai > /dev/null << EOF
+sudo tee /etc/nginx/sites-available/taskboss-ai > /dev/null << EOF
 server {
     listen 80;
     server_name $SERVER_IP;
+    root $PWD/dist; # Use the current directory for the root
+    index index.html;
 
     # Security headers
     add_header X-Frame-Options "SAMEORIGIN" always;
@@ -310,20 +332,9 @@ server {
     gzip_min_length 1024;
     gzip_types text/plain text/css text/xml text/javascript application/javascript application/json;
 
-    # Rate limiting
-    limit_req_zone \$binary_remote_addr zone=api:10m rate=10r/s;
-
     # Main application (frontend)
     location / {
-        proxy_pass http://localhost:5173;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade \$http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host \$host;
-        proxy_set_header X-Real-IP \$remote_addr;
-        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto \$scheme;
-        proxy_cache_bypass \$http_upgrade;
+        try_files \$uri \$uri/ /index.html;
     }
 
     # API endpoints (backend)
@@ -348,8 +359,13 @@ server {
 }
 EOF
 
+# Add rate limiting zone to main nginx.conf if not present
+if ! grep -q "limit_req_zone" /etc/nginx/nginx.conf; then
+    sudo sed -i '/http {/a \    limit_req_zone $binary_remote_addr zone=api:10m rate=10r/s;' /etc/nginx/nginx.conf
+fi
+
 # Enable the site
-sudo ln -sf /etc/nginx/sites-available/task-flow-ai /etc/nginx/sites-enabled/
+sudo ln -sf /etc/nginx/sites-available/taskboss-ai /etc/nginx/sites-enabled/
 sudo rm -f /etc/nginx/sites-enabled/default
 
 # Test Nginx configuration
@@ -375,13 +391,12 @@ echo ""
 read -p "Do you want to start the application now? (y/n): " start_now
 if [[ $start_now =~ ^[Yy]$ ]]; then
     echo ""
-    echo "Starting Task Flow AI with PM2..."
+    echo "Starting TaskBoss-AI with PM2..."
     
     # Start with PM2
-    pm2 start server/server.js --name "taskflow-backend"
-    pm2 start "npm run dev" --name "taskflow-frontend"
+    pm2 start server/server.js --name "taskboss-ai-backend"
     pm2 save
-    pm2 startup
+    sudo env PATH=$PATH:/usr/bin /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u $(whoami) --hp /home/$(whoami)
     
     echo ""
     echo -e "${GREEN}✅ Application started with PM2!${NC}"
@@ -392,4 +407,7 @@ if [[ $start_now =~ ^[Yy]$ ]]; then
     echo "   pm2 logs                   - View logs"
     echo "   pm2 restart all            - Restart all"
     echo "   pm2 stop all               - Stop all"
+    
+    echo ""
+    pm2 status
 fi

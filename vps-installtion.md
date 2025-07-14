@@ -1,4 +1,4 @@
-# מדריך התקנה מלא ל-VPS - Task Flow AI
+# מדריך התקנה מלא ל-VPS - TaskBoss-AI
 
 <div dir="rtl">
 
@@ -7,7 +7,7 @@
 ### 1.1 יצירת Repository חדש ב-GitHub
 1. היכנס ל-GitHub.com
 2. לחץ על "New Repository"
-3. בחר שם לפרויקט (לדוגמה: `task-flow-ai`)
+3. בחר שם לפרויקט (לדוגמה: `taskboss-ai`)
 4. לחץ על "Create repository"
 
 ### 1.2 העלאת הקוד המקומי
@@ -17,7 +17,7 @@ git init
 git add .
 git commit -m "Initial commit"
 git branch -M main
-git remote add origin https://github.com/YOUR_USERNAME/task-flow-ai.git
+git remote add origin https://github.com/YOUR_USERNAME/taskboss-ai.git
 git push -u origin main
 ```
 
@@ -65,8 +65,8 @@ cd /var/www
 
 ### 3.2 שכפול הפרויקט
 ```bash
-git clone https://github.com/YOUR_USERNAME/task-flow-ai.git
-cd task-flow-ai
+git clone https://github.com/YOUR_USERNAME/taskboss-ai.git
+cd taskboss-ai
 ```
 
 ### 3.3 התקנת התלויות
@@ -101,7 +101,7 @@ node server.js
 
 ### 5.2 הפעלה עם PM2
 ```bash
-pm2 start server.js --name "task-flow-ai"
+pm2 start server.js --name "taskboss-ai"
 ```
 
 ### 5.3 הגדרת הפעלה אוטומטית
@@ -115,7 +115,7 @@ pm2 save
 ### 6.1 בדיקת סטטוס
 ```bash
 pm2 status
-pm2 logs task-flow-ai
+pm2 logs taskboss-ai
 ```
 
 ### 6.2 בדיקת חיבור
@@ -137,16 +137,16 @@ ufw allow 443   # HTTPS (אם תרצה nginx)
 ### 8.1 ניהול האפליקציה
 ```bash
 # הפעלה מחדש
-pm2 restart task-flow-ai
+pm2 restart taskboss-ai
 
 # עצירה
-pm2 stop task-flow-ai
+pm2 stop taskboss-ai
 
 # הפעלה
-pm2 start task-flow-ai
+pm2 start taskboss-ai
 
 # צפייה בלוגים
-pm2 logs task-flow-ai
+pm2 logs taskboss-ai
 
 # סטטוס
 pm2 status
@@ -154,18 +154,18 @@ pm2 status
 
 ### 8.2 עדכון הקוד
 ```bash
-cd /var/www/task-flow-ai
+cd /var/www/taskboss-ai
 git pull origin main
 npm install  # אם יש תלויות חדשות
-pm2 restart task-flow-ai
+pm2 restart taskboss-ai
 ```
 
 ## שלב 9: פתרון בעיות נפוצות
 
 ### 9.1 בעיית הרשאות
 ```bash
-chown -R root:root /var/www/task-flow-ai
-chmod -R 755 /var/www/task-flow-ai
+chown -R root:root /var/www/taskboss-ai
+chmod -R 755 /var/www/taskboss-ai
 ```
 
 ### 9.2 בדיקת פורטים
@@ -175,7 +175,7 @@ netstat -tulpn | grep :3001
 
 ### 9.3 צפייה בשגיאות
 ```bash
-pm2 logs task-flow-ai --lines 50
+pm2 logs taskboss-ai --lines 50
 ```
 
 ## שלב 10: אבטחה בסיסית

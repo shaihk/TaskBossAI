@@ -1,6 +1,6 @@
 @echo off
 echo ========================================
-echo    Task Flow AI - Setup Script
+echo    TaskBoss-AI - Setup Script
 echo ========================================
 echo.
 
@@ -12,7 +12,7 @@ if exist ".env" if exist "server\.env" (
     goto :start_app
 )
 
-echo Setting up Task Flow AI for the first time...
+echo Setting up TaskBoss-AI for the first time...
 echo.
 
 REM Create directories if they don't exist
@@ -109,7 +109,7 @@ echo.
 
 :start_app
 echo ========================================
-echo    Starting Task Flow AI...
+echo    Starting TaskBoss-AI...
 echo ========================================
 echo.
 
@@ -141,7 +141,7 @@ start http://localhost:5173
 
 echo.
 echo ========================================
-echo    Task Flow AI is ready!
+echo    TaskBoss-AI is ready!
 echo ========================================
 echo Backend server: http://localhost:3001
 echo Frontend server: http://localhost:5173

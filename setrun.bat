@@ -1,5 +1,5 @@
 @echo off
-echo Installing dependencies for Task Flow AI...
+echo Installing dependencies for TaskBoss-AI...
 echo.
 
 echo Installing main app dependencies...
@@ -29,7 +29,7 @@ timeout /t 5 /nobreak >nul
 start http://localhost:5173
 
 echo.
-echo Task Flow AI is starting up!
+echo TaskBoss-AI is starting up!
 echo Backend server: http://localhost:3001
 echo Frontend server: http://localhost:5173
 echo.

@@ -275,7 +275,7 @@ export default function Layout({ children, currentPageName }) {
               </div>
               {!sidebarCollapsed && (
                 <div className="text-right">
-                  <h1 className="text-xl font-bold gradient-text tracking-tight">TaskMaster AI</h1>
+                  <h1 className="text-2xl font-bold">TaskBoss-AI</h1>
                   <p className={`text-xs font-medium mt-1 ${
                     isDarkMode ? 'text-gray-300' : 'text-gray-500'
                   }`}>{t('home.smartTaskManager')}</p>

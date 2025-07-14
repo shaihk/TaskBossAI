@@ -1,12 +1,12 @@
 #!/bin/bash
 
-# Task Flow AI - VPS Setup Script
+# TaskBoss-AI - VPS Setup Script
 # This script automates the installation process on Ubuntu/Debian VPS
 
 set -e  # Exit on any error
 
 echo "========================================="
-echo "    Task Flow AI - VPS Setup Script"
+echo "    TaskBoss-AI - VPS Setup Script"
 echo "========================================="
 echo ""
 
@@ -40,7 +40,7 @@ if [ "$EUID" -ne 0 ]; then
     exit 1
 fi
 
-print_status "Starting VPS setup for Task Flow AI..."
+print_status "Starting VPS setup for TaskBoss-AI..."
 
 # Step 1: Update system
 print_status "Updating system packages..."
@@ -104,7 +104,7 @@ print_success "Additional tools installed successfully"
 
 # Step 8: Setup application directory
 CURRENT_DIR=$(pwd)
-APP_DIR="/var/www/task-flow-ai"
+APP_DIR="/var/www/taskboss-ai"
 
 # Check if we're running from the application directory
 if [ -f "$CURRENT_DIR/package.json" ] && [ -f "$CURRENT_DIR/server/package.json" ]; then
@@ -404,7 +404,7 @@ fi
 cat > ecosystem.config.cjs << EOF
 module.exports = {
   apps: [{
-    name: 'task-flow-ai',
+    name: 'taskboss-ai',
     script: '$SERVER_FILE',
     cwd: '$WORK_DIR',
     instances: 1,
@@ -444,7 +444,7 @@ else
 fi
 
 # Create Nginx configuration
-cat > /etc/nginx/sites-available/task-flow-ai << EOF
+cat > /etc/nginx/sites-available/taskboss-ai << EOF
 server {
     listen 80;
     server_name $SERVER_NAME;
@@ -529,7 +529,7 @@ server {
 EOF
 
 # Enable the site
-ln -sf /etc/nginx/sites-available/task-flow-ai /etc/nginx/sites-enabled/
+ln -sf /etc/nginx/sites-available/taskboss-ai /etc/nginx/sites-enabled/
 rm -f /etc/nginx/sites-enabled/default
 
 # Test Nginx configuration
@@ -583,7 +583,7 @@ print_status "Checking final status..."
 sleep 3
 
 # Check PM2 status
-PM2_STATUS=$(pm2 list | grep task-flow-ai | grep online || echo "")
+PM2_STATUS=$(pm2 list | grep taskboss-ai | grep online || echo "")
 if [ -n "$PM2_STATUS" ]; then
     print_success "Application is running successfully!"
 else
@@ -612,27 +612,27 @@ echo "========================================="
 echo "           SETUP COMPLETE!"
 echo "========================================="
 echo ""
-print_success "Task Flow AI has been installed successfully!"
+print_success "TaskBoss-AI has been installed successfully!"
 echo ""
 echo "🌐 Application URL: $FINAL_URL"
 echo "🔒 Direct Node.js access blocked for security"
 echo ""
 echo "🔧 Useful commands:"
 echo "   pm2 status                 - Check application status"
-echo "   pm2 logs task-flow-ai      - View application logs"
-echo "   pm2 restart task-flow-ai   - Restart application"
-echo "   pm2 stop task-flow-ai      - Stop application"
+echo "   pm2 logs taskboss-ai      - View application logs"
+echo "   pm2 restart taskboss-ai   - Restart application"
+echo "   pm2 stop taskboss-ai      - Stop application"
 echo "   nginx -t                   - Test Nginx configuration"
 echo "   systemctl reload nginx     - Reload Nginx"
 echo ""
 echo "📁 Application directory: $APP_DIR"
-echo "📁 Nginx config: /etc/nginx/sites-available/task-flow-ai"
+echo "📁 Nginx config: /etc/nginx/sites-available/taskboss-ai"
 echo ""
 echo "🔄 To update the application:"
 echo "   cd $APP_DIR"
 echo "   git pull origin main"
 echo "   npm install"
-echo "   pm2 restart task-flow-ai"
+echo "   pm2 restart taskboss-ai"
 echo ""
 echo "🔐 Security features enabled:"
 echo "   ✅ Rate limiting on API endpoints"

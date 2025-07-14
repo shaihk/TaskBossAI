@@ -499,7 +499,7 @@ app.get('*', (req, res) => {
 
 // Validate setup before starting server
 async function startServer() {
-  console.log('Starting Task Flow AI Server...');
+  console.log('Starting TaskBoss-AI Server...');
   console.log('');
   
   const isValid = await validateSetup();

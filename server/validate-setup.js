@@ -99,7 +99,7 @@ async function validateJWTSecret() {
 
 async function validateSetup() {
   console.log('========================================');
-  console.log('    Task Flow AI - Setup Validation');
+  console.log('    TaskBoss-AI - Setup Validation');
   console.log('========================================');
   console.log('');
 

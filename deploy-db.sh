@@ -58,7 +58,7 @@ if [[ ! $CONFIRM =~ ^[Yy]$ ]]; then
 fi
 
 # Define VPS paths
-VPS_APP_DIR="/var/www/task-flow-ai"
+VPS_APP_DIR="/var/www/taskboss-ai"
 VPS_DB_PATH="$VPS_APP_DIR/server/db.json"
 
 print_status "Connecting to VPS and backing up existing database..."
@@ -91,7 +91,7 @@ print_status "Restarting the application..."
 # Restart the application
 ssh $VPS_USER@$VPS_IP "
     cd '$VPS_APP_DIR'
-    pm2 restart task-flow-ai
+    pm2 restart taskboss-ai
 "
 
 print_success "Database deployed successfully!"

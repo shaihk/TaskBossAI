@@ -1,7 +1,7 @@
 {
-  "name": "task-flow-ai-backend",
+  "name": "taskboss-ai-backend",
   "version": "1.0.0",
-  "description": "Simple backend for Task Flow AI",
+  "description": "Simple backend for TaskBoss-AI",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
@@ -14,6 +14,6 @@
     "express": "^4.19.2",
     "jsonwebtoken": "^9.0.2",
     "openai": "^4.52.7",
-    "task-flow-ai-backend": "file:"
+    "taskboss-ai-backend": "file:"
   }
 }
