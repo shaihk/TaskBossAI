@@ -69,7 +69,11 @@ export default function GoalForm({ goal, onSubmit, onCancel }) {
         'ru': 'Russian'
       };
       const result = await InvokeLLM({
-        prompt: `Generate 3 relevant tags in ${languageMap[currentLanguage]} for the goal: "${formData.title}". Respond with a JSON object containing a "tags" array.`,
+        prompt: `Generate 3 relevant tags for the goal: "${formData.title}". 
+        
+IMPORTANT: You MUST respond ONLY in ${languageMap[currentLanguage]} language. All tags must be written in ${languageMap[currentLanguage]}.
+
+Respond with a JSON object containing a "tags" array.`,
         response_json_schema: {
           type: "object",
           properties: {

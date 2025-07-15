@@ -44,7 +44,7 @@ const categoryColors = {
 };
 
 export default function GoalDetail({ goal, tasks, onBack, onTaskUpdate }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [showChat, setShowChat] = useState(false);
@@ -138,13 +138,32 @@ export default function GoalDetail({ goal, tasks, onBack, onTaskUpdate }) {
       const existingTasks = tasks.map(t => t.title).join(', ');
       console.log("About to call InvokeLLM with existing tasks:", existingTasks);
       
-      const result = await InvokeLLM({
-        prompt: `עבור היעד "${goal.title}" ${goal.description ? `(${goal.description})` : ''} ${existingTasks ? `שכבר יש לו את המשימות: [${existingTasks}]` : ''}, הצע 3-5 משימות נוספות שיעזרו להשיג את היעד. המשימות צריכות להיות קונקרטיות ומעשיות.
+      // Get current language for response
+      const currentLang = i18n.language;
+      console.log("Current language detected:", currentLang);
+      
+      // Map language codes to full language names for clearer LLM instructions
+      const languageMap = {
+        'he': 'Hebrew',
+        'ru': 'Russian', 
+        'en': 'English'
+      };
+      const responseLang = languageMap[currentLang] || 'English';
+      
+      const descriptionText = goal.description ? ` (Description: ${goal.description})` : '';
+      const existingTasksText = existingTasks ? ` that already has these tasks: [${existingTasks}]` : '';
+      
+      const prompt = `For the goal "${goal.title}"${descriptionText}${existingTasksText}, suggest 3-5 additional concrete and practical tasks that will help achieve this goal.
 
-תמיד תענה בעברית בפורמט JSON בלבד:
+IMPORTANT: You MUST respond ONLY in ${responseLang} language. The entire response must be in ${responseLang}.
+
+Response format:
 {
-  "suggested_tasks": ["משימה 1", "משימה 2", "משימה 3"]
-}`,
+  "suggested_tasks": ["Task 1", "Task 2", "Task 3", "Task 4", "Task 5"]
+}`;
+      
+      const result = await InvokeLLM({
+        prompt: prompt,
         response_json_schema: {
           type: "object",
           properties: {

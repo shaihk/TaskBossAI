@@ -7,8 +7,9 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Bot, Key, CheckCircle, XCircle, AlertCircle, Settings, Loader2 } from 'lucide-react';
+import { Bot, Key, CheckCircle, XCircle, AlertCircle, Settings, Loader2, Palette } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { Switch } from "@/components/ui/switch";
 
 export default function SettingsModal({ isOpen, onClose }) {
   const { t } = useTranslation();
@@ -28,6 +29,9 @@ export default function SettingsModal({ isOpen, onClose }) {
   const [connectionStatus, setConnectionStatus] = useState({
     openai: 'unknown',
     gemini: 'unknown'
+  });
+  const [uiPreferences, setUiPreferences] = useState({
+    taskWhiteBackground: false
   });
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -76,6 +80,12 @@ export default function SettingsModal({ isOpen, onClose }) {
         });
         setConnectionStatus(keysData.status);
       }
+      
+      // Load UI preferences from localStorage
+      const taskWhiteBackground = localStorage.getItem('taskWhiteBackground') === 'true';
+      setUiPreferences({
+        taskWhiteBackground
+      });
     } catch (error) {
       console.error('Error loading settings:', error);
     } finally {
@@ -147,6 +157,10 @@ export default function SettingsModal({ isOpen, onClose }) {
 
       // Update localStorage
       localStorage.setItem('aiModelPreferences', JSON.stringify(aiPreferences));
+      localStorage.setItem('taskWhiteBackground', uiPreferences.taskWhiteBackground);
+      
+      // Force re-render of task components
+      window.dispatchEvent(new Event('storage'));
       
       onClose();
     } catch (error) {
@@ -399,6 +413,37 @@ export default function SettingsModal({ isOpen, onClose }) {
                       <Badge variant="secondary">{aiPreferences.fallbackModel}</Badge>
                     </div>
                   </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Separator />
+
+            {/* UI Preferences */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Palette className="w-5 h-5" />
+                  {t('settings.uiPreferences', 'העדפות ממשק')}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label htmlFor="task-white-bg" className="text-base">
+                      {t('settings.whiteTaskBackground', 'רקע לבן למשימות')}
+                    </Label>
+                    <p className="text-sm text-muted-foreground">
+                      {t('settings.whiteTaskBackgroundDesc', 'השתמש ברקע לבן למשימות במקום צבעי עדיפות')}
+                    </p>
+                  </div>
+                  <Switch
+                    id="task-white-bg"
+                    checked={uiPreferences.taskWhiteBackground}
+                    onCheckedChange={(checked) => 
+                      setUiPreferences(prev => ({ ...prev, taskWhiteBackground: checked }))
+                    }
+                  />
                 </div>
               </CardContent>
             </Card>

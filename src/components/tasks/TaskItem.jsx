@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -41,23 +41,27 @@ const statusColors = {
   paused: "text-orange-500"
 };
 
-// Priority color schemes for light and dark modes
+// Priority color schemes for light and dark modes - Traffic light system
 const priorityColors = {
   low: {
-    light: "border-l-emerald-300 bg-gradient-to-r from-emerald-50 to-teal-50 hover:from-emerald-100 hover:to-teal-100",
-    dark: "border-l-emerald-400 bg-gradient-to-r from-emerald-900/30 to-teal-900/30 hover:from-emerald-800/40 hover:to-teal-800/40"
+    light: "border-l-4 border-l-green-400 bg-green-50 hover:bg-green-100",
+    dark: "border-l-4 border-l-green-500 bg-green-900/20 hover:bg-green-900/30",
+    white: "border-l-4 border-l-green-400 bg-white hover:bg-gray-50"
   },
   medium: {
-    light: "border-l-amber-300 bg-gradient-to-r from-amber-50 to-yellow-50 hover:from-amber-100 hover:to-yellow-100",
-    dark: "border-l-amber-400 bg-gradient-to-r from-amber-900/30 to-yellow-900/30 hover:from-amber-800/40 hover:to-yellow-800/40"
+    light: "border-l-4 border-l-green-600 bg-green-100 hover:bg-green-200",
+    dark: "border-l-4 border-l-green-600 bg-green-800/30 hover:bg-green-800/40",
+    white: "border-l-4 border-l-green-600 bg-white hover:bg-gray-50"
   },
   high: {
-    light: "border-l-orange-400 bg-gradient-to-r from-orange-100 to-red-100 hover:from-orange-200 hover:to-red-200",
-    dark: "border-l-orange-400 bg-gradient-to-r from-orange-900/40 to-red-900/40 hover:from-orange-800/50 hover:to-red-800/50"
+    light: "border-l-4 border-l-yellow-500 bg-yellow-50 hover:bg-yellow-100",
+    dark: "border-l-4 border-l-yellow-500 bg-yellow-900/20 hover:bg-yellow-900/30",
+    white: "border-l-4 border-l-yellow-500 bg-white hover:bg-gray-50"
   },
   urgent: {
-    light: "border-l-red-500 bg-gradient-to-r from-red-200 to-pink-200 hover:from-red-300 hover:to-pink-300 shadow-red-200/50",
-    dark: "border-l-red-400 bg-gradient-to-r from-red-900/50 to-pink-900/50 hover:from-red-800/60 hover:to-pink-800/60 shadow-red-900/30"
+    light: "border-l-4 border-l-red-500 bg-red-50 hover:bg-red-100 animate-pulse-subtle",
+    dark: "border-l-4 border-l-red-500 bg-red-900/30 hover:bg-red-900/40 animate-pulse-subtle",
+    white: "border-l-4 border-l-red-500 bg-white hover:bg-gray-50 animate-pulse-subtle"
   }
 };
 
@@ -86,6 +90,9 @@ export default function TaskItem({ task, goal, onStatusChange, showGoalInfo = tr
   const isCompleted = task.status === "completed";
   const isOverdue = (task.dueDate || task.due_date) && new Date(task.dueDate || task.due_date) < new Date() && !isCompleted;
   const priority = task.priority || 'medium';
+  
+  // Get user preference for white background
+  const useWhiteBackground = localStorage.getItem('taskWhiteBackground') === 'true';
 
   // Text colors based on priority and theme
   const getTextColors = () => {
@@ -151,7 +158,18 @@ export default function TaskItem({ task, goal, onStatusChange, showGoalInfo = tr
   const [showPlanningChat, setShowPlanningChat] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
   const [showFocusTimer, setShowFocusTimer] = useState(false);
+  const [forceUpdate, setForceUpdate] = useState(0);
   const { isDarkMode } = useTheme();
+  
+  // Listen for storage changes to update UI preferences
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setForceUpdate(prev => prev + 1);
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
 
   const { textColor, secondaryTextColor, linkColor, dateColor, overdueColor } = getTextColors();
 
@@ -184,12 +202,12 @@ export default function TaskItem({ task, goal, onStatusChange, showGoalInfo = tr
 
   return (
     <>
-      <Card className={`border-0 border-l-4 shadow-lg hover:shadow-xl transition-all duration-300 ${
-        isCompleted ? "bg-green-50 border-l-green-400" :
-        priorityColors[priority]?.[isDarkMode ? 'dark' : 'light'] || 'bg-white border-l-gray-300'
-      }`}>
-        <CardContent className="p-4">
-          <div className="flex items-start gap-4">
+      <Card className={`border-0 shadow-md hover:shadow-lg transition-all duration-300 ${
+        isCompleted ? "bg-green-50 border-l-4 border-l-green-400" :
+        priorityColors[priority]?.[useWhiteBackground ? 'white' : (isDarkMode ? 'dark' : 'light')] || 'bg-white border-l-4 border-l-gray-300'
+      } mobile-task-card`}>
+        <CardContent className="p-3 sm:p-4">
+          <div className="flex items-start gap-2 sm:gap-4">
             {/* Status Button */}
             <Button
               variant="ghost"
@@ -202,9 +220,9 @@ export default function TaskItem({ task, goal, onStatusChange, showGoalInfo = tr
                   alert("שגיאה בעדכון סטטוס המשימה. אנא נסה שוב.");
                 }
               }}
-              className="p-1 hover:bg-transparent"
+              className="p-1 hover:bg-transparent min-w-fit"
             >
-              <StatusIcon className={`w-6 h-6 ${statusColors[task.status]}`} />
+              <StatusIcon className={`w-5 h-5 sm:w-6 sm:h-6 ${statusColors[task.status]}`} />
             </Button>
 
             {/* Task Content */}
@@ -278,7 +296,7 @@ export default function TaskItem({ task, goal, onStatusChange, showGoalInfo = tr
             </div>
 
             {/* Actions */}
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-1 sm:gap-2 mobile-actions">
               <Button
                 variant="outline"
                 size="sm"
@@ -290,7 +308,7 @@ export default function TaskItem({ task, goal, onStatusChange, showGoalInfo = tr
                     alert("שגיאה בעדכון סטטוס המשימה. אנא נסה שוב.");
                   }
                 }}
-                className="text-sm"
+                className="text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2 hidden sm:inline-flex"
               >
                 {getStatusText()}
               </Button>
@@ -298,40 +316,40 @@ export default function TaskItem({ task, goal, onStatusChange, showGoalInfo = tr
                 variant="outline"
                 size="sm"
                 onClick={() => setShowEditForm(true)}
-                className={`text-sm ${
+                className={`text-xs sm:text-sm p-1 sm:p-2 ${
                   isDarkMode 
                     ? 'bg-gray-800 border-gray-600 text-gray-200 hover:bg-gray-700 hover:border-gray-500' 
                     : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
                 }`}
                 title={t('tasks.editTask')}
               >
-                <Edit className="w-3 h-3" />
+                <Edit className="w-3 h-3 sm:w-4 sm:h-4" />
               </Button>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setShowPlanningChat(true)}
-                className={`text-sm ${
+                className={`text-xs sm:text-sm p-1 sm:p-2 ${
                   isDarkMode 
                     ? 'bg-gray-800 border-gray-600 text-gray-200 hover:bg-gray-700 hover:border-gray-500' 
                     : 'bg-gradient-to-r from-blue-50 to-purple-50 hover:from-blue-100 hover:to-purple-100 border-blue-200'
                 }`}
                 title={t('tasks.taskPlanningControl')}
               >
-                <Settings className="w-3 h-3" />
+                <Settings className="w-3 h-3 sm:w-4 sm:h-4" />
               </Button>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setShowFocusTimer(true)}
-                className={`text-sm ${
+                className={`text-xs sm:text-sm p-1 sm:p-2 ${
                   isDarkMode 
                     ? 'bg-gray-800 border-gray-600 text-gray-200 hover:bg-gray-700 hover:border-gray-500' 
                     : 'bg-gradient-to-r from-green-50 to-teal-50 hover:from-green-100 hover:to-teal-100 border-green-200'
                 }`}
                 title={t('focus.focusTimer')}
               >
-                <Timer className="w-3 h-3" />
+                <Timer className="w-3 h-3 sm:w-4 sm:h-4" />
               </Button>
             </div>
           </div>

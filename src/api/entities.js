@@ -1,4 +1,5 @@
-const API_URL = 'http://localhost:3001/api';
+import { API_BASE_URL } from '@/services/api';
+const API_URL = `${API_BASE_URL}/api`;
 
 // Base entity class with common CRUD operations
 class BaseEntity {

@@ -54,13 +54,19 @@ export default function TaskPlanningChat({ task, goal, onClose }) {
         ${t('taskPlanning.context.estimatedTime')}: ${task.estimated_time || t('taskPlanning.context.notSpecified')} ${t('taskPlanning.context.minutes')}
       `;
       
-      const languageInstruction = i18n.language === 'he' 
-        ? 'You should always answer in Hebrew in a professional and helpful tone.'
-        : 'You should always answer in English in a professional and helpful tone.';
+      const currentLang = i18n.language;
+      const languageMap = {
+        'he': 'Hebrew',
+        'ru': 'Russian',
+        'en': 'English'
+      };
+      const responseLang = languageMap[currentLang] || 'English';
 
       const systemMessage = {
         role: "system",
-        content: `You are an expert task planner and assistant. Your context is:\n${context}\n\nThe user is asking for help with this task. ${languageInstruction}`
+        content: `You are an expert task planner and assistant. Your context is:\n${context}\n\nThe user is asking for help with this task. 
+        
+IMPORTANT: You MUST respond ONLY in ${responseLang} language. Always answer in ${responseLang} with a professional and helpful tone.`
       };
 
       const result = await chat([systemMessage, ...newMessages]);

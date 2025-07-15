@@ -37,13 +37,17 @@ export default function AIChat({ goal, tasks, onClose, onTaskCreate }) {
         Existing tasks are: ${tasks.map(t => `${t.title} (${t.status})`).join(', ') || 'No tasks'}
       `;
 
-      const languageInstruction = i18n.language === 'he' 
-        ? 'You should always answer in Hebrew in a friendly and encouraging tone.'
-        : 'You should always answer in English in a friendly and encouraging tone.';
+      const currentLang = i18n.language;
+      const languageMap = {
+        'he': 'Hebrew',
+        'ru': 'Russian',
+        'en': 'English'
+      };
+      const responseLang = languageMap[currentLang] || 'English';
       
       const systemMessage = {
         role: "system",
-        content: `You are an advanced consultant and assistant for achieving goals. Your context is:\n${context}\n\n${languageInstruction}`
+        content: `You are an advanced consultant and assistant for achieving goals. Your context is:\n${context}\n\nIMPORTANT: You MUST respond ONLY in ${responseLang} language. Always answer in ${responseLang} with a friendly and encouraging tone.`
       };
 
       const result = await chat([systemMessage, ...newMessages]);

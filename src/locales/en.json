@@ -172,6 +172,11 @@
       "default": "You are a professional consultant and expert task planner. Your context is:\n{{context}}\n\nThe user asked: \"{{message}}\"\n\nProvide a helpful, professional, and detailed answer that will help the user succeed in the task. If appropriate, suggest concrete steps or sub-tasks.\n\nAlways answer in the user's language in a clear and practical way."
     }
   },
+  "goals": {
+    "prompts": {
+      "suggestTasks": "For the goal \"{{title}}\"{{description}}{{existingTasks}}, suggest 3-5 additional tasks that will help achieve this goal. The tasks should be concrete and practical.\n\nAlways answer in the user's language in JSON format only:\n{\n  \"suggested_tasks\": [\"Task 1\", \"Task 2\", \"Task 3\"]\n}"
+    }
+  },
   "profile": {
     "editProfile": "Edit Profile",
     "level": "Level {{level}}",
@@ -218,7 +223,29 @@
     "greeting": "Hello! I'm here to help you with the goal \"{{title}}\". How can I assist you?",
     "error": "Sorry, an error occurred. Please try again.",
     "chatTitle": "Chat with Digital Mentor",
-    "askQuestionPlaceholder": "Ask me any question about the goal..."
+    "askQuestionPlaceholder": "Ask me any question about the goal...",
+    "assistant": "AI Assistant",
+    "suggestedTasks": "Suggested Tasks",
+    "createTask": "Create Task",
+    "difficulty": "Difficulty",
+    "minutes": "minutes",
+    "quickPromptPlaceholder": "Choose a quick question or write your own:",
+    "askMeAnything": "Ask me anything...",
+    "quickPrompts": {
+      "planDay": "Help me plan my day",
+      "improveProductivity": "How can I improve my productivity?",
+      "healthTasks": "Give me tasks for health goal",
+      "breakDownProject": "Help me break down a large project into small tasks",
+      "learningTasks": "Recommend tasks for learning goal"
+    },
+    "prompts": {
+      "assistant": "You are an advanced AI assistant for task manager. The user wrote: \"{{message}}\"\n\nGive a helpful and practical answer. If the user asks for help creating tasks, breaking down large tasks, or planning time - provide concrete suggestions.\n\nIf you suggest tasks, include:\n1. Clear title\n2. Brief description\n3. Time estimate in minutes\n4. Difficulty level (1-10)\n5. Appropriate category\n6. Priority\n\nAlways answer in the user's language in a friendly and encouraging way.",
+      "generateTags": "Generate 3 relevant tags for the task: \"{{title}}\". You must respond only in English. Respond with a JSON object containing a \"tags\" array.",
+      "taskAnalysis": "I need help with the following task: \"{{title}}\". {{description}}\n\nPlease provide me with:\n1. Accurate time estimate (in minutes)\n2. Difficulty level (1-10)\n3. Suggestion to break down the task into smaller sub-tasks (maximum 5)\n\nYou must answer only in English.",
+      "refineSubtasks": "For the task \"{{title}}\" with sub-tasks: {{subtasks}}, please refine and improve these sub-tasks. Make them more specific and actionable. You must respond only in English.",
+      "taskAdvice": "Give me practical advice for completing the task: \"{{title}}\". {{description}}\n\nInclude specific tips and best practices. You must respond only in English.",
+      "additionalSubtasks": "For the task \"{{title}}\" that already has these sub-tasks: {{existingSubtasks}}, suggest 2-3 additional helpful sub-tasks. You must respond only in English."
+    }
   },
   "common": {
     "language": "Language",
@@ -244,15 +271,15 @@
     "update": "Update",
     "save": "Save Changes",
     "edit": "Edit",
+    "priority": "Priority",
+    "status": "Status",
     "priority": {
-      "title": "Priority",
       "low": "Low",
       "medium": "Medium",
       "high": "High",
       "urgent": "Urgent"
     },
     "category": {
-      "title": "Category",
       "work": "Work",
       "personal": "Personal",
       "health": "Health",
@@ -261,7 +288,6 @@
       "creative": "Creative"
     },
     "status": {
-      "title": "Status",
       "pending": "Pending",
       "inProgress": "In Progress",
       "completed": "Completed",

@@ -16,23 +16,27 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 
-// Priority color schemes for both light and dark modes
+// Priority color schemes for light and dark modes - Traffic light system
 const priorityColors = {
   low: {
-    light: "border-l-emerald-300 bg-gradient-to-r from-emerald-50 to-teal-50 hover:from-emerald-100 hover:to-teal-100",
-    dark: "border-l-emerald-400 bg-gradient-to-r from-emerald-900/30 to-teal-900/30 hover:from-emerald-800/40 hover:to-teal-800/40"
+    light: "border-l-4 border-l-green-400 bg-green-50 hover:bg-green-100",
+    dark: "border-l-4 border-l-green-500 bg-green-900/20 hover:bg-green-900/30",
+    white: "border-l-4 border-l-green-400 bg-white hover:bg-gray-50"
   },
   medium: {
-    light: "border-l-amber-300 bg-gradient-to-r from-amber-50 to-yellow-50 hover:from-amber-100 hover:to-yellow-100",
-    dark: "border-l-amber-400 bg-gradient-to-r from-amber-900/30 to-yellow-900/30 hover:from-amber-800/40 hover:to-yellow-800/40"
+    light: "border-l-4 border-l-green-600 bg-green-100 hover:bg-green-200",
+    dark: "border-l-4 border-l-green-600 bg-green-800/30 hover:bg-green-800/40",
+    white: "border-l-4 border-l-green-600 bg-white hover:bg-gray-50"
   },
   high: {
-    light: "border-l-orange-400 bg-gradient-to-r from-orange-100 to-red-100 hover:from-orange-200 hover:to-red-200",
-    dark: "border-l-orange-400 bg-gradient-to-r from-orange-900/40 to-red-900/40 hover:from-orange-800/50 hover:to-red-800/50"
+    light: "border-l-4 border-l-yellow-500 bg-yellow-50 hover:bg-yellow-100",
+    dark: "border-l-4 border-l-yellow-500 bg-yellow-900/20 hover:bg-yellow-900/30",
+    white: "border-l-4 border-l-yellow-500 bg-white hover:bg-gray-50"
   },
   urgent: {
-    light: "border-l-red-500 bg-gradient-to-r from-red-200 to-pink-200 hover:from-red-300 hover:to-pink-300 shadow-red-200/50",
-    dark: "border-l-red-400 bg-gradient-to-r from-red-900/50 to-pink-900/50 hover:from-red-800/60 hover:to-pink-800/60 shadow-red-900/30"
+    light: "border-l-4 border-l-red-500 bg-red-50 hover:bg-red-100 animate-pulse-subtle",
+    dark: "border-l-4 border-l-red-500 bg-red-900/30 hover:bg-red-900/40 animate-pulse-subtle",
+    white: "border-l-4 border-l-red-500 bg-white hover:bg-gray-50 animate-pulse-subtle"
   }
 };
 
@@ -198,6 +202,9 @@ function TaskItem({ task, onStatusChange, isDarkMode }) {
   const StatusIcon = statusIcons[task.status];
   const isCompleted = task.status === "completed";
   const priority = task.priority || 'medium';
+  
+  // Get user preference for white background
+  const useWhiteBackground = localStorage.getItem('taskWhiteBackground') === 'true';
 
   // Text colors based on priority and theme
   const getTextColors = () => {
@@ -242,32 +249,32 @@ function TaskItem({ task, onStatusChange, isDarkMode }) {
   const { textColor, secondaryTextColor } = getTextColors();
 
   return (
-    <div className={`flex items-center gap-4 p-4 rounded-2xl border-l-4 border-2 transition-all duration-300 hover:shadow-lg ${
+    <div className={`flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-lg sm:rounded-2xl border-2 transition-all duration-300 hover:shadow-lg mobile-task-card ${
       isCompleted 
-        ? "bg-gradient-to-r from-green-50 to-emerald-50 border-green-200 hover:border-green-300" 
-        : priorityColors[priority]?.[isDarkMode ? 'dark' : 'light'] || 'bg-white border-l-gray-300'
+        ? "bg-green-50 border-l-4 border-l-green-400" 
+        : priorityColors[priority]?.[useWhiteBackground ? 'white' : (isDarkMode ? 'dark' : 'light')] || 'bg-white border-l-4 border-l-gray-300'
     }`}>
       <Button
         variant="ghost"
         size="sm"
         onClick={() => onStatusChange(task, isCompleted ? "pending" : "completed")}
-        className={`p-2 h-auto hover:bg-transparent rounded-xl transition-all duration-200 ${
+        className={`p-1 sm:p-2 h-auto hover:bg-transparent rounded-xl transition-all duration-200 min-w-fit ${
           isCompleted 
             ? "hover:bg-green-100" 
             : "hover:bg-blue-100"
         }`}
       >
-        <StatusIcon className={`w-6 h-6 ${
+        <StatusIcon className={`w-5 h-5 sm:w-6 sm:h-6 ${
           isCompleted ? "text-green-600" : "text-gray-400 hover:text-blue-600"
         }`} />
       </Button>
       
       <div className="flex-1 min-w-0">
-        <h4 className={`font-bold text-base ${isCompleted ? "line-through text-gray-500" : textColor}`}>
+        <h4 className={`font-bold text-sm sm:text-base ${isCompleted ? "line-through text-gray-500" : textColor}`}>
           {task.title}
         </h4>
-        <div className="flex items-center gap-3 mt-2">
-          <Badge className={`${priorityBadgeColors[priority]} font-semibold px-3 py-1 rounded-xl`} variant="secondary">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-2">
+          <Badge className={`${priorityBadgeColors[priority]} font-semibold text-xs px-2 py-1 sm:px-3 rounded-xl`} variant="secondary">
             {t(`form.priority.${priority}`)}
           </Badge>
           {task.estimated_time && (
@@ -284,7 +291,7 @@ function TaskItem({ task, onStatusChange, isDarkMode }) {
       </div>
       
       {task.points_earned > 0 && (
-        <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-bold px-3 py-2 rounded-xl shadow-lg">
+        <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-bold text-xs px-2 py-1 sm:px-3 sm:py-2 rounded-xl shadow-lg">
           {t('home.pointsEarned', { points: task.points_earned })}
         </Badge>
       )}

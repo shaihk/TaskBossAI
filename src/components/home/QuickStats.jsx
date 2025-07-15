@@ -67,19 +67,11 @@ export default function QuickStats({ userStats, todayTasks, completionRate, isLo
       color: "from-blue-400 to-cyan-500",
       progress: completionRate,
       subtitle: t('home.pendingTasks', { count: pendingTasks })
-    },
-    {
-      title: t('home.totalPoints'),
-      value: userStats?.total_points || 0,
-      icon: Star,
-      color: "from-purple-400 to-pink-500",
-      progress: Math.min((userStats?.total_points || 0) / 100, 100),
-      subtitle: t('home.completedTasksCount', { count: userStats?.tasks_completed || 0 })
     }
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {stats.map((stat, index) => (
         <Card key={index} className={`${cardBg} shadow-xl rounded-3xl card-hover overflow-hidden relative group`}>
           <div className={`absolute inset-0 bg-gradient-to-br ${stat.color} opacity-5 group-hover:opacity-10 transition-opacity duration-300`}></div>
@@ -113,26 +105,6 @@ export default function QuickStats({ userStats, todayTasks, completionRate, isLo
           </CardContent>
         </Card>
       ))}
-      <Card className={`${cardBg} shadow-xl rounded-3xl card-hover`}>
-        <CardHeader className="pb-4">
-          <CardTitle className={`text-xl font-bold ${textColor}`}>{t('home.quickActions')}</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          <Link to={createPageUrl("Goals")} className="block">
-            <Button variant="outline" className={`w-full justify-start ${isDarkMode ? 'border-gray-700 hover:border-blue-500' : ''}`}>
-              <Target className="w-4 h-4 mr-2" />
-              {t('home.addNewGoal')}
-            </Button>
-          </Link>
-          <Link to={createPageUrl("Achievements")} className="block">
-            <Button variant="outline" className={`w-full justify-start ${isDarkMode ? 'border-gray-700 hover:border-purple-500' : ''}`}>
-              <Award className="w-4 h-4 mr-2" />
-              {t('home.viewAchievements')}
-            </Button>
-          </Link>
-          <FavoriteQuotesModal favoriteQuotes={favoriteQuotes} isDarkMode={isDarkMode} />
-        </CardContent>
-      </Card>
     </div>
   );
 }

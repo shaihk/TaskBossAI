@@ -1,5 +1,6 @@
 
-const API_URL = 'http://localhost:3001/api';
+import { API_BASE_URL } from '@/services/api';
+const API_URL = `${API_BASE_URL}/api`;
 
 // --- Tasks ---
 
@@ -63,13 +64,18 @@ export const deleteGoal = async (id) => {
   });
 };
 
+import i18n from '@/i18n';
+
+// ... (rest of the file)
+
 // --- AI Chat ---
 
 export const chat = async (messages) => {
+  const language = i18n.language;
   const response = await fetch(`${API_URL}/chat`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ messages }),
+    body: JSON.stringify({ messages, language }),
   });
   return response.json();
 };

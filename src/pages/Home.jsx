@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { tasksAPI, goalsAPI, usersAPI, userStatsAPI } from "@/services/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -131,6 +130,13 @@ export default function Home() {
         </div>
       </div>
 
+      {/* Daily Quote Section */}
+      <Motivation 
+        onQuoteFavorited={handleQuoteFavorited} 
+        isDarkMode={isDarkMode}
+        favoriteQuotes={favoriteQuotes}
+      />
+
       {/* User Stats Section */}
       <div className="space-y-8">
         <Card className={`${cardBg} shadow-2xl rounded-3xl overflow-hidden card-hover`}>
@@ -208,65 +214,13 @@ export default function Home() {
           />
         </div>
 
-        <div className="space-y-8">
-          <GoalProgress 
-            goals={activeGoals}
-            isLoading={isLoading}
-          />
-        </div>
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-1 h-full">
-          <Card className={`${cardBg} shadow-xl rounded-3xl card-hover h-full`}>
-            <CardHeader className="pb-4">
-              <CardTitle className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center shadow-lg">
-                  <Zap className="w-5 h-5 text-white" />
-                </div>
-                <span className={`text-xl font-bold ${textColor}`}>{t('home.quickActions')}</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Link to={createPageUrl("Goals")} className="block">
-                <Button variant="outline" className={`w-full justify-start p-4 h-auto rounded-2xl border-2 transition-all duration-200 group ${isDarkMode ? 'border-gray-700 hover:border-blue-500 hover:bg-gray-700' : 'hover:border-blue-300 hover:bg-blue-50'}`}>
-                  <div className="flex items-center gap-3">
-                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-colors ${isDarkMode ? 'bg-gray-700 group-hover:bg-blue-900/50' : 'bg-blue-100 group-hover:bg-blue-200'}`}>
-                      <Trophy className="w-4 h-4 text-blue-600" />
-                    </div>
-                    <span className={`font-semibold ${isDarkMode ? 'text-gray-300 group-hover:text-blue-400' : 'text-gray-700 group-hover:text-blue-700'}`}>
-                      {t('home.addNewGoal')}
-                    </span>
-                  </div>
-                </Button>
-              </Link>
-              <Link to={createPageUrl("Achievements")} className="block">
-                <Button variant="outline" className={`w-full justify-start p-4 h-auto rounded-2xl border-2 transition-all duration-200 group ${isDarkMode ? 'border-gray-700 hover:border-purple-500 hover:bg-gray-700' : 'hover:border-purple-300 hover:bg-purple-50'}`}>
-                  <div className="flex items-center gap-3">
-                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-colors ${isDarkMode ? 'bg-gray-700 group-hover:bg-purple-900/50' : 'bg-purple-100 group-hover:bg-purple-200'}`}>
-                      <Award className="w-4 h-4 text-purple-600" />
-                    </div>
-                    <span className={`font-semibold ${isDarkMode ? 'text-gray-300 group-hover:text-purple-400' : 'text-gray-700 group-hover:text-purple-700'}`}>
-                      {t('home.viewAchievements')}
-                    </span>
-                  </div>
-                </Button>
-              </Link>
-              <FavoriteQuotesModal 
-                favoriteQuotes={favoriteQuotes} 
-                isDarkMode={isDarkMode} 
-                onDeleteQuote={handleQuoteDeleted}
-              />
-            </CardContent>
-          </Card>
-        </div>
-        <div className="lg:col-span-2 h-full">
-          <Motivation 
-            onQuoteFavorited={handleQuoteFavorited} 
-            isDarkMode={isDarkMode}
-            favoriteQuotes={favoriteQuotes}
-          />
-        </div>
+      <div className="w-full">
+        <GoalProgress 
+          goals={activeGoals}
+          isLoading={isLoading}
+        />
       </div>
     </div>
   );

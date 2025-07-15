@@ -13,7 +13,11 @@ const { migrateAddDescription } = require('./migrate-add-description');
 const app = express();
 const port = process.env.PORT || 3001;
 
-app.use(cors());
+app.use(cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(bodyParser.json());
 
 // Serve static files from React build
@@ -538,16 +542,21 @@ app.delete('/api/goals/:id', authenticateToken, async (req, res) => {
 
 // AI Chat
 app.post('/api/chat', authenticateToken, async (req, res) => {
-    const { messages } = req.body;
+    const { messages, language } = req.body;
 
     if (!messages) {
         return res.status(400).json({ error: 'Messages are required' });
     }
 
     try {
+        const systemMessage = {
+            role: 'system',
+            content: `You are a helpful assistant. Please respond in ${language || 'en'}.`
+        };
+
         const completion = await openai.chat.completions.create({
             model: 'gpt-4o',
-            messages,
+            messages: [systemMessage, ...messages],
         });
         res.json(completion.choices[0]);
     } catch (error) {
@@ -631,13 +640,15 @@ app.put('/api/user-stats/:id', authenticateToken, async (req, res) => {
 
 // LLM Integration with Gemini primary, OpenAI fallback
 app.post('/api/llm/invoke', authenticateToken, async (req, res) => {
-    const { prompt, response_json_schema, model = 'gemini-1.5-flash' } = req.body;
+    const { prompt, response_json_schema, model = 'gemini-1.5-flash', language } = req.body;
     
-    console.log("LLM Request received:", { prompt: prompt?.substring(0, 100) + "...", response_json_schema, model });
+    console.log("LLM Request received:", { prompt: prompt?.substring(0, 100) + "...", response_json_schema, model, language });
 
     if (!prompt) {
         return res.status(400).json({ error: 'Prompt is required' });
     }
+
+    const languageInstruction = `Please respond in ${language || 'en'}.`;
 
     // Try Gemini first
     if (gemini && model.includes('gemini')) {
@@ -646,7 +657,7 @@ app.post('/api/llm/invoke', authenticateToken, async (req, res) => {
             
             const geminiModel = gemini.getGenerativeModel({ model: 'gemini-1.5-flash' });
             
-            let finalPrompt = prompt;
+            let finalPrompt = `${prompt}\n\n${languageInstruction}`;
             if (response_json_schema) {
                 finalPrompt += `\n\nPlease respond with a valid JSON object that matches this schema: ${JSON.stringify(response_json_schema)}`;
             }
@@ -695,7 +706,7 @@ app.post('/api/llm/invoke', authenticateToken, async (req, res) => {
         
         const requestBody = {
             model: model.includes('gemini') ? 'gpt-4o' : model,
-            messages: [{ role: 'user', content: prompt }],
+            messages: [{ role: 'user', content: `${prompt}\n\n${languageInstruction}` }],
             response_format: response_json_schema ? { type: 'json_object' } : undefined,
         };
         
@@ -1014,7 +1025,7 @@ app.get('*', (req, res) => {
 });
 
 // Start the server
-app.listen(port, () => {
+app.listen(port, '0.0.0.0', () => {
     console.log('');
     console.log('========================================');
     console.log(`✅ TaskBoss-AI Server is running at http://localhost:${port}`);

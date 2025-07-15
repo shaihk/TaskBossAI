@@ -106,7 +106,7 @@ export default function TaskEditForm({ task, goal, onClose, onTaskUpdate }) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Priority */}
             <div className="space-y-2">
-                <Label htmlFor="priority">{t('form.priority.title')}</Label>
+                <Label htmlFor="priority">{t('form.priority')}</Label>
                 <Select value={formData.priority} onValueChange={(value) => handleInputChange("priority", value)}>
                     <SelectTrigger id="priority">
                         <SelectValue />
@@ -121,7 +121,7 @@ export default function TaskEditForm({ task, goal, onClose, onTaskUpdate }) {
             </div>
             {/* Status */}
             <div className="space-y-2">
-              <Label htmlFor="status">{t('form.status.title')}</Label>
+              <Label htmlFor="status">{t('form.status')}</Label>
                <Select value={formData.status} onValueChange={(value) => handleInputChange("status", value)}>
                     <SelectTrigger id="status">
                         <SelectValue />

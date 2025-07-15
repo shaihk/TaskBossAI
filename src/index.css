@@ -156,3 +156,43 @@ button:focus-visible {
     @apply bg-background text-foreground;
   }
 }
+
+/* Subtle pulse animation for urgent tasks */
+@keyframes pulse-subtle {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.1), 0 2px 4px -1px rgba(239, 68, 68, 0.06);
+  }
+  50% {
+    opacity: 0.95;
+    box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.2), 0 4px 6px -2px rgba(239, 68, 68, 0.1);
+  }
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Mobile optimizations for task cards */
+@media (max-width: 640px) {
+  .mobile-task-card {
+    @apply rounded-lg;
+  }
+  
+  .mobile-task-card .mobile-actions {
+    @apply justify-end mt-2;
+  }
+  
+  /* Reduce font sizes on mobile */
+  .mobile-task-card h3 {
+    @apply text-sm;
+  }
+  
+  .mobile-task-card p {
+    @apply text-xs;
+  }
+  
+  .mobile-task-card .text-sm {
+    @apply text-xs;
+  }
+}

@@ -22,13 +22,22 @@ export default function Motivation({ onQuoteFavorited, isDarkMode, favoriteQuote
     setIsAnimating(true);
     
     try {
+      const currentLang = i18n.language;
+      const languageMap = {
+        'he': 'Hebrew',
+        'ru': 'Russian',
+        'en': 'English'
+      };
+      const responseLang = languageMap[currentLang] || 'English';
+      
       const result = await InvokeLLM({
         prompt: `Generate an inspiring and motivational quote. The quote should be:
         - Inspirational and uplifting
         - From a famous person or original
         - Professional yet motivating
         - Suitable for a productivity app
-        - Include both English and Hebrew translation
+        
+        IMPORTANT: You MUST respond ONLY in ${responseLang} language. The quote and author must be in ${responseLang}.
         
         Please provide the author if known.`,
         useCase: 'quote',

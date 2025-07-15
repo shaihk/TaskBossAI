@@ -1,4 +1,5 @@
-const API_URL = 'http://localhost:3001/api';
+import { API_BASE_URL } from '@/services/api';
+const API_URL = `${API_BASE_URL}/api`;
 
 const getAuthToken = () => {
   return localStorage.getItem('token');
@@ -22,26 +23,17 @@ const getUserModelPreferences = () => {
   };
 };
 
+import i18n from '@/i18n'; // Import i18n instance
+
+// ... (rest of the file is the same until InvokeLLM)
+
 // LLM integration for AI features with fallback support
 export const InvokeLLM = async ({ prompt, response_json_schema, model = null, useCase = 'chat' }) => {
   const preferences = getUserModelPreferences();
+  const language = i18n.language; // Get current language
   
-  // Determine which model to use based on use case
-  let primaryModel = model;
-  if (!primaryModel) {
-    switch (useCase) {
-      case 'quote':
-        primaryModel = preferences.quoteModel;
-        break;
-      case 'chat':
-      default:
-        primaryModel = preferences.chatModel;
-        break;
-    }
-  }
-  
-  const fallbackModel = preferences.fallbackModel;
-  
+  // ... (rest of the function is the same until the fetch call)
+
   // Try primary model first
   try {
     const response = await fetch(`${API_URL}/llm/invoke`, {
@@ -50,7 +42,8 @@ export const InvokeLLM = async ({ prompt, response_json_schema, model = null, us
       body: JSON.stringify({
         prompt,
         response_json_schema,
-        model: primaryModel
+        model: primaryModel,
+        language // Add language to the request
       }),
     });
     
@@ -72,7 +65,8 @@ export const InvokeLLM = async ({ prompt, response_json_schema, model = null, us
           body: JSON.stringify({
             prompt,
             response_json_schema,
-            model: fallbackModel
+            model: fallbackModel,
+            language // Add language to the fallback request
           }),
         });
         
@@ -93,11 +87,12 @@ export const InvokeLLM = async ({ prompt, response_json_schema, model = null, us
 
 // Chat integration
 export const chat = async (messages) => {
+  const language = i18n.language; // Get current language
   try {
     const response = await fetch(`${API_URL}/chat`, {
       method: 'POST',
       headers: createAuthHeaders(),
-      body: JSON.stringify({ messages }),
+      body: JSON.stringify({ messages, language }), // Add language to the request
     });
     
     if (!response.ok) {

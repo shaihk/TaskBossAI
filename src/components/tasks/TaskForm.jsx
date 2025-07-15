@@ -30,7 +30,7 @@ const getCategories = (t) => [
 ];
 
 export default function TaskForm({ task, onSubmit, onCancel }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [formData, setFormData] = useState({
     title: task?.title || "",
     description: task?.description || "",
@@ -78,8 +78,20 @@ export default function TaskForm({ task, onSubmit, onCancel }) {
   const getAITags = async () => {
     setIsGettingTags(true);
     try {
+      const currentLang = i18n.language;
+      const languageMap = {
+        'he': 'Hebrew',
+        'ru': 'Russian',
+        'en': 'English'
+      };
+      const responseLang = languageMap[currentLang] || 'English';
+      
       const result = await InvokeLLM({
-        prompt: `Generate 3 relevant tags in Hebrew for the task: "${formData.title}". Respond with a JSON object containing a "tags" array.`,
+        prompt: `Generate 3 relevant tags for the task: "${formData.title}". 
+
+IMPORTANT: You MUST respond ONLY in ${responseLang} language. All tags must be written in ${responseLang}.
+
+Respond with a JSON object containing a "tags" array.`,
         response_json_schema: {
           type: "object",
           properties: {
@@ -153,15 +165,24 @@ export default function TaskForm({ task, onSubmit, onCancel }) {
     setSelectedAiSubtasks({});
 
     try {
+      const currentLang = i18n.language;
+      const languageMap = {
+        'he': 'Hebrew',
+        'ru': 'Russian',
+        'en': 'English'
+      };
+      const responseLang = languageMap[currentLang] || 'English';
+      const descriptionText = formData.description ? ` Description: ${formData.description}` : '';
+      
       const result = await InvokeLLM({
-        prompt: `אני צריך עזרה עם המשימה הבאה: "${formData.title}". ${formData.description ? `תיאור: ${formData.description}` : ''}
-        
-        אנא ספק לי:
-        1. הערכת זמן מדויקת (בדקות)
-        2. רמת קושי (1-10)
-        3. הצעה לפירוק המשימה למשימות משנה קטנות יותר (מקסימום 5)
-        
-        תמיד תענה בעברית.`,
+        prompt: `I need help with the following task: "${formData.title}".${descriptionText}
+
+Please provide me with:
+1. Accurate time estimate (in minutes)
+2. Difficulty level (1-10)
+3. Suggestion to break down the task into smaller sub-tasks (maximum 5)
+
+IMPORTANT: You MUST respond ONLY in ${responseLang} language. All content must be written in ${responseLang}.`,
         response_json_schema: {
           type: "object",
           properties: {
@@ -199,8 +220,21 @@ export default function TaskForm({ task, onSubmit, onCancel }) {
     setIsRefiningSubtasks(true);
     try {
         const subtasksString = formData.subtasks.map(s => s.title).join(', ');
+        
+        const currentLang = i18n.language;
+        const languageMap = {
+          'he': 'Hebrew',
+          'ru': 'Russian',
+          'en': 'English'
+        };
+        const responseLang = languageMap[currentLang] || 'English';
+        
+        const prompt = `Based on the main task "${formData.title}" and current subtasks list [${subtasksString}], please break down the subtasks to a more detailed level, create a new and more accurate list of subtasks.
+
+IMPORTANT: You MUST respond ONLY in ${responseLang} language. All subtasks must be written in ${responseLang}.`;
+        
         const result = await InvokeLLM({
-            prompt: `בהתבסס על המשימה הראשית "${formData.title}" ורשימת תתי המשימות הנוכחית [${subtasksString}], פרק בבקשה את תתי המשימות לרמה מפורטת יותר, צור רשימה חדשה ומדויקת יותר של תתי משימות. תמיד תענה בעברית.`,
+            prompt: prompt,
             response_json_schema: {
               type: "object",
               properties: {
@@ -230,16 +264,28 @@ export default function TaskForm({ task, onSubmit, onCancel }) {
     
     setIsGettingAdvice(true);
     try {
+      const currentLang = i18n.language;
+      const languageMap = {
+        'he': 'Hebrew',
+        'ru': 'Russian',
+        'en': 'English'
+      };
+      const responseLang = languageMap[currentLang] || 'English';
+      const description = formData.description ? ` Description: ${formData.description}` : '';
+      
+      const prompt = `I need practical advice on how to complete the task: "${formData.title}".${description}
+
+Give me:
+1. 3-5 practical and concrete tips on how to approach the task
+2. A list of recommended actions that will help me succeed
+3. Effective ways to deal with possible difficulties
+4. Tips to stay focused and motivated
+
+IMPORTANT: You MUST respond ONLY in ${responseLang} language. All advice must be written in ${responseLang}.
+Be friendly and practical in your response.`;
+      
       const result = await InvokeLLM({
-        prompt: `אני צריך עצות מעשיות איך להשלים את המשימה: "${formData.title}". ${formData.description ? `תיאור: ${formData.description}` : ''}
-
-תן לי:
-1. 3-5 עצות מעשיות וקונקרטיות איך לגשת למשימה
-2. רשימת פעולות מומלצות שיעזרו לי להצליח
-3. דרכים יעילות להתמודד עם קשיים אפשריים
-4. טיפים להישאר ממוקד ומוטיבציה
-
-תמיד תענה בעברית בצורה ידידותית ומעשית.`,
+        prompt: prompt,
         response_json_schema: {
           type: "object",
           properties: {
@@ -265,12 +311,22 @@ export default function TaskForm({ task, onSubmit, onCancel }) {
     setIsAddingMoreSubtasks(true);
     try {
       const existingSubtasks = formData.subtasks.map(s => s.title).join(', ');
-      const result = await InvokeLLM({
-        prompt: `למשימה "${formData.title}" יש לי כבר את משימות המשנה הבאות: [${existingSubtasks}]. 
-        
-תציע לי עוד 3-5 רעיונות למשימות משנה שיכולות לעזור להשלים את המשימה בצורה טובה יותר. הרעיונות צריכים להיות משלימים ולא חוזרים על מה שכבר יש.
+      const currentLang = i18n.language;
+      const languageMap = {
+        'he': 'Hebrew',
+        'ru': 'Russian',
+        'en': 'English'
+      };
+      const responseLang = languageMap[currentLang] || 'English';
+      
+      const prompt = `For the task "${formData.title}" I already have the following subtasks: [${existingSubtasks}]. 
+      
+Suggest 3-5 more subtask ideas that can help complete the task better. The ideas should be complementary and not repeat what's already there.
 
-תמיד תענה בעברית.`,
+IMPORTANT: You MUST respond ONLY in ${responseLang} language. All subtasks must be written in ${responseLang}.`;
+      
+      const result = await InvokeLLM({
+        prompt: prompt,
         response_json_schema: {
           type: "object",
           properties: {

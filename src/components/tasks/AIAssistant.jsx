@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { InvokeLLM } from "@/api/integrations";
+import { useTranslation } from "react-i18next";
 import { 
   Sparkles, 
   MessageCircle, 
@@ -16,6 +17,7 @@ import {
 } from "lucide-react";
 
 export default function AIAssistant({ onTaskCreate, onClose }) {
+  const { t, i18n } = useTranslation();
   const [message, setMessage] = useState("");
   const [conversation, setConversation] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -30,20 +32,29 @@ export default function AIAssistant({ onTaskCreate, onClose }) {
     setIsLoading(true);
 
     try {
+      const currentLang = i18n.language;
+      const languageMap = {
+        'he': 'Hebrew',
+        'ru': 'Russian',
+        'en': 'English'
+      };
+      const responseLang = languageMap[currentLang] || 'English';
+      
       const result = await InvokeLLM({
-        prompt: `אתה עוזר AI מתקדם למנהל משימות. המשתמש כתב: "${message}"
-        
-        תן תשובה מועילה ומעשית. אם המשתמש מבקש עזרה ביצירת משימות, פירוק משימות גדולות, או תכנון זמנים - תספק הצעות קונקרטיות.
-        
-        אם אתה מציע משימות, תכלול:
-        1. כותרת ברורה
-        2. תיאור קצר
-        3. הערכת זמן בדקות
-        4. רמת קושי (1-10)
-        5. קטגוריה מתאימה
-        6. עדיפות
-        
-        תמיד תענה בעברית בצורה ידידותית ומעודדת.`,
+        prompt: `You are an advanced AI assistant for task manager. The user wrote: "${message}"
+
+Give a helpful and practical answer. If the user asks for help creating tasks, breaking down large tasks, or planning time - provide concrete suggestions.
+
+If you suggest tasks, include:
+1. Clear title
+2. Brief description
+3. Time estimate in minutes
+4. Difficulty level (1-10)
+5. Appropriate category
+6. Priority
+
+IMPORTANT: You MUST respond ONLY in ${responseLang} language. Your entire response must be in ${responseLang}.
+Be friendly and encouraging in your response.`,
         response_json_schema: {
           type: "object",
           properties: {
@@ -74,7 +85,7 @@ export default function AIAssistant({ onTaskCreate, onClose }) {
       }
     } catch (error) {
       console.error("Error with AI assistant:", error);
-      const errorMessage = { type: "ai", content: "מצטער, אירעה שגיאה. אנא נסה שוב." };
+      const errorMessage = { type: "ai", content: t('ai.error') };
       setConversation(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
@@ -90,11 +101,11 @@ export default function AIAssistant({ onTaskCreate, onClose }) {
   };
 
   const quickPrompts = [
-    "עזור לי לתכנן את היום שלי",
-    "איך אני יכול לשפר את הפרודוקטיביות שלי?",
-    "תן לי משימות למטרת בריאות",
-    "עזור לי לפרק פרויקט גדול למשימות קטנות",
-    "תמליץ על משימות למטרת למידה"
+    t('ai.quickPrompts.planDay'),
+    t('ai.quickPrompts.improveProductivity'),
+    t('ai.quickPrompts.healthTasks'),
+    t('ai.quickPrompts.breakDownProject'),
+    t('ai.quickPrompts.learningTasks')
   ];
 
   return (
@@ -105,7 +116,7 @@ export default function AIAssistant({ onTaskCreate, onClose }) {
             <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center">
               <Sparkles className="w-4 h-4 text-white" />
             </div>
-            <span>עוזר AI</span>
+            <span>{t('ai.assistant')}</span>
           </div>
           <Button variant="ghost" size="icon" onClick={onClose}>
             <X className="w-5 h-5" />
@@ -116,7 +127,7 @@ export default function AIAssistant({ onTaskCreate, onClose }) {
         {/* Quick Prompts */}
         {conversation.length === 0 && (
           <div className="space-y-3">
-            <p className="text-sm text-gray-600">בחר שאלה מהירה או כתב שאלה משלך:</p>
+            <p className="text-sm text-gray-600">{t('ai.quickPromptPlaceholder')}</p>
             <div className="flex flex-wrap gap-2">
               {quickPrompts.map((prompt, index) => (
                 <Button
@@ -155,7 +166,7 @@ export default function AIAssistant({ onTaskCreate, onClose }) {
           <div className="space-y-3">
             <h4 className="font-medium flex items-center gap-2">
               <Target className="w-4 h-4" />
-              משימות מוצעות
+              {t('ai.suggestedTasks')}
             </h4>
             <div className="space-y-2">
               {suggestedTasks.map((task, index) => (
@@ -167,17 +178,17 @@ export default function AIAssistant({ onTaskCreate, onClose }) {
                       onClick={() => handleCreateTask(task)}
                       className="bg-green-600 hover:bg-green-700"
                     >
-                      צור משימה
+                      {t('ai.createTask')}
                     </Button>
                   </div>
                   <p className="text-sm text-gray-600 mb-2">{task.description}</p>
                   <div className="flex flex-wrap gap-1">
                     <Badge variant="outline" className="text-xs">
                       <Clock className="w-3 h-3 mr-1" />
-                      {task.estimated_time} דקות
+                      {task.estimated_time} {t('ai.minutes')}
                     </Badge>
                     <Badge variant="outline" className="text-xs">
-                      קושי: {task.difficulty}/10
+                      {t('ai.difficulty')}: {task.difficulty}/10
                     </Badge>
                     <Badge variant="outline" className="text-xs">
                       {task.category}
@@ -197,7 +208,7 @@ export default function AIAssistant({ onTaskCreate, onClose }) {
           <Input
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            placeholder="שאל אותי כל שאלה..."
+            placeholder={t('ai.askMeAnything')}
             onKeyPress={(e) => e.key === 'Enter' && !isLoading && handleSendMessage()}
             disabled={isLoading}
           />
