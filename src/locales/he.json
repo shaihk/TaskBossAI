@@ -4,7 +4,8 @@
     "tasks": "משימות",
     "goals": "יעדים",
     "achievements": "הישגים",
-    "profile": "פרופיל"
+    "profile": "פרופיל",
+    "videoFaceExtraction": "חילוץ פרצופים מוידאו"
   },
   "home": {
     "welcome": "ברוך הבא, {{username}}!",
@@ -445,5 +446,23 @@
   },
   "app": {
     "name": "TaskBoss-AI"
+  },
+  "videoFaceExtraction": {
+    "title": "חילוץ פרצופים מוידאו",
+    "description": "העלה קובץ וידאו וחלץ תמונות פנים ייחודיות לכל אדם שזוהה בוידאו",
+    "selectVideo": "בחר קובץ וידאו",
+    "changeVideo": "שנה וידאו",
+    "frameRate": "קצב פריימים",
+    "framesPerSecond": "פריימים לשנייה",
+    "frameRateHelp": "קצב גבוה יותר = דיוק גבוה יותר אך עיבוד איטי יותר",
+    "maxFaces": "מספר פרצופים מקסימלי",
+    "maxFacesHelp": "מספר מקסימלי של פרצופים ייחודיים לחילוץ",
+    "extractFaces": "חלץ פרצופים",
+    "processing": "מעבד וידאו...",
+    "extractedFaces": "פרצופים שחולצו",
+    "downloadAll": "הורד הכל",
+    "face": "פנים",
+    "confidence": "ודאות",
+    "processAnother": "עבד וידאו נוסף"
   }
 }

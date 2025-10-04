@@ -2,6 +2,16 @@
 
 TaskBoss-AI is a comprehensive task and goal management application with AI-powered assistance. The application uses React for the frontend, Express.js for the backend, and SQLite for data storage.
 
+## ✨ Features
+
+- **Task Management**: Create, organize, and track tasks with AI assistance
+- **Goal Tracking**: Set and monitor progress toward your goals
+- **Achievements System**: Earn badges and rewards for completing tasks
+- **User Profiles**: Customize your profile and track statistics
+- **Video Face Extraction**: Upload videos and automatically extract unique face photos (NEW!)
+- **Multi-language Support**: English, Hebrew, and Russian
+- **Dark Mode**: Eye-friendly dark theme support
+
 ## 🚀 Quick Start
 
 ### Local Development (Windows)
@@ -157,6 +167,9 @@ TaskBoss-AI uses SQLite for data storage with the following tables:
 
 For comprehensive VPS deployment instructions, troubleshooting, and advanced configuration, see:
 **[VPS-SETUP-GUIDE.md](VPS-SETUP-GUIDE.md)**
+
+For information about the Video Face Extraction feature, see:
+**[VIDEO_FACE_EXTRACTION.md](VIDEO_FACE_EXTRACTION.md)**
 
 This guide includes:
 - Step-by-step installation process

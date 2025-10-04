@@ -176,23 +176,27 @@ button:focus-visible {
 /* Mobile optimizations for task cards */
 @media (max-width: 640px) {
   .mobile-task-card {
-    @apply rounded-lg;
+    border-radius: 0.5rem;
   }
   
   .mobile-task-card .mobile-actions {
-    @apply justify-end mt-2;
+    justify-content: flex-end;
+    margin-top: 0.5rem;
   }
   
   /* Reduce font sizes on mobile */
   .mobile-task-card h3 {
-    @apply text-sm;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
   }
   
   .mobile-task-card p {
-    @apply text-xs;
+    font-size: 0.75rem;
+    line-height: 1rem;
   }
   
   .mobile-task-card .text-sm {
-    @apply text-xs;
+    font-size: 0.75rem;
+    line-height: 1rem;
   }
 }

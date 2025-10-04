@@ -5,10 +5,13 @@ const cors = require('cors');
 const path = require('path');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const multer = require('multer');
+const fs = require('fs');
 const { OpenAI } = require('openai');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const { initializeDatabase, dbHelpers, getDatabase } = require('./database');
 const { migrateAddDescription } = require('./migrate-add-description');
+const { extractUniqueFaces } = require('./videoFaceExtraction');
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -18,7 +21,30 @@ app.use(cors({
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+
+// Configure multer for video uploads
+const upload = multer({
+    dest: path.join(__dirname, 'temp/uploads'),
+    limits: {
+        fileSize: 100 * 1024 * 1024 // 100MB limit
+    },
+    fileFilter: (req, file, cb) => {
+        // Accept video files only
+        if (file.mimetype.startsWith('video/')) {
+            cb(null, true);
+        } else {
+            cb(new Error('Only video files are allowed'), false);
+        }
+    }
+});
+
+// Ensure temp directory exists
+const tempDir = path.join(__dirname, 'temp/uploads');
+if (!fs.existsSync(tempDir)) {
+    fs.mkdirSync(tempDir, { recursive: true });
+}
 
 // Serve static files from React build
 app.use(express.static(path.join(__dirname, '../dist')));
@@ -762,6 +788,57 @@ app.get('/api/models/available', authenticateToken, async (req, res) => {
     } catch (error) {
         console.error('Error getting available models:', error);
         res.status(500).json({ error: 'Failed to get available models' });
+    }
+});
+
+// Video face extraction endpoint
+app.post('/api/video/extract-faces', authenticateToken, upload.single('video'), async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ error: 'No video file uploaded' });
+        }
+        
+        console.log(`📹 Processing video: ${req.file.originalname}`);
+        
+        // Extract options from request
+        const options = {
+            frameRate: parseFloat(req.body.frameRate) || 1,
+            similarityThreshold: parseFloat(req.body.similarityThreshold) || 0.6,
+            maxFaces: parseInt(req.body.maxFaces) || 50
+        };
+        
+        // Extract faces from video
+        const faces = await extractUniqueFaces(req.file.path, options);
+        
+        // Clean up uploaded video file
+        try {
+            fs.unlinkSync(req.file.path);
+        } catch (error) {
+            console.error('Error deleting uploaded video:', error);
+        }
+        
+        res.json({
+            success: true,
+            facesCount: faces.length,
+            faces: faces
+        });
+        
+    } catch (error) {
+        console.error('Error extracting faces from video:', error);
+        
+        // Clean up uploaded file on error
+        if (req.file && fs.existsSync(req.file.path)) {
+            try {
+                fs.unlinkSync(req.file.path);
+            } catch (cleanupError) {
+                console.error('Error deleting uploaded video:', cleanupError);
+            }
+        }
+        
+        res.status(500).json({ 
+            error: 'Failed to extract faces from video',
+            details: error.message 
+        });
     }
 });
 

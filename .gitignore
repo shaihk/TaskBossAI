@@ -50,3 +50,5 @@ db.json.backup
 *.tmp
 *.temp
 .cache/
+server/temp/
+server/models/
