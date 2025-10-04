@@ -4,7 +4,8 @@
     "tasks": "Tasks",
     "goals": "Goals",
     "achievements": "Achievements",
-    "profile": "Profile"
+    "profile": "Profile",
+    "videoFaceExtraction": "Video Face Extraction"
   },
   "home": {
     "welcome": "Welcome, {{username}}!",
@@ -457,5 +458,23 @@
     "notEnoughData": "Not enough data yet",
     "dailyGoalStreak": "Daily Goal Streak",
     "consecutiveDays": "Consecutive days of goal completion"
+  },
+  "videoFaceExtraction": {
+    "title": "Video Face Extraction",
+    "description": "Upload a video file and extract unique face photos for each person detected in the video",
+    "selectVideo": "Select Video File",
+    "changeVideo": "Change Video",
+    "frameRate": "Frame Rate",
+    "framesPerSecond": "frames/second",
+    "frameRateHelp": "Higher frame rate = more accurate but slower processing",
+    "maxFaces": "Maximum Faces",
+    "maxFacesHelp": "Maximum number of unique faces to extract",
+    "extractFaces": "Extract Faces",
+    "processing": "Processing video...",
+    "extractedFaces": "Extracted Faces",
+    "downloadAll": "Download All",
+    "face": "Face",
+    "confidence": "confidence",
+    "processAnother": "Process Another Video"
   }
 }

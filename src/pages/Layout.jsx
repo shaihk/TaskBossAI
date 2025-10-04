@@ -34,6 +34,7 @@ const getNavigationItems = (t) => [
   { name: t("nav.tasks"), url: createPageUrl("Tasks"), icon: CheckSquare },
   { name: t("nav.achievements"), url: createPageUrl("Achievements"), icon: Trophy },
   { name: t("nav.profile"), url: createPageUrl("Profile"), icon: User },
+  { name: t("nav.videoFaceExtraction", "Video Face Extraction"), url: createPageUrl("VideoFaceExtraction"), icon: Sparkles },
 ];
 
 export default function Layout({ children, currentPageName }) {

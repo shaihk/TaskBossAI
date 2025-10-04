@@ -10,6 +10,8 @@ import Achievements from "./Achievements";
 
 import Profile from "./Profile";
 
+import VideoFaceExtraction from "./VideoFaceExtraction";
+
 import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { ThemeProvider } from '@/context/ThemeContext';
@@ -26,6 +28,8 @@ const PAGES = {
     Achievements: Achievements,
     
     Profile: Profile,
+    
+    VideoFaceExtraction: VideoFaceExtraction,
     
 }
 
@@ -63,6 +67,8 @@ function PagesContent() {
                 <Route path="/Achievements" element={<Achievements />} />
                 
                 <Route path="/Profile" element={<Profile />} />
+                
+                <Route path="/VideoFaceExtraction" element={<VideoFaceExtraction />} />
                 
             </Routes>
         </Layout>
