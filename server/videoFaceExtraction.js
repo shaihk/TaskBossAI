@@ -1,7 +1,7 @@
 const ffmpeg = require('fluent-ffmpeg');
 const ffmpegPath = require('ffmpeg-static');
 const canvas = require('canvas');
-const faceapi = require('@vladmandic/face-api');
+const faceapi = require('face-api.js');
 const fs = require('fs');
 const path = require('path');
 const { Canvas, Image, ImageData } = canvas;
