@@ -99,6 +99,37 @@ function initializeDatabase() {
                     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                     FOREIGN KEY (user_id) REFERENCES users (id)
                 )
+            `);
+
+            // Gmail credentials table
+            db.run(`
+                CREATE TABLE IF NOT EXISTS gmail_credentials (
+                    id INTEGER PRIMARY KEY,
+                    user_id INTEGER UNIQUE,
+                    access_token TEXT NOT NULL,
+                    refresh_token TEXT NOT NULL,
+                    token_expiry DATETIME,
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (user_id) REFERENCES users (id)
+                )
+            `);
+
+            // Downloaded invoices table
+            db.run(`
+                CREATE TABLE IF NOT EXISTS downloaded_invoices (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id INTEGER NOT NULL,
+                    email_id TEXT NOT NULL,
+                    sender TEXT,
+                    subject TEXT,
+                    date TEXT,
+                    filename TEXT,
+                    file_path TEXT,
+                    file_size INTEGER,
+                    downloaded_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (user_id) REFERENCES users (id)
+                )
             `, (err) => {
                 if (err) {
                     console.error('Error creating tables:', err);
@@ -411,6 +442,72 @@ const dbHelpers = {
             values.push(id, userId);
             
             db.run(`UPDATE user_stats SET ${fields} WHERE id = ? AND user_id = ?`, values, function(err) {
+                if (err) reject(err);
+                else resolve({ changes: this.changes });
+            });
+        });
+    },
+
+    // Gmail Credentials
+    createGmailCredentials: (db, credentials) => {
+        return new Promise((resolve, reject) => {
+            const stmt = db.prepare(`
+                INSERT OR REPLACE INTO gmail_credentials (user_id, access_token, refresh_token, token_expiry, updated_at)
+                VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+            `);
+            stmt.run([credentials.user_id, credentials.access_token, credentials.refresh_token, credentials.token_expiry], function(err) {
+                if (err) reject(err);
+                else resolve({ id: this.lastID, ...credentials });
+            });
+            stmt.finalize();
+        });
+    },
+
+    getGmailCredentials: (db, userId) => {
+        return new Promise((resolve, reject) => {
+            db.get('SELECT * FROM gmail_credentials WHERE user_id = ?', [userId], (err, row) => {
+                if (err) reject(err);
+                else resolve(row);
+            });
+        });
+    },
+
+    deleteGmailCredentials: (db, userId) => {
+        return new Promise((resolve, reject) => {
+            db.run('DELETE FROM gmail_credentials WHERE user_id = ?', [userId], function(err) {
+                if (err) reject(err);
+                else resolve({ changes: this.changes });
+            });
+        });
+    },
+
+    // Downloaded Invoices
+    createInvoice: (db, invoice) => {
+        return new Promise((resolve, reject) => {
+            const stmt = db.prepare(`
+                INSERT INTO downloaded_invoices (user_id, email_id, sender, subject, date, filename, file_path, file_size)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            `);
+            stmt.run([invoice.user_id, invoice.email_id, invoice.sender, invoice.subject, invoice.date, invoice.filename, invoice.file_path, invoice.file_size], function(err) {
+                if (err) reject(err);
+                else resolve({ id: this.lastID, ...invoice });
+            });
+            stmt.finalize();
+        });
+    },
+
+    getInvoicesByUserId: (db, userId) => {
+        return new Promise((resolve, reject) => {
+            db.all('SELECT * FROM downloaded_invoices WHERE user_id = ? ORDER BY downloaded_at DESC', [userId], (err, rows) => {
+                if (err) reject(err);
+                else resolve(rows);
+            });
+        });
+    },
+
+    deleteInvoice: (db, id, userId) => {
+        return new Promise((resolve, reject) => {
+            db.run('DELETE FROM downloaded_invoices WHERE id = ? AND user_id = ?', [id, userId], function(err) {
                 if (err) reject(err);
                 else resolve({ changes: this.changes });
             });
