@@ -1,6 +1,7 @@
 const { google } = require('googleapis');
 const fs = require('fs').promises;
 const path = require('path');
+const sanitizeFilename = require('sanitize-filename');
 
 // Gmail OAuth2 Configuration
 const SCOPES = ['https://www.googleapis.com/auth/gmail.readonly'];
@@ -169,16 +170,19 @@ async function downloadAttachment(gmail, messageId, attachmentId, filename, down
         // Ensure download directory exists
         await fs.mkdir(downloadPath, { recursive: true });
         
+        // Sanitize filename to prevent path traversal attacks
+        const safeFilename = sanitizeFilename(filename, { replacement: '_' });
+        
         // Create unique filename to avoid collisions
         const timestamp = Date.now();
-        const safeFilename = filename.replace(/[^a-zA-Z0-9.-]/g, '_');
-        const filePath = path.join(downloadPath, `${timestamp}_${safeFilename}`);
+        const finalFilename = `${timestamp}_${safeFilename}`;
+        const filePath = path.join(downloadPath, finalFilename);
         
         await fs.writeFile(filePath, data);
         
         return {
             filePath,
-            filename: `${timestamp}_${safeFilename}`,
+            filename: finalFilename,
             size: data.length
         };
     } catch (error) {

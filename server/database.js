@@ -102,6 +102,8 @@ function initializeDatabase() {
             `);
 
             // Gmail credentials table
+            // UNIQUE constraint on user_id ensures one Gmail connection per user
+            // The createGmailCredentials function uses INSERT OR REPLACE to handle reconnections
             db.run(`
                 CREATE TABLE IF NOT EXISTS gmail_credentials (
                     id INTEGER PRIMARY KEY,

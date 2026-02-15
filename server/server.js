@@ -3,6 +3,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs').promises;
+const fsSync = require('fs');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { OpenAI } = require('openai');
@@ -877,15 +879,13 @@ app.get('/api/settings/keys', authenticateToken, async (req, res) => {
 app.post('/api/settings/keys', authenticateToken, async (req, res) => {
     try {
         const { openai, gemini: geminiApiKey } = req.body;
-        const fs = require('fs');
-        const path = require('path');
         
         // Read current .env file
         const envPath = path.join(__dirname, '../.env');
         let envContent = '';
         
-        if (fs.existsSync(envPath)) {
-            envContent = fs.readFileSync(envPath, 'utf8');
+        if (fsSync.existsSync(envPath)) {
+            envContent = fsSync.readFileSync(envPath, 'utf8');
         }
         
         // Update environment variables
@@ -914,11 +914,11 @@ app.post('/api/settings/keys', authenticateToken, async (req, res) => {
         }
         
         // Write updated .env file
-        fs.writeFileSync(envPath, envContent);
+        fsSync.writeFileSync(envPath, envContent);
         
         // Also update server/.env file
         const serverEnvPath = path.join(__dirname, '.env');
-        fs.writeFileSync(serverEnvPath, envContent);
+        fsSync.writeFileSync(serverEnvPath, envContent);
         
         res.json({ message: 'API keys updated successfully' });
     } catch (error) {
@@ -1165,7 +1165,6 @@ app.delete('/api/invoices/:id', authenticateToken, async (req, res) => {
         }
 
         // Delete file if it exists
-        const fs = require('fs').promises;
         try {
             await fs.unlink(invoice.file_path);
         } catch (error) {
