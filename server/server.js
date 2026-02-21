@@ -3,12 +3,15 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs').promises;
+const fsSync = require('fs');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { OpenAI } = require('openai');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const { initializeDatabase, dbHelpers, getDatabase } = require('./database');
 const { migrateAddDescription } = require('./migrate-add-description');
+const gmailAgent = require('./gmail-agent');
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -876,15 +879,13 @@ app.get('/api/settings/keys', authenticateToken, async (req, res) => {
 app.post('/api/settings/keys', authenticateToken, async (req, res) => {
     try {
         const { openai, gemini: geminiApiKey } = req.body;
-        const fs = require('fs');
-        const path = require('path');
         
         // Read current .env file
         const envPath = path.join(__dirname, '../.env');
         let envContent = '';
         
-        if (fs.existsSync(envPath)) {
-            envContent = fs.readFileSync(envPath, 'utf8');
+        if (fsSync.existsSync(envPath)) {
+            envContent = fsSync.readFileSync(envPath, 'utf8');
         }
         
         // Update environment variables
@@ -913,11 +914,11 @@ app.post('/api/settings/keys', authenticateToken, async (req, res) => {
         }
         
         // Write updated .env file
-        fs.writeFileSync(envPath, envContent);
+        fsSync.writeFileSync(envPath, envContent);
         
         // Also update server/.env file
         const serverEnvPath = path.join(__dirname, '.env');
-        fs.writeFileSync(serverEnvPath, envContent);
+        fsSync.writeFileSync(serverEnvPath, envContent);
         
         res.json({ message: 'API keys updated successfully' });
     } catch (error) {
@@ -1016,6 +1017,188 @@ app.post('/api/test/openai', async (req, res) => {
             details: error.message,
             apiKey: process.env.OPENAI_API_KEY ? 'API key is set' : 'API key is missing'
         });
+    }
+});
+
+// ======================================
+// Gmail Invoice Agent Endpoints
+// ======================================
+
+// Get Gmail OAuth URL
+app.get('/api/gmail/auth-url', authenticateToken, async (req, res) => {
+    try {
+        const authUrl = gmailAgent.getAuthUrl();
+        res.json({ authUrl });
+    } catch (error) {
+        console.error('Error generating Gmail auth URL:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Handle Gmail OAuth callback
+app.post('/api/gmail/callback', authenticateToken, async (req, res) => {
+    try {
+        const { code } = req.body;
+        
+        if (!code) {
+            return res.status(400).json({ error: 'Authorization code is required' });
+        }
+
+        // Exchange code for tokens
+        const tokens = await gmailAgent.getTokensFromCode(code);
+        
+        // Store credentials in database
+        await dbHelpers.createGmailCredentials(db, {
+            user_id: req.user.id,
+            access_token: tokens.access_token,
+            refresh_token: tokens.refresh_token,
+            token_expiry: tokens.expiry_date ? new Date(tokens.expiry_date).toISOString() : null
+        });
+
+        res.json({ 
+            success: true, 
+            message: 'Gmail account connected successfully' 
+        });
+    } catch (error) {
+        console.error('Error handling Gmail callback:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Test Gmail connection
+app.get('/api/gmail/test', authenticateToken, async (req, res) => {
+    try {
+        const credentials = await dbHelpers.getGmailCredentials(db, req.user.id);
+        
+        if (!credentials) {
+            return res.status(404).json({ 
+                error: 'Gmail not connected. Please connect your Gmail account first.' 
+            });
+        }
+
+        const result = await gmailAgent.testConnection(
+            credentials.access_token,
+            credentials.refresh_token
+        );
+
+        res.json(result);
+    } catch (error) {
+        console.error('Error testing Gmail connection:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Download invoices from Gmail
+app.post('/api/gmail/download-invoices', authenticateToken, async (req, res) => {
+    try {
+        const { startDate, endDate, searchQuery } = req.body;
+        
+        // Validate required fields
+        if (!startDate || !endDate) {
+            return res.status(400).json({ 
+                error: 'Start date and end date are required' 
+            });
+        }
+
+        // Get Gmail credentials
+        const credentials = await dbHelpers.getGmailCredentials(db, req.user.id);
+        
+        if (!credentials) {
+            return res.status(404).json({ 
+                error: 'Gmail not connected. Please connect your Gmail account first.' 
+            });
+        }
+
+        console.log(`Downloading invoices for user ${req.user.id} from ${startDate} to ${endDate}`);
+
+        // Download invoices
+        const result = await gmailAgent.downloadInvoices(
+            credentials.access_token,
+            credentials.refresh_token,
+            startDate,
+            endDate,
+            searchQuery || '',
+            req.user.id
+        );
+
+        // Store invoice records in database
+        for (const invoice of result.invoices) {
+            await dbHelpers.createInvoice(db, {
+                user_id: req.user.id,
+                ...invoice
+            });
+        }
+
+        res.json({
+            success: result.success,
+            message: result.message,
+            count: result.invoices.length
+        });
+    } catch (error) {
+        console.error('Error downloading invoices:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Get list of downloaded invoices
+app.get('/api/invoices', authenticateToken, async (req, res) => {
+    try {
+        const invoices = await dbHelpers.getInvoicesByUserId(db, req.user.id);
+        res.json(invoices);
+    } catch (error) {
+        console.error('Error fetching invoices:', error);
+        res.status(500).json({ error: 'Server error fetching invoices' });
+    }
+});
+
+// Delete invoice record and file
+app.delete('/api/invoices/:id', authenticateToken, async (req, res) => {
+    try {
+        const invoiceId = parseInt(req.params.id);
+        
+        // Get invoice details first to delete the file
+        const invoices = await dbHelpers.getInvoicesByUserId(db, req.user.id);
+        const invoice = invoices.find(inv => inv.id === invoiceId);
+        
+        if (!invoice) {
+            return res.status(404).json({ error: 'Invoice not found' });
+        }
+
+        // Delete file if it exists
+        try {
+            await fs.unlink(invoice.file_path);
+        } catch (error) {
+            console.error('Error deleting file:', error);
+            // Continue even if file deletion fails
+        }
+
+        // Delete from database
+        const result = await dbHelpers.deleteInvoice(db, invoiceId, req.user.id);
+        
+        if (result.changes > 0) {
+            res.status(204).send();
+        } else {
+            res.status(404).json({ error: 'Invoice not found' });
+        }
+    } catch (error) {
+        console.error('Error deleting invoice:', error);
+        res.status(500).json({ error: 'Server error deleting invoice' });
+    }
+});
+
+// Disconnect Gmail account
+app.delete('/api/gmail/disconnect', authenticateToken, async (req, res) => {
+    try {
+        const result = await dbHelpers.deleteGmailCredentials(db, req.user.id);
+        
+        if (result.changes > 0) {
+            res.json({ success: true, message: 'Gmail account disconnected' });
+        } else {
+            res.status(404).json({ error: 'Gmail account not found' });
+        }
+    } catch (error) {
+        console.error('Error disconnecting Gmail:', error);
+        res.status(500).json({ error: 'Server error disconnecting Gmail' });
     }
 });
 

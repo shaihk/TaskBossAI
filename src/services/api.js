@@ -184,3 +184,67 @@ export const llmAPI = {
     return handleResponse(response);
   }
 };
+
+// Gmail Agent API
+export const gmailAPI = {
+  getAuthUrl: async () => {
+    const response = await fetch(`${API_BASE_URL}/api/gmail/auth-url`, {
+      headers: createAuthHeaders()
+    });
+    return handleResponse(response);
+  },
+
+  handleCallback: async (code) => {
+    const response = await fetch(`${API_BASE_URL}/api/gmail/callback`, {
+      method: 'POST',
+      headers: createAuthHeaders(),
+      body: JSON.stringify({ code })
+    });
+    return handleResponse(response);
+  },
+
+  testConnection: async () => {
+    const response = await fetch(`${API_BASE_URL}/api/gmail/test`, {
+      headers: createAuthHeaders()
+    });
+    return handleResponse(response);
+  },
+
+  downloadInvoices: async (startDate, endDate, searchQuery = '') => {
+    const response = await fetch(`${API_BASE_URL}/api/gmail/download-invoices`, {
+      method: 'POST',
+      headers: createAuthHeaders(),
+      body: JSON.stringify({ startDate, endDate, searchQuery })
+    });
+    return handleResponse(response);
+  },
+
+  disconnect: async () => {
+    const response = await fetch(`${API_BASE_URL}/api/gmail/disconnect`, {
+      method: 'DELETE',
+      headers: createAuthHeaders()
+    });
+    return handleResponse(response);
+  }
+};
+
+// Invoices API
+export const invoicesAPI = {
+  getAll: async () => {
+    const response = await fetch(`${API_BASE_URL}/api/invoices`, {
+      headers: createAuthHeaders()
+    });
+    return handleResponse(response);
+  },
+
+  delete: async (id) => {
+    const response = await fetch(`${API_BASE_URL}/api/invoices/${id}`, {
+      method: 'DELETE',
+      headers: createAuthHeaders()
+    });
+    if (response.status === 204) {
+      return { success: true };
+    }
+    return handleResponse(response);
+  }
+};
